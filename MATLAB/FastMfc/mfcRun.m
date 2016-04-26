@@ -27,9 +27,10 @@ fig = figure(1);
 legendString = {};
 hold on
 
-T = 1;
+T = 0.2;
 
-mfcDynamics = [20.8395  498.2432    2.0000    0.0412];
+% mfcDynamics = [20.8395  498.2432    2.0000    0.0412];
+mfcDynamics = [5.726117682433310 0.030299840936202];
 
 odeOptions = odeset('RelTol',1e-6,'AbsTol',1e-9);
 
@@ -38,15 +39,15 @@ waitBarHandler = waitbar(0);
 for j = 1 : length(S0)
   for i = 1 : length(Rext)
     if oDoBetaDif
-      [tt, Y] = ode15s('mfcModel', [0 T], mfcDynamics, odeOptions, S0(j), Rext(i) + beta(j));
+      [tt, Y] = ode15s('mfcModelFast', [0 T], mfcDynamics, odeOptions, S0(j), Rext(i) + beta(j));
       mfcDynamics = Y(end, :);
 
-      [dummy, Pout(i)] = mfcModel(T, mfcDynamics, odeOptions, S0(j), Rext(i) + beta(j));
+      [dummy, Pout(i)] = mfcModelFast(T, mfcDynamics, odeOptions, S0(j), Rext(i) + beta(j));
     else
-      [tt, Y] = ode15s('mfcModel', [0 T], mfcDynamics, odeOptions, S0(j), Rext(i));
+      [tt, Y] = ode15s('mfcModelFast', [0 T], mfcDynamics, odeOptions, S0(j), Rext(i));
       mfcDynamics = Y(end, :);
 
-      [dummy, Pout(i)] = mfcModel(T, mfcDynamics, odeOptions, S0(j), Rext(i));
+      [dummy, Pout(i)] = mfcModelFast(T, mfcDynamics, odeOptions, S0(j), Rext(i));
     end
     
     if oDoGammaDif
@@ -56,7 +57,7 @@ for j = 1 : length(S0)
     waitbar(i/length(Rext));
   end
   
-  mfcDynamics = [20.8395  498.2432    2.0000    0.0412];
+  mfcDynamics = [5.726117682433310 0.030299840936202];
 
   plot(Rext, Pout)
   max(Pout);
