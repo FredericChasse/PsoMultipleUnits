@@ -27,8 +27,11 @@ extern BOOL  oCaracMode
             ,oMultiUnitMode
             ,oMultiUnitDone
             ,oPsoMode
+            ,oPsoSeqMode
             ,oPsoDone
             ;
+
+extern UINT8 psoSeqCounter;
 
 UINT16 perturbation = 300;
 
@@ -90,6 +93,7 @@ sPsoValues_t psoValues =
   ,.objFnc            = {0}
   ,.previousObjFnc    = {0}
   ,.particleIndex     = {0}
+  ,.seqParticleIndex  = 2
   ,.pBestByte         = {0}
   ,.pBestFloat        = {0}
   ,.particleSpeed     = {0}
@@ -98,8 +102,8 @@ sPsoValues_t psoValues =
   ,.rMinByte          = 0
   ,.rMinFloat         = WIPER_VALUE
 //  ,.maxIteration      = 56
-  ,.maxIteration      = 224
-  ,.perturbIteration  = 100
+  ,.maxIteration      = 112
+  ,.perturbIteration  = 50
   ,.oChangeHasOccured = 0
   ,.oDoPerturb        = 0
   ,.detectPrecision   = 0.05
@@ -183,11 +187,22 @@ void SetPotInitialCondition (void)
     psoValues.nParticles = 3;
 //    psoValues.nParticles = 4;
     
+    psoSeqCounter = 0;
+    
+    if (oPsoSeqMode)
+    {
+      psoValues.seqParticleIndex = 7 + 2;
+    }
+    else
+    {
+      psoValues.seqParticleIndex = 0;
+    }
+    
     potDelta = (MAX_POT_VALUE - WIPER_VALUE) / (psoValues.nParticles + 1);
     
     psoValues.particleIndex[0] = 7 + 2;
-    psoValues.particleIndex[1] = 7 + 3;
-    psoValues.particleIndex[2] = 7 + 1;
+    psoValues.particleIndex[1] = 7 + 6;
+    psoValues.particleIndex[2] = 7 + 7;
 //    psoValues.particleIndex[3] = 7 + 8;
     
     for (i = 0; i < psoValues.nParticles; i++)

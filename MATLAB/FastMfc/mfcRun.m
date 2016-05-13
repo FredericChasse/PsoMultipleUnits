@@ -1,4 +1,4 @@
-clear all
+% clear all
 close all
 
 Rext = 50:1:200;
@@ -32,7 +32,8 @@ T = 0.2;
 % mfcDynamics = [20.8395  498.2432    2.0000    0.0412];
 mfcDynamics = [5.726117682433310 0.030299840936202];
 
-odeOptions = odeset('RelTol',1e-6,'AbsTol',1e-9);
+% odeOptions = odeset('RelTol',1e-6,'AbsTol',1e-9);
+odeOptions = odeset('RelTol',1e-9,'AbsTol',1e-12);
 
 tic
 waitBarHandler = waitbar(0);

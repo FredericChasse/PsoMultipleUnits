@@ -1,7 +1,9 @@
 % clear all
 close all
 
-nUnits = 6;
+nUnits = 4;
+
+S0 = zeros(nUnits,1);
 
 for i = 1 : nUnits
   S0(i,1) = 450;
@@ -45,7 +47,8 @@ for i = 1 : nUnits
 end
 % mfcDynamics = [5.726117682433310 0.030299840936202; 5.726117682433310 0.030299840936202];
 
-odeOptions = odeset('RelTol',1e-6,'AbsTol',1e-9);
+% odeOptions = odeset('RelTol',1e-6,'AbsTol',1e-9);
+odeOptions = odeset('RelTol',1e-9,'AbsTol',1e-12);
 
 tic
 waitBarHandler = waitbar(0);

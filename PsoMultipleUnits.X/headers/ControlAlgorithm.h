@@ -76,6 +76,7 @@ typedef struct sPsoValues
   UINT8 pBestByte[16];
   float pBestFloat[16];
   UINT8 particleIndex[16];
+  UINT8 seqParticleIndex;
   float previousObjFnc[16];
   float objFnc[16];
   float maxObjFnc;

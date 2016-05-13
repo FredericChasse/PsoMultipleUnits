@@ -33,7 +33,7 @@ extern const float potRealValuesInverse[256];
 extern UINT8 potIndexValue[16];
 extern UINT32 cellVoltageRaw[16];
 extern UINT16 nSamples;
-extern BOOL oSmoothData;
+extern BOOL oSmoothData, oPsoSeqMode;
 const float kFilter = 0.1;
 extern sUartFifoBuffer_t matlabData;
 extern BOOL oSendData;

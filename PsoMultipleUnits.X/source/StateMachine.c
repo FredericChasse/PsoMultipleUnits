@@ -28,6 +28,8 @@ extern volatile BOOL   oAdcReady
 
 extern UINT8 matlabPacketSize;
 
+extern const float potRealValuesInverse[256];
+
 BOOL  oSendData       = 0
      ,oNewSample      = 0
      ,oErrorFlag      = 0
@@ -35,10 +37,13 @@ BOOL  oSendData       = 0
      ,oCaracMode      = 1   // Caracterization by default
      ,oCaracDone      = 1
      ,oPsoMode        = 1
+     ,oPsoSeqMode     = 0
      ,oPsoDone        = 1
      ,oMultiUnitMode  = 0
      ,oMultiUnitDone  = 0
      ;
+
+UINT8 psoSeqCounter = 0;
 
 UINT16 dutyCycle = 500;
 
@@ -373,7 +378,7 @@ void StateAcq(void)
         
         oAdcReady       = 0;
       }
-      else if ( (buffer.buffer[0] == 'p') || (buffer.buffer[0] == 'P') )      // PSO mode
+      else if ( (buffer.buffer[0] == 'p') || (buffer.buffer[0] == 'P') || (buffer.buffer[0] == 'S') )      // PSO mode
       {
         oMatlabReady    = 1;
         
@@ -402,6 +407,17 @@ void StateAcq(void)
         else
         {
           psoValues.oDoPerturb = 0;
+        }
+        
+        if (buffer.buffer[0] == 'S')
+        {
+          psoValues.seqParticleIndex = 7 + 2;
+          oPsoSeqMode = 1;
+        }
+        else
+        {
+          oPsoSeqMode = 0;
+          psoValues.seqParticleIndex = 0;
         }
       }
       else if ( (buffer.buffer[0] == 'm') || (buffer.buffer[0] == 'M') )       // Multi-Unit mode
@@ -556,19 +572,32 @@ void StateCompute(void)
     }
     else if (oPsoMode)
     {
-      for (i = 0; i < psoValues.nParticles; i++)
+      if (!oPsoSeqMode)
       {
-        ComputeCellPower(psoValues.particleIndex[i], potIndexValue[psoValues.particleIndex[i]]);
+        for (i = 0; i < psoValues.nParticles; i++)
+        {
+          ComputeCellPower(psoValues.particleIndex[i], potIndexValue[psoValues.particleIndex[i]]);
+        }
+        ParticleSwarmOptimization();
       }
-//      ComputeCellPower(psoValues.particleIndex[0], potIndexValue[psoValues.particleIndex[0]]);
-//      ComputeCellPower(psoValues.particleIndex[1], potIndexValue[psoValues.particleIndex[1]]);
-////      ComputeCellPower(10, potIndexValue[10]);
-//      ComputeCellPower(psoValues.particleIndex[2], potIndexValue[psoValues.particleIndex[2]]);
-      
-//      UINT32 coreTickRate = Timer.Tic(1500, SCALE_US);
-      ParticleSwarmOptimization();
-//      testInt32 = Timer.Toc(1500, coreTickRate);
-//      testFloat = 0;
+      else
+      {
+//        ComputeCellPower(psoValues.seqParticleIndex, potIndexValue[psoValues.particleIndex[psoSeqCounter]]);
+        sCellValues.cells[psoValues.particleIndex[psoSeqCounter]].cellPowerFloat  = sCellValues.cells[psoValues.seqParticleIndex].cellVoltFloat 
+                                                                                  * sCellValues.cells[psoValues.seqParticleIndex].cellVoltFloat 
+                                                                                  * potRealValuesInverse[potIndexValue[psoValues.particleIndex[psoSeqCounter]]];
+        
+        if (psoSeqCounter < (psoValues.nParticles - 1))
+        {
+          SetPot(psoValues.seqParticleIndex, potIndexValue[psoValues.particleIndex[psoSeqCounter + 1]]);
+          psoSeqCounter++;
+        }
+        else
+        {
+          psoSeqCounter = 0;
+          ParticleSwarmOptimization();
+        }
+      }
     }
     else if (oMultiUnitMode)
     {

@@ -1,5 +1,5 @@
 %% clear variables and close figures
-% clear all
+clear all
 
 if ( ~exist('rngState', 'var') )
   rngState = rng;
@@ -102,7 +102,8 @@ if oDoPerturbDynamic
   clear t x
 end
 
-odeOptions = odeset('RelTol',1e-6,'AbsTol',1e-9);
+% odeOptions = odeset('RelTol',1e-6,'AbsTol',1e-9);
+odeOptions = odeset('RelTol',1e-9,'AbsTol',1e-12);
 
 T = 0.2;
 

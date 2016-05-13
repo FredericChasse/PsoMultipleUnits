@@ -1,5 +1,5 @@
 %% clear variables and close figures
-% clear all
+clear all
 
 if ( ~exist('rngState', 'var') )
   rngState = rng;
@@ -14,7 +14,7 @@ oFigures = 1;   %% 0 = don't print figures
 
 %% Simulation parameters
 
-nIterations = 200;
+nIterations = 30;
 nParticles  = 8;
 
 omega = 0.5;
@@ -27,8 +27,8 @@ end
 
 
 % Search space
-dmin        = 50;
-dmax        = 1050;
+dmin        = 200;
+dmax        = 1500;
 
 
 % RextResolution = (dmax-dmin)/255; % Ohms
@@ -102,11 +102,13 @@ if oDoPerturbDynamic
   clear t x
 end
 
-odeOptions = odeset('RelTol',1e-6,'AbsTol',1e-9);
+% odeOptions = odeset('RelTol',1e-6,'AbsTol',1e-9);
+odeOptions = odeset('RelTol',1e-9,'AbsTol',1e-12);
 
 T = 0.2;
 
 %% Simulation
+warning off
 tic
 waitBarHandler = waitbar(0);
 for iData = 1 : nIterations
@@ -115,8 +117,15 @@ for iData = 1 : nIterations
   
   % Curve (J)
   %========================================================================
-%   for iUnit = 1 : nParticles
-%     
+  for iUnit = 1 : nParticles
+    RextPv = d(iData, iUnit);
+    opt = simset('DstWorkspace', 'current');
+    sim('pvModel')
+    J(iData, iUnit) = PoutPv(end);
+    oPvModelDone = 0;
+%     while(~oPvModelDone)
+%     end
+    
 %     if (iUnit > 4) && (oDoBetaDif)
 %       [tt, Y] = ode15s('mfcModelFast', [0 T], mfcDynamics(iUnit, :), odeOptions, S0(iUnit, iData), d(iData, iUnit) + beta);
 %       mfcDynamics(iUnit,:) = Y(end, :);
@@ -130,17 +139,7 @@ for iData = 1 : nIterations
 %     if (iUnit > 4) && (oDoGammaDif)
 %       J(iData, iUnit) = J(iData, iUnit) + gamma;
 %     end
-%   end
-  
-  [tt, Y] = ode15s('mfcModelFastParallel', [0 T], mfcDynamics, odeOptions, S0(iUnit, iData), d(iData, iUnit));
-  mfcDynamics(iUnit,:) = Y(end, :);
-  [dummy, J(iData, iUnit)] = mfcModelFastParallel(T, mfcDynamics, odeOptions, S0(iUnit, iData), d(iData, iUnit));
-  
-  [tt, Y] = ode15s('mfcModelFastParallel', [0 T], mfcDynamics, odeOptions, S0(j), Rext(:, i), 0);
-  mfcDynamics = Y(end, :);
-
-  [dummy, Pout(:,i)] = mfcModelFastParallel(T, mfcDynamics, odeOptions, S0(j), Rext(:, i), 1);
-  
+  end
   %========================================================================
 
   % Global max values
@@ -295,6 +294,8 @@ for iData = 1 : nIterations
 end
 toc
 close(waitBarHandler)
+
+warning on
     
 %% Steady-state
 

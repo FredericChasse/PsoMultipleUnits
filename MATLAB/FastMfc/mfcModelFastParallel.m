@@ -54,9 +54,10 @@ else
 %   S   = y(:, 1)
 %   Mox = y(:, 2)
 %   xm = Xtot - Xeg
+%   keyboard
 end
 
-
+% keyboard
 
 %% Équations dynamiques
 
@@ -103,5 +104,7 @@ else
 
   % dy = [Sp; Moxp]';
   dy = [Sp; Moxp];
+  
+%   keyboard
   
 end
