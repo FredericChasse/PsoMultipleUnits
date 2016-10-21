@@ -15,7 +15,7 @@ oFigures = 1;   %% 0 = don't print figures
 %% Simulation parameters
 
 nIterations = 30;
-nParticles  = 8;
+nParticles  = 4;
 
 omega = 0.5;
 
@@ -27,8 +27,10 @@ end
 
 
 % Search space
-dmin        = 200;
-dmax        = 1500;
+% dmin        = 200;
+% dmax        = 1500;
+dmin        = 10;
+dmax        = 800;
 
 
 % RextResolution = (dmax-dmin)/255; % Ohms
@@ -56,6 +58,10 @@ Gbest       = zeros(nIterations, 1);
 c           = zeros(nIterations, 2);
 
 % Initial position of particles
+% d(1,1) = 500;
+% d(1,2) = 770;
+% d(1,3) = 105;
+% d(1,4) = 393;
 for iUnit = 1 : nParticles
   d(1, iUnit) = rand* (dmax-dmin) + dmin;
   tmp = abs(Rvalues - d(1, iUnit));
@@ -110,14 +116,18 @@ T = 0.2;
 %% Simulation
 warning off
 tic
-waitBarHandler = waitbar(0);
+% waitBarHandler = waitbar(0);
+waitbar1 = waitbar(0, 'Iteration', 'Units', 'normalized', 'Position', [0.25 0.4 0.25 0.051]);
+waitbar2 = waitbar(0, 'Particle' , 'Units', 'normalized', 'Position', [0.50 0.4 0.25 0.051]);
 for iData = 1 : nIterations
-
-  waitbar(iData/nIterations);
+  waitbar(iData/nIterations, waitbar1);
+%   waitbar(iData/nIterations);
   
   % Curve (J)
   %========================================================================
   for iUnit = 1 : nParticles
+    waitbar(iUnit/nParticles, waitbar2);
+    
     RextPv = d(iData, iUnit);
     opt = simset('DstWorkspace', 'current');
     sim('pvModel')
@@ -293,7 +303,8 @@ for iData = 1 : nIterations
   
 end
 toc
-close(waitBarHandler)
+close(waitbar1)
+close(waitbar2)
 
 warning on
     
@@ -330,6 +341,8 @@ if iStart ~= 1
 else
   iSteadyState;
 end
+
+iSteadyState
 
 %% Figures
 

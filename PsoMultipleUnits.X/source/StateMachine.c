@@ -288,25 +288,29 @@ void StateInit(void)
   
 //  UINT16 dutyCycle = 400;
   
-  SetLedDutyCycle( 0, dutyCycle);
-  SetLedDutyCycle( 1, dutyCycle);
-  SetLedDutyCycle( 2, dutyCycle);
-  SetLedDutyCycle( 3, dutyCycle);
+  SetLedDutyCycle( 1, 150);
+  SetLedDutyCycle(13, 200);
+  SetLedDutyCycle(14, 300);
   
-//  SetLedDutyCycle( 4, dutyCycle);
-//  SetLedDutyCycle( 5, dutyCycle);
-//  SetLedDutyCycle( 6, dutyCycle);
-//  SetLedDutyCycle( 7, dutyCycle);
-  
-//  SetLedDutyCycle( 8, dutyCycle);
-//  SetLedDutyCycle( 9, dutyCycle);
-//  SetLedDutyCycle(10, dutyCycle);
-//  SetLedDutyCycle(11, dutyCycle);
-  
-  SetLedDutyCycle(12, dutyCycle);
-  SetLedDutyCycle(13, dutyCycle);
-  SetLedDutyCycle(14, dutyCycle);
-  SetLedDutyCycle(15, dutyCycle);
+//  SetLedDutyCycle( 0, dutyCycle);
+//  SetLedDutyCycle( 1, dutyCycle);
+//  SetLedDutyCycle( 2, dutyCycle);
+//  SetLedDutyCycle( 3, dutyCycle);
+//  
+////  SetLedDutyCycle( 4, dutyCycle);
+////  SetLedDutyCycle( 5, dutyCycle);
+////  SetLedDutyCycle( 6, dutyCycle);
+////  SetLedDutyCycle( 7, dutyCycle);
+//  
+////  SetLedDutyCycle( 8, dutyCycle);
+////  SetLedDutyCycle( 9, dutyCycle);
+////  SetLedDutyCycle(10, dutyCycle);
+////  SetLedDutyCycle(11, dutyCycle);
+//  
+//  SetLedDutyCycle(12, dutyCycle);
+//  SetLedDutyCycle(13, dutyCycle);
+//  SetLedDutyCycle(14, dutyCycle);
+//  SetLedDutyCycle(15, dutyCycle);
 
 }
 
@@ -492,14 +496,19 @@ void StateAcq(void)
         
 //        UINT16 dutyCycle = 150;
         
-        SetLedDutyCycle( 0, dutyCycle);
-        SetLedDutyCycle( 1, dutyCycle);
-        SetLedDutyCycle( 2, dutyCycle);
-        SetLedDutyCycle( 3, dutyCycle);
-        SetLedDutyCycle(12, dutyCycle);
-        SetLedDutyCycle(13, dutyCycle);
-        SetLedDutyCycle(14, dutyCycle);
-        SetLedDutyCycle(15, dutyCycle);
+//        SetLedDutyCycle( 0, dutyCycle);
+//        SetLedDutyCycle( 1, dutyCycle);
+//        SetLedDutyCycle( 2, dutyCycle);
+//        SetLedDutyCycle( 3, dutyCycle);
+//        SetLedDutyCycle(12, dutyCycle);
+//        SetLedDutyCycle(13, dutyCycle);
+//        SetLedDutyCycle(14, dutyCycle);
+//        SetLedDutyCycle(15, dutyCycle);
+        
+        
+//        SetLedDutyCycle( 1, 150);
+//        SetLedDutyCycle(13, 200);
+//        SetLedDutyCycle(14, 300);
       }
     }
   }

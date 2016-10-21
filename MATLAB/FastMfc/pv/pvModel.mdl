@@ -7,7 +7,7 @@ Model {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.54"
+    ComputedModelVersion    "1.55"
     NumModelReferences	    0
     NumTestPointedSignals   0
   }
@@ -42,7 +42,7 @@ Model {
       $ObjectID		      3
       $ClassName	      "Simulink.WindowInfo"
       IsActive		      [1]
-      Location		      [141.0, 407.0, 2005.0, 1116.0]
+      Location		      [141.0, 407.0, 2005.0, 1092.0]
       Object {
 	$PropName		"ModelBrowserInfo"
 	$ObjectID		4
@@ -66,9 +66,9 @@ Model {
 	IsActive		[1]
 	ViewObjType		"SimulinkTopLevel"
 	LoadSaveID		"0"
-	Extents			[1949.0, 885.0]
-	ZoomFactor		[2.0]
-	Offset			[-47.900711285176016, -6.5761904761905043]
+	Extents			[1955.0, 893.0]
+	ZoomFactor		[1.0]
+	Offset			[-441.40071128517604, -52.576190476190504]
       }
     }
   }
@@ -81,9 +81,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "ironi"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Wed May 04 14:35:54 2016"
-  RTWModifiedTimeStamp	  384269431
-  ModelVersionFormat	  "1.%<AutoIncrement:54>"
+  LastModifiedDate	  "Sat Oct 15 16:49:59 2016"
+  RTWModifiedTimeStamp	  398450997
+  ModelVersionFormat	  "1.%<AutoIncrement:55>"
   ConfigurationManager	  "none"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -950,7 +950,7 @@ Model {
   }
   System {
     Name		    "pvModel"
-    Location		    [141, 407, 2146, 1523]
+    Location		    [141, 407, 2146, 1499]
     Open		    on
     ModelBrowserVisibility  off
     ModelBrowserWidth	    200
@@ -962,7 +962,7 @@ Model {
     TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
     TiledPageScale	    1
     ShowPageBoundaries	    off
-    ZoomFactor		    "200"
+    ZoomFactor		    "100"
     ReportName		    "simulink-default.rpt"
     SIDHighWatermark	    "95"
     Block {
@@ -1000,7 +1000,7 @@ Model {
       RequestExecContextInheritance off
       System {
 	Name			"PV "
-	Location		[141, 407, 2146, 1523]
+	Location		[141, 407, 2146, 1499]
 	Open			off
 	ModelBrowserVisibility	off
 	ModelBrowserWidth	200
@@ -1908,7 +1908,7 @@ Stateflow {
       "odule (°C)\n%----------------------------------------------------------------------\nk = 1.381e-23;      % cste "
       "de Boltzmann  \nq = 1.602e-19;      % charge electron \n% A = 1.81;           % facteur de idealité de la diode "
       "(1<A<2)\nA = 1.3;           % facteur de idealité de la diode (1<A<2)\nEg = 1.16;          % energie de bandgap "
-      "du semi-conducteur (eV)\n% Ns = 72;            % cellules en =\nNs = 1;            % cellules en =\nNp = 1;     "
+      "du semi-conducteur (eV)\n% Ns = 72;            % cellules en =\nNs = 4;            % cellules en =\nNp = 1;     "
       "          % cellules en //\nki=1.96e-3;         % Coefficient de température de court-circuit(A/°K)\n% Rs =2.48e"
       "-3;        % résistance serie(Ohm)\nRs =0.221;        % résistance serie(Ohm)\n% Rp = 8.7;           % résistanc"
       "e parallele(Ohm)\nRp = 50;           % résistance parallele(Ohm)\nTr =298.5;          % temperature de reference"

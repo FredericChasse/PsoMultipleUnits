@@ -16,7 +16,8 @@ end
 port = instrfind('Type', 'serial', 'Port', 'COM5', 'Tag', '');
 
 if isempty(port)
-    port = serial('COM5');
+%     port = serial('COM5');
+    port = serial('COM3');
 else
     fclose(port);
     port = port(1)
@@ -29,12 +30,12 @@ nSolarCells = 4;
 %% Matlab Mode
 global matlabMode;
 
-matlabMode = 'p';   % PSO
-% matlabMode = 'c';   % Caracterization
+% matlabMode = 'p';   % PSO
+matlabMode = 'c';   % Caracterization
 % matlabMode = 'm';   % Multi-Unit
 
 oDoPerturb = 0;
-oDoPerturb = 1;
+% oDoPerturb = 1;
 iPerturb   = 100;
 
 global psoData;

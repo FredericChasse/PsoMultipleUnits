@@ -7,7 +7,7 @@ Model {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.29"
+    ComputedModelVersion    "1.32"
     NumModelReferences	    0
     NumTestPointedSignals   0
   }
@@ -30,7 +30,7 @@ Model {
       $ObjectID		      2
       $ClassName	      "Simulink.WindowInfo"
       IsActive		      [1]
-      Location		      [-10.0, 0.0, 2894.0, 1570.0]
+      Location		      [-8.0, -8.0, 1936.0, 1056.0]
       Object {
 	$PropName		"ModelBrowserInfo"
 	$ObjectID		3
@@ -54,9 +54,9 @@ Model {
 	IsActive		[1]
 	ViewObjType		"SimulinkTopLevel"
 	LoadSaveID		"0"
-	Extents			[2838.0, 1339.0]
-	ZoomFactor		[2.0]
-	Offset			[0.0, 0.0]
+	Extents			[1886.0, 857.0]
+	ZoomFactor		[1.5]
+	Offset			[-117.33333333333337, -55.333333333333343]
       }
     }
   }
@@ -69,9 +69,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "ironi"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Tue May 03 18:58:59 2016"
-  RTWModifiedTimeStamp	  384202738
-  ModelVersionFormat	  "1.%<AutoIncrement:29>"
+  LastModifiedDate	  "Sat Oct 15 18:03:39 2016"
+  RTWModifiedTimeStamp	  398455418
+  ModelVersionFormat	  "1.%<AutoIncrement:32>"
   ConfigurationManager	  "none"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -186,7 +186,7 @@ Model {
 	  $ObjectID		  8
 	  Version		  "1.15.0"
 	  StartTime		  "0.0"
-	  StopTime		  "0.01"
+	  StopTime		  "0.005"
 	  AbsTol		  "auto"
 	  FixedStep		  "auto"
 	  InitialStep		  "auto"
@@ -978,7 +978,7 @@ Model {
   }
   System {
     Name		    "Khaldoun_Caracteristiques_PV"
-    Location		    [-10, 0, 2884, 1570]
+    Location		    [-8, -8, 1928, 1048]
     Open		    on
     ModelBrowserVisibility  off
     ModelBrowserWidth	    200
@@ -990,7 +990,7 @@ Model {
     TiledPaperMargins	    [0.500000, 0.500000, 0.500000, 0.500000]
     TiledPageScale	    1
     ShowPageBoundaries	    off
-    ZoomFactor		    "200"
+    ZoomFactor		    "150"
     ReportName		    "simulink-default.rpt"
     SIDHighWatermark	    "87"
     Block {
@@ -1016,7 +1016,6 @@ Model {
       SID		      "10"
       Position		      [70, 154, 95, 176]
       ZOrder		      -2
-      Value		      ".5"
     }
     Block {
       BlockType		      From
@@ -1090,7 +1089,7 @@ Model {
       RequestExecContextInheritance off
       System {
 	Name			"PV "
-	Location		[-10, 0, 2884, 1570]
+	Location		[-8, -8, 1928, 1048]
 	Open			off
 	ModelBrowserVisibility	off
 	ModelBrowserWidth	200
@@ -2177,7 +2176,7 @@ Stateflow {
       "odule (°C)\n%----------------------------------------------------------------------\nk = 1.381e-23;      % cste "
       "de Boltzmann  \nq = 1.602e-19;      % charge electron \n% A = 1.81;           % facteur de idealité de la diode "
       "(1<A<2)\nA = 1.3;           % facteur de idealité de la diode (1<A<2)\nEg = 1.16;          % energie de bandgap "
-      "du semi-conducteur (eV)\n% Ns = 72;            % cellules en =\nNs = 8;            % cellules en =\nNp = 1;     "
+      "du semi-conducteur (eV)\n% Ns = 72;            % cellules en =\nNs = 1;            % cellules en =\nNp = 1;     "
       "          % cellules en //\nki=1.96e-3;         % Coefficient de température de court-circuit(A/°K)\n% Rs =2.48e"
       "-3;        % résistance serie(Ohm)\nRs =0.221;        % résistance serie(Ohm)\n% Rp = 8.7;           % résistanc"
       "e parallele(Ohm)\nRp = 50;           % résistance parallele(Ohm)\nTr =298.5;          % temperature de reference"

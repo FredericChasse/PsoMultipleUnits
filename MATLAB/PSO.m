@@ -14,8 +14,8 @@ oFigures = 1;   %% 0 = don't print figures
 
 %% Simulation parameters
 
-% nIterations = 200;
-% nParticles  = 8;
+nParticles  = 8;
+nIterations = 200;
 
 omega = 0.5;
 
@@ -74,7 +74,7 @@ end
 % oDoPerturbStatic  = 0;
 % oDoPerturbDynamic = 0;
 % oDoGammaDif       = 0;
-% oDoBetaDif        = 1;
+% oDoBetaDif        = 0;
 % oDoGammaBetaDif   = 0;
 % gamma             = 0.0002;
 % beta              = 20;
