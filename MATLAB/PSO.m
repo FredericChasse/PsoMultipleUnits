@@ -1,5 +1,5 @@
 %% clear variables and close figures
-% clear all
+clear all
 
 % if ( ~exist('rngState', 'var') )
 %   rngState = rng;
@@ -7,7 +7,7 @@
 % clearvars -except rngState
 % rng(rngState);
 
-% close all
+close all
 % clc
 
 oFigures = 1;   %% 0 = don't print figures
@@ -15,7 +15,7 @@ oFigures = 1;   %% 0 = don't print figures
 %% Simulation parameters
 
 nParticles  = 8;
-nIterations = 200;
+nIterations = 75;
 
 omega = 0.5;
 
@@ -71,16 +71,16 @@ for i = 1:nParticles
   mfcDynamics(i,:) = [20.8395  498.2432    2.0000    0.0412];
 end
 
-% oDoPerturbStatic  = 0;
-% oDoPerturbDynamic = 0;
-% oDoGammaDif       = 0;
-% oDoBetaDif        = 0;
-% oDoGammaBetaDif   = 0;
-% gamma             = 0.0002;
-% beta              = 20;
-% 
-% iPerturb = 30;
-% perturbAmp = 300;
+oDoPerturbStatic  = 0;
+oDoPerturbDynamic = 0;
+oDoGammaDif       = 0;
+oDoBetaDif        = 0;
+oDoGammaBetaDif   = 0;
+gamma             = 0.0002;
+beta              = 20;
+
+iPerturb = 30;
+perturbAmp = 300;
 
 % S0 = ones(nParticles, nIterations) * 450;
 S0 = ones(nParticles, nIterations) * 300;
@@ -105,7 +105,7 @@ end
 odeOptions = odeset('RelTol',1e-6,'AbsTol',1e-9);
 % odeOptions = odeset('RelTol',1e-9,'AbsTol',1e-12);
 
-T = 2;
+T = .5;
 
 %% Simulation
 tic
@@ -191,11 +191,11 @@ for iData = 1 : nIterations
   % Acceleration coefficients (c)
   %========================================================================
   if (iData == 1)
-      c(1,1) = 2;   % Cognitive
-      c(1,2) = 1;     % Social
+      c(1,1) = 1;   % Cognitive
+      c(1,2) = 2;   % Social
   else
-      c(iData,1) = c(iData - 1,1) + 1/nIterations;
-      c(iData,2) = c(iData - 1,2) - 1/nIterations;
+      c(iData,1) = c(iData - 1,1);% + 1/nIterations;
+      c(iData,2) = c(iData - 1,2);% - 1/nIterations;
   end
   %========================================================================
   
