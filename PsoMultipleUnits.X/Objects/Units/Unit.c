@@ -15,6 +15,7 @@
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 #include "Unit.h"
+#include "StateMachine.h"
 
 
 // Private definitions
@@ -34,12 +35,13 @@ typedef struct
 void  _Unit_Init      (Unit_t *unit);
 INT8  _Unit_SetPos    (Unit_t *unit, float pos);
 float _Unit_GetPos    (Unit_t *unit);
-void  _Unit_EvalPower (Unit_t *unit);
 float _Unit_GetPower  (Unit_t *unit);
 UINT8 _Unit_GetId     (Unit_t *unit);
 
 // Private variables
 //==============================================================================
+
+extern struct sAllCells sCellValues;
 
 Unit_t _units[N_UNITS_TOTAL] = 
 {
@@ -56,7 +58,6 @@ Unit_t _units[N_UNITS_TOTAL] =
 const UnitInterface_t _unit0_if = 
 {
   .ctx        = (void *)            &_units[0]
- ,.EvalPower  = (UnitEvalPower_fct) &_Unit_EvalPower 
  ,.GetId      = (UnitGetId_fct)     &_Unit_GetId 
  ,.GetPos     = (UnitGetPos_fct)    &_Unit_GetPos 
  ,.GetPower   = (UnitGetPower_fct)  &_Unit_GetPower 
@@ -66,7 +67,6 @@ const UnitInterface_t _unit0_if =
 const UnitInterface_t _unit1_if = 
 {
   .ctx        = (void *)            &_units[1]
- ,.EvalPower  = (UnitEvalPower_fct) &_Unit_EvalPower 
  ,.GetId      = (UnitGetId_fct)     &_Unit_GetId 
  ,.GetPos     = (UnitGetPos_fct)    &_Unit_GetPos 
  ,.GetPower   = (UnitGetPower_fct)  &_Unit_GetPower 
@@ -76,7 +76,6 @@ const UnitInterface_t _unit1_if =
 const UnitInterface_t _unit2_if = 
 {
   .ctx        = (void *)            &_units[2]
- ,.EvalPower  = (UnitEvalPower_fct) &_Unit_EvalPower 
  ,.GetId      = (UnitGetId_fct)     &_Unit_GetId 
  ,.GetPos     = (UnitGetPos_fct)    &_Unit_GetPos 
  ,.GetPower   = (UnitGetPower_fct)  &_Unit_GetPower 
@@ -86,7 +85,6 @@ const UnitInterface_t _unit2_if =
 const UnitInterface_t _unit3_if = 
 {
   .ctx        = (void *)            &_units[3]
- ,.EvalPower  = (UnitEvalPower_fct) &_Unit_EvalPower 
  ,.GetId      = (UnitGetId_fct)     &_Unit_GetId 
  ,.GetPos     = (UnitGetPos_fct)    &_Unit_GetPos 
  ,.GetPower   = (UnitGetPower_fct)  &_Unit_GetPower 
@@ -96,7 +94,6 @@ const UnitInterface_t _unit3_if =
 const UnitInterface_t _unit4_if = 
 {
   .ctx        = (void *)            &_units[4]
- ,.EvalPower  = (UnitEvalPower_fct) &_Unit_EvalPower 
  ,.GetId      = (UnitGetId_fct)     &_Unit_GetId 
  ,.GetPos     = (UnitGetPos_fct)    &_Unit_GetPos 
  ,.GetPower   = (UnitGetPower_fct)  &_Unit_GetPower 
@@ -106,7 +103,6 @@ const UnitInterface_t _unit4_if =
 const UnitInterface_t _unit5_if = 
 {
   .ctx        = (void *)            &_units[5]
- ,.EvalPower  = (UnitEvalPower_fct) &_Unit_EvalPower 
  ,.GetId      = (UnitGetId_fct)     &_Unit_GetId 
  ,.GetPos     = (UnitGetPos_fct)    &_Unit_GetPos 
  ,.GetPower   = (UnitGetPower_fct)  &_Unit_GetPower 
@@ -116,7 +112,6 @@ const UnitInterface_t _unit5_if =
 const UnitInterface_t _unit6_if = 
 {
   .ctx        = (void *)            &_units[6]
- ,.EvalPower  = (UnitEvalPower_fct) &_Unit_EvalPower 
  ,.GetId      = (UnitGetId_fct)     &_Unit_GetId 
  ,.GetPos     = (UnitGetPos_fct)    &_Unit_GetPos 
  ,.GetPower   = (UnitGetPower_fct)  &_Unit_GetPower 
@@ -126,7 +121,6 @@ const UnitInterface_t _unit6_if =
 const UnitInterface_t _unit7_if = 
 {
   .ctx        = (void *)            &_units[7]
- ,.EvalPower  = (UnitEvalPower_fct) &_Unit_EvalPower 
  ,.GetId      = (UnitGetId_fct)     &_Unit_GetId 
  ,.GetPos     = (UnitGetPos_fct)    &_Unit_GetPos 
  ,.GetPower   = (UnitGetPower_fct)  &_Unit_GetPower 
@@ -180,14 +174,9 @@ float _Unit_GetPos (Unit_t *unit)
 }
 
 
-void _Unit_EvalPower (Unit_t *unit)
-{
-  
-}
-
-
 float _Unit_GetPower (Unit_t *unit)
 {
+  unit->power = sCellValues.cells[unit->adcNum].cellPowerFloat;
   return unit->power;
 }
 

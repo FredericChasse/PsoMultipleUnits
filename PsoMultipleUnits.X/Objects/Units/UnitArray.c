@@ -28,20 +28,15 @@ typedef struct
   UnitInterface_t *units[N_UNITS_TOTAL];
 } UnitArray_t;
 
-typedef struct
-{
-  UINT8 inUse;
-  UnitArray_t *arraysInUse[N_UNITS_TOTAL + 1];
-};
-
 
 // Private prototypes
 //==============================================================================
-void  UnitArray_Init                (UnitArray_t *array);
-void  UnitArray_SetUnitPos          (UnitArray_t *array, UINT8 idx, float pos);
-float UnitArray_GetUnitPos          (UnitArray_t *array, UINT8 idx);
-void  UnitArray_EvalUnitPower       (UnitArray_t *array, UINT8 idx);
-float UnitArray_GetUnitPower        (UnitArray_t *array, UINT8 idx);
+void  _UnitArray_Init                (UnitArray_t *array);
+void  _UnitArray_SetUnitPos          (UnitArray_t *array, UINT8 idx, float pos);
+float _UnitArray_GetUnitPos          (UnitArray_t *array, UINT8 idx);
+float _UnitArray_GetUnitPower        (UnitArray_t *array, UINT8 idx);
+INT8  _UnitArray_AddUnitToArray      (UnitArray_t *array, UnitInterface_t *unit);
+INT8  _UnitArray_RemoveUnitFromArray (UnitArray_t *array, UINT8 idx);
 
 
 // Private variables
@@ -60,90 +55,79 @@ UnitArray_t _arrays[N_UNITS_TOTAL + 1] =
  ,{8, 0, {0}}
 };
 
-UINT8 _arraysInUse = 1;   /*!< Used to determine how many arrays are active. */
-
 const UnitArrayInterface_t _arrays_if[N_UNITS_TOTAL + 1] = 
 {
   { (void *)                            &_arrays[0]
-  , (UnitArrayInit_fct)                 &UnitArray_Init
-  , (UnitArraySetUnitPos_fct)           &UnitArray_SetUnitPos
-  , (UnitArrayGetUnitPos_fct)           &UnitArray_GetUnitPos
-  , (UnitArrayEvalUnitPower_fct)        &UnitArray_EvalUnitPower
-  , (UnitArrayGetUnitPower_fct)         &UnitArray_GetUnitPower
-  , (UnitArrayAddUnitToArray_fct)       &UnitArray_AddUnitToArray
-  , (UnitArrayRemoveUnitFromArray_fct)  &UnitArray_RemoveUnitFromArray
+  , (UnitArrayInit_fct)                 &_UnitArray_Init
+  , (UnitArraySetUnitPos_fct)           &_UnitArray_SetUnitPos
+  , (UnitArrayGetUnitPos_fct)           &_UnitArray_GetUnitPos
+  , (UnitArrayGetUnitPower_fct)         &_UnitArray_GetUnitPower
+  , (UnitArrayAddUnitToArray_fct)       &_UnitArray_AddUnitToArray
+  , (UnitArrayRemoveUnitFromArray_fct)  &_UnitArray_RemoveUnitFromArray
   }
  ,{ (void *)                            &_arrays[1]
-  , (UnitArrayInit_fct)                 &UnitArray_Init
-  , (UnitArraySetUnitPos_fct)           &UnitArray_SetUnitPos
-  , (UnitArrayGetUnitPos_fct)           &UnitArray_GetUnitPos
-  , (UnitArrayEvalUnitPower_fct)        &UnitArray_EvalUnitPower
-  , (UnitArrayGetUnitPower_fct)         &UnitArray_GetUnitPower
-  , (UnitArrayAddUnitToArray_fct)       &UnitArray_AddUnitToArray
-  , (UnitArrayRemoveUnitFromArray_fct)  &UnitArray_RemoveUnitFromArray
+  , (UnitArrayInit_fct)                 &_UnitArray_Init
+  , (UnitArraySetUnitPos_fct)           &_UnitArray_SetUnitPos
+  , (UnitArrayGetUnitPos_fct)           &_UnitArray_GetUnitPos
+  , (UnitArrayGetUnitPower_fct)         &_UnitArray_GetUnitPower
+  , (UnitArrayAddUnitToArray_fct)       &_UnitArray_AddUnitToArray
+  , (UnitArrayRemoveUnitFromArray_fct)  &_UnitArray_RemoveUnitFromArray
   }
  ,{ (void *)                            &_arrays[2]
-  , (UnitArrayInit_fct)                 &UnitArray_Init
-  , (UnitArraySetUnitPos_fct)           &UnitArray_SetUnitPos
-  , (UnitArrayGetUnitPos_fct)           &UnitArray_GetUnitPos
-  , (UnitArrayEvalUnitPower_fct)        &UnitArray_EvalUnitPower
-  , (UnitArrayGetUnitPower_fct)         &UnitArray_GetUnitPower
-  , (UnitArrayAddUnitToArray_fct)       &UnitArray_AddUnitToArray
-  , (UnitArrayRemoveUnitFromArray_fct)  &UnitArray_RemoveUnitFromArray
+  , (UnitArrayInit_fct)                 &_UnitArray_Init
+  , (UnitArraySetUnitPos_fct)           &_UnitArray_SetUnitPos
+  , (UnitArrayGetUnitPos_fct)           &_UnitArray_GetUnitPos
+  , (UnitArrayGetUnitPower_fct)         &_UnitArray_GetUnitPower
+  , (UnitArrayAddUnitToArray_fct)       &_UnitArray_AddUnitToArray
+  , (UnitArrayRemoveUnitFromArray_fct)  &_UnitArray_RemoveUnitFromArray
   }
  ,{ (void *)                            &_arrays[3]
-  , (UnitArrayInit_fct)                 &UnitArray_Init
-  , (UnitArraySetUnitPos_fct)           &UnitArray_SetUnitPos
-  , (UnitArrayGetUnitPos_fct)           &UnitArray_GetUnitPos
-  , (UnitArrayEvalUnitPower_fct)        &UnitArray_EvalUnitPower
-  , (UnitArrayGetUnitPower_fct)         &UnitArray_GetUnitPower
-  , (UnitArrayAddUnitToArray_fct)       &UnitArray_AddUnitToArray
-  , (UnitArrayRemoveUnitFromArray_fct)  &UnitArray_RemoveUnitFromArray
+  , (UnitArrayInit_fct)                 &_UnitArray_Init
+  , (UnitArraySetUnitPos_fct)           &_UnitArray_SetUnitPos
+  , (UnitArrayGetUnitPos_fct)           &_UnitArray_GetUnitPos
+  , (UnitArrayGetUnitPower_fct)         &_UnitArray_GetUnitPower
+  , (UnitArrayAddUnitToArray_fct)       &_UnitArray_AddUnitToArray
+  , (UnitArrayRemoveUnitFromArray_fct)  &_UnitArray_RemoveUnitFromArray
   }
  ,{ (void *)                            &_arrays[4]
-  , (UnitArrayInit_fct)                 &UnitArray_Init
-  , (UnitArraySetUnitPos_fct)           &UnitArray_SetUnitPos
-  , (UnitArrayGetUnitPos_fct)           &UnitArray_GetUnitPos
-  , (UnitArrayEvalUnitPower_fct)        &UnitArray_EvalUnitPower
-  , (UnitArrayGetUnitPower_fct)         &UnitArray_GetUnitPower
-  , (UnitArrayAddUnitToArray_fct)       &UnitArray_AddUnitToArray
-  , (UnitArrayRemoveUnitFromArray_fct)  &UnitArray_RemoveUnitFromArray
+  , (UnitArrayInit_fct)                 &_UnitArray_Init
+  , (UnitArraySetUnitPos_fct)           &_UnitArray_SetUnitPos
+  , (UnitArrayGetUnitPos_fct)           &_UnitArray_GetUnitPos
+  , (UnitArrayGetUnitPower_fct)         &_UnitArray_GetUnitPower
+  , (UnitArrayAddUnitToArray_fct)       &_UnitArray_AddUnitToArray
+  , (UnitArrayRemoveUnitFromArray_fct)  &_UnitArray_RemoveUnitFromArray
   }
  ,{ (void *)                            &_arrays[5]
-  , (UnitArrayInit_fct)                 &UnitArray_Init
-  , (UnitArraySetUnitPos_fct)           &UnitArray_SetUnitPos
-  , (UnitArrayGetUnitPos_fct)           &UnitArray_GetUnitPos
-  , (UnitArrayEvalUnitPower_fct)        &UnitArray_EvalUnitPower
-  , (UnitArrayGetUnitPower_fct)         &UnitArray_GetUnitPower
-  , (UnitArrayAddUnitToArray_fct)       &UnitArray_AddUnitToArray
-  , (UnitArrayRemoveUnitFromArray_fct)  &UnitArray_RemoveUnitFromArray
+  , (UnitArrayInit_fct)                 &_UnitArray_Init
+  , (UnitArraySetUnitPos_fct)           &_UnitArray_SetUnitPos
+  , (UnitArrayGetUnitPos_fct)           &_UnitArray_GetUnitPos
+  , (UnitArrayGetUnitPower_fct)         &_UnitArray_GetUnitPower
+  , (UnitArrayAddUnitToArray_fct)       &_UnitArray_AddUnitToArray
+  , (UnitArrayRemoveUnitFromArray_fct)  &_UnitArray_RemoveUnitFromArray
   }
  ,{ (void *)                            &_arrays[6]
-  , (UnitArrayInit_fct)                 &UnitArray_Init
-  , (UnitArraySetUnitPos_fct)           &UnitArray_SetUnitPos
-  , (UnitArrayGetUnitPos_fct)           &UnitArray_GetUnitPos
-  , (UnitArrayEvalUnitPower_fct)        &UnitArray_EvalUnitPower
-  , (UnitArrayGetUnitPower_fct)         &UnitArray_GetUnitPower
-  , (UnitArrayAddUnitToArray_fct)       &UnitArray_AddUnitToArray
-  , (UnitArrayRemoveUnitFromArray_fct)  &UnitArray_RemoveUnitFromArray
+  , (UnitArrayInit_fct)                 &_UnitArray_Init
+  , (UnitArraySetUnitPos_fct)           &_UnitArray_SetUnitPos
+  , (UnitArrayGetUnitPos_fct)           &_UnitArray_GetUnitPos
+  , (UnitArrayGetUnitPower_fct)         &_UnitArray_GetUnitPower
+  , (UnitArrayAddUnitToArray_fct)       &_UnitArray_AddUnitToArray
+  , (UnitArrayRemoveUnitFromArray_fct)  &_UnitArray_RemoveUnitFromArray
   }
  ,{ (void *)                            &_arrays[7]
-  , (UnitArrayInit_fct)                 &UnitArray_Init
-  , (UnitArraySetUnitPos_fct)           &UnitArray_SetUnitPos
-  , (UnitArrayGetUnitPos_fct)           &UnitArray_GetUnitPos
-  , (UnitArrayEvalUnitPower_fct)        &UnitArray_EvalUnitPower
-  , (UnitArrayGetUnitPower_fct)         &UnitArray_GetUnitPower
-  , (UnitArrayAddUnitToArray_fct)       &UnitArray_AddUnitToArray
-  , (UnitArrayRemoveUnitFromArray_fct)  &UnitArray_RemoveUnitFromArray
+  , (UnitArrayInit_fct)                 &_UnitArray_Init
+  , (UnitArraySetUnitPos_fct)           &_UnitArray_SetUnitPos
+  , (UnitArrayGetUnitPos_fct)           &_UnitArray_GetUnitPos
+  , (UnitArrayGetUnitPower_fct)         &_UnitArray_GetUnitPower
+  , (UnitArrayAddUnitToArray_fct)       &_UnitArray_AddUnitToArray
+  , (UnitArrayRemoveUnitFromArray_fct)  &_UnitArray_RemoveUnitFromArray
   }
  ,{ (void *)                            &_arrays[8]
-  , (UnitArrayInit_fct)                 &UnitArray_Init
-  , (UnitArraySetUnitPos_fct)           &UnitArray_SetUnitPos
-  , (UnitArrayGetUnitPos_fct)           &UnitArray_GetUnitPos
-  , (UnitArrayEvalUnitPower_fct)        &UnitArray_EvalUnitPower
-  , (UnitArrayGetUnitPower_fct)         &UnitArray_GetUnitPower
-  , (UnitArrayAddUnitToArray_fct)       &UnitArray_AddUnitToArray
-  , (UnitArrayRemoveUnitFromArray_fct)  &UnitArray_RemoveUnitFromArray
+  , (UnitArrayInit_fct)                 &_UnitArray_Init
+  , (UnitArraySetUnitPos_fct)           &_UnitArray_SetUnitPos
+  , (UnitArrayGetUnitPos_fct)           &_UnitArray_GetUnitPos
+  , (UnitArrayGetUnitPower_fct)         &_UnitArray_GetUnitPower
+  , (UnitArrayAddUnitToArray_fct)       &_UnitArray_AddUnitToArray
+  , (UnitArrayRemoveUnitFromArray_fct)  &_UnitArray_RemoveUnitFromArray
   }
 };
 
@@ -151,7 +135,7 @@ const UnitArrayInterface_t _arrays_if[N_UNITS_TOTAL + 1] =
 // Private functions
 //==============================================================================
 
-void UnitArray_Init (UnitArray_t *array)
+void _UnitArray_Init (UnitArray_t *array)
 {
   UINT8 i;
   if (array->id == 0)
@@ -164,7 +148,7 @@ void UnitArray_Init (UnitArray_t *array)
 }
 
 
-void UnitArray_SetUnitPos (UnitArray_t *array, UINT8 idx, float pos)
+void _UnitArray_SetUnitPos (UnitArray_t *array, UINT8 idx, float pos)
 {
   if (idx < array->nUnits)
   {
@@ -173,7 +157,7 @@ void UnitArray_SetUnitPos (UnitArray_t *array, UINT8 idx, float pos)
 }
 
 
-float UnitArray_GetUnitPos (UnitArray_t *array, UINT8 idx)
+float _UnitArray_GetUnitPos (UnitArray_t *array, UINT8 idx)
 {
   if (idx < array->nUnits)
   {
@@ -186,16 +170,7 @@ float UnitArray_GetUnitPos (UnitArray_t *array, UINT8 idx)
 }
 
 
-void UnitArray_EvalUnitPower (UnitArray_t *array, UINT8 idx)
-{
-  if (idx < array->nUnits)
-  {
-    return array->units[idx]->EvalPower(array->units[idx]->ctx);
-  }
-}
-
-
-float UnitArray_GetUnitPower (UnitArray_t *array, UINT8 idx)
+float _UnitArray_GetUnitPower (UnitArray_t *array, UINT8 idx)
 {
   if (idx < array->nUnits)
   {
@@ -204,7 +179,7 @@ float UnitArray_GetUnitPower (UnitArray_t *array, UINT8 idx)
 }
 
 
-INT8 UnitArray_AddUnitToArray (UnitArray_t *array, UnitInterface_t *unit)
+INT8 _UnitArray_AddUnitToArray (UnitArray_t *array, UnitInterface_t *unit)
 {
   if (array->nUnits == N_UNITS_TOTAL)
   {
@@ -216,7 +191,7 @@ INT8 UnitArray_AddUnitToArray (UnitArray_t *array, UnitInterface_t *unit)
 }
 
 
-INT8 UnitArray_RemoveUnitFromArray (UnitArray_t *array, UINT8 idx)
+INT8 _UnitArray_RemoveUnitFromArray (UnitArray_t *array, UINT8 idx)
 {
   if (idx >= array->nUnits)
   {
