@@ -31,12 +31,14 @@ typedef struct
 
 // Private prototypes
 //==============================================================================
-void  _UnitArray_Init                (UnitArray_t *array);
-void  _UnitArray_SetUnitPos          (UnitArray_t *array, UINT8 idx, float pos);
-float _UnitArray_GetUnitPos          (UnitArray_t *array, UINT8 idx);
-float _UnitArray_GetUnitPower        (UnitArray_t *array, UINT8 idx);
-INT8  _UnitArray_AddUnitToArray      (UnitArray_t *array, UnitInterface_t *unit);
-INT8  _UnitArray_RemoveUnitFromArray (UnitArray_t *array, UINT8 idx);
+void  _UnitArray_Init                 (UnitArray_t *array);
+void  _UnitArray_SetUnitPos           (UnitArray_t *array, UINT8 idx, float pos);
+float _UnitArray_GetUnitPos           (UnitArray_t *array, UINT8 idx);
+float _UnitArray_GetUnitPower         (UnitArray_t *array, UINT8 idx);
+INT8  _UnitArray_AddUnitToArray       (UnitArray_t *array, UnitInterface_t *unit);
+INT8  _UnitArray_RemoveUnitFromArray  (UnitArray_t *array, UINT8 idx);
+UINT8 _UnitArray_GetNUnits            (UnitArray_t *array);
+void* _UnitArray_GetUnitHandle        (UnitArray_t *array, UINT8 idx);
 
 
 // Private variables
@@ -64,6 +66,8 @@ const UnitArrayInterface_t _arrays_if[N_UNITS_TOTAL + 1] =
   , (UnitArrayGetUnitPower_fct)         &_UnitArray_GetUnitPower
   , (UnitArrayAddUnitToArray_fct)       &_UnitArray_AddUnitToArray
   , (UnitArrayRemoveUnitFromArray_fct)  &_UnitArray_RemoveUnitFromArray
+  , (UnitArrayGetNUnits_fct)            &_UnitArray_GetNUnits
+  , (UnitArrayGetUnitHandle_fct)        &_UnitArray_GetUnitHandle
   }
  ,{ (void *)                            &_arrays[1]
   , (UnitArrayInit_fct)                 &_UnitArray_Init
@@ -72,6 +76,8 @@ const UnitArrayInterface_t _arrays_if[N_UNITS_TOTAL + 1] =
   , (UnitArrayGetUnitPower_fct)         &_UnitArray_GetUnitPower
   , (UnitArrayAddUnitToArray_fct)       &_UnitArray_AddUnitToArray
   , (UnitArrayRemoveUnitFromArray_fct)  &_UnitArray_RemoveUnitFromArray
+  , (UnitArrayGetNUnits_fct)            &_UnitArray_GetNUnits
+  , (UnitArrayGetUnitHandle_fct)        &_UnitArray_GetUnitHandle
   }
  ,{ (void *)                            &_arrays[2]
   , (UnitArrayInit_fct)                 &_UnitArray_Init
@@ -80,6 +86,8 @@ const UnitArrayInterface_t _arrays_if[N_UNITS_TOTAL + 1] =
   , (UnitArrayGetUnitPower_fct)         &_UnitArray_GetUnitPower
   , (UnitArrayAddUnitToArray_fct)       &_UnitArray_AddUnitToArray
   , (UnitArrayRemoveUnitFromArray_fct)  &_UnitArray_RemoveUnitFromArray
+  , (UnitArrayGetNUnits_fct)            &_UnitArray_GetNUnits
+  , (UnitArrayGetUnitHandle_fct)        &_UnitArray_GetUnitHandle
   }
  ,{ (void *)                            &_arrays[3]
   , (UnitArrayInit_fct)                 &_UnitArray_Init
@@ -88,6 +96,8 @@ const UnitArrayInterface_t _arrays_if[N_UNITS_TOTAL + 1] =
   , (UnitArrayGetUnitPower_fct)         &_UnitArray_GetUnitPower
   , (UnitArrayAddUnitToArray_fct)       &_UnitArray_AddUnitToArray
   , (UnitArrayRemoveUnitFromArray_fct)  &_UnitArray_RemoveUnitFromArray
+  , (UnitArrayGetNUnits_fct)            &_UnitArray_GetNUnits
+  , (UnitArrayGetUnitHandle_fct)        &_UnitArray_GetUnitHandle
   }
  ,{ (void *)                            &_arrays[4]
   , (UnitArrayInit_fct)                 &_UnitArray_Init
@@ -96,6 +106,8 @@ const UnitArrayInterface_t _arrays_if[N_UNITS_TOTAL + 1] =
   , (UnitArrayGetUnitPower_fct)         &_UnitArray_GetUnitPower
   , (UnitArrayAddUnitToArray_fct)       &_UnitArray_AddUnitToArray
   , (UnitArrayRemoveUnitFromArray_fct)  &_UnitArray_RemoveUnitFromArray
+  , (UnitArrayGetNUnits_fct)            &_UnitArray_GetNUnits
+  , (UnitArrayGetUnitHandle_fct)        &_UnitArray_GetUnitHandle
   }
  ,{ (void *)                            &_arrays[5]
   , (UnitArrayInit_fct)                 &_UnitArray_Init
@@ -104,6 +116,8 @@ const UnitArrayInterface_t _arrays_if[N_UNITS_TOTAL + 1] =
   , (UnitArrayGetUnitPower_fct)         &_UnitArray_GetUnitPower
   , (UnitArrayAddUnitToArray_fct)       &_UnitArray_AddUnitToArray
   , (UnitArrayRemoveUnitFromArray_fct)  &_UnitArray_RemoveUnitFromArray
+  , (UnitArrayGetNUnits_fct)            &_UnitArray_GetNUnits
+  , (UnitArrayGetUnitHandle_fct)        &_UnitArray_GetUnitHandle
   }
  ,{ (void *)                            &_arrays[6]
   , (UnitArrayInit_fct)                 &_UnitArray_Init
@@ -112,6 +126,8 @@ const UnitArrayInterface_t _arrays_if[N_UNITS_TOTAL + 1] =
   , (UnitArrayGetUnitPower_fct)         &_UnitArray_GetUnitPower
   , (UnitArrayAddUnitToArray_fct)       &_UnitArray_AddUnitToArray
   , (UnitArrayRemoveUnitFromArray_fct)  &_UnitArray_RemoveUnitFromArray
+  , (UnitArrayGetNUnits_fct)            &_UnitArray_GetNUnits
+  , (UnitArrayGetUnitHandle_fct)        &_UnitArray_GetUnitHandle
   }
  ,{ (void *)                            &_arrays[7]
   , (UnitArrayInit_fct)                 &_UnitArray_Init
@@ -120,6 +136,7 @@ const UnitArrayInterface_t _arrays_if[N_UNITS_TOTAL + 1] =
   , (UnitArrayGetUnitPower_fct)         &_UnitArray_GetUnitPower
   , (UnitArrayAddUnitToArray_fct)       &_UnitArray_AddUnitToArray
   , (UnitArrayRemoveUnitFromArray_fct)  &_UnitArray_RemoveUnitFromArray
+  , (UnitArrayGetNUnits_fct)            &_UnitArray_GetNUnits
   }
  ,{ (void *)                            &_arrays[8]
   , (UnitArrayInit_fct)                 &_UnitArray_Init
@@ -128,6 +145,8 @@ const UnitArrayInterface_t _arrays_if[N_UNITS_TOTAL + 1] =
   , (UnitArrayGetUnitPower_fct)         &_UnitArray_GetUnitPower
   , (UnitArrayAddUnitToArray_fct)       &_UnitArray_AddUnitToArray
   , (UnitArrayRemoveUnitFromArray_fct)  &_UnitArray_RemoveUnitFromArray
+  , (UnitArrayGetNUnits_fct)            &_UnitArray_GetNUnits
+  , (UnitArrayGetUnitHandle_fct)        &_UnitArray_GetUnitHandle
   }
 };
 
@@ -148,12 +167,28 @@ void _UnitArray_Init (UnitArray_t *array)
 }
 
 
+UINT8 _UnitArray_GetNUnits (UnitArray_t *array)
+{
+  return array->nUnits;
+}
+
+
 void _UnitArray_SetUnitPos (UnitArray_t *array, UINT8 idx, float pos)
 {
   if (idx < array->nUnits)
   {
     array->units[idx]->SetPos(array->units[idx]->ctx, pos);
   }
+}
+
+
+void * _UnitArray_GetUnitHandle (UnitArray_t *array, UINT8 idx)
+{
+  if (idx >= array->nUnits)
+  {
+    return 0;
+  }
+  return (void *) array->units[idx];
 }
 
 
