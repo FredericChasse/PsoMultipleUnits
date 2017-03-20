@@ -5,6 +5,10 @@
       <itemPath>Objects/Algo/Pso.c</itemPath>
       <itemPath>Objects/Algo/Pso.h</itemPath>
       <itemPath>Objects/Algo/AlgoInterface.h</itemPath>
+      <itemPath>Objects/Algo/PsoSwarm.c</itemPath>
+      <itemPath>Objects/Algo/PsoSwarm.h</itemPath>
+      <itemPath>Objects/Algo/PsoParticle.c</itemPath>
+      <itemPath>Objects/Algo/PsoParticle.h</itemPath>
     </logicalFolder>
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
