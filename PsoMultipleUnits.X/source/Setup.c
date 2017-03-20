@@ -68,15 +68,7 @@ void InitTimer(void)
 //	Open timers
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //  timerCounterValue = Timer.Open(TIMER_1, 500, SCALE_MS);   // Open Timer 1 with a period of 500 ms
-//  if (timerCounterValue < 0)
-//  {
-//    LED1_ON;
-//  }
 //  timerCounterValue = Timer.Open(TIMER_2, 500, SCALE_US);   // Open Timer 2 with a period of 500 us
-//  if (timerCounterValue < 0)
-//  {
-//    LED1_ON;
-//  }
 //  timerCounterValue = Timer.Open(TIMER_3, 50, SCALE_MS);   // Timer used for ADC
 //  timerCounterValue = Timer.Open(TIMER_3, 1, SCALE_MS);   // Timer used for ADC
   timerCounterValue = Timer.Open(TIMER_3, 100, SCALE_US);   // Timer used for ADC
@@ -85,15 +77,7 @@ void InitTimer(void)
     LED1_ON;
   }
 //  timerCounterValue = Timer.Open(TIMER_4, 500, SCALE_MS);   // Open Timer 4 with a period of 500 ms
-//  if (timerCounterValue < 0)
-//  {
-//    LED1_ON;
-//  }
 //  timerCounterValue = Timer.Open(TIMER_5, 500, SCALE_US);   // Open Timer 5 with a period of 500 us
-//  if (timerCounterValue < 0)
-//  {
-//    LED1_ON;
-//  }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //	Configure timer interrupts
@@ -327,7 +311,7 @@ void InitAdc(void)
   // Hardware config.
   //================================================
   UINT32 configHardware = ADC_VREF_EXT_AVSS         // Vref+ external and Vref- is AVss
-                        | ADC_SAMPLES_PER_INT_8;    // 1 sample/interrupt
+                        | ADC_SAMPLES_PER_INT_8;    // 8 sample/interrupt
   //================================================
 
   // Port config.

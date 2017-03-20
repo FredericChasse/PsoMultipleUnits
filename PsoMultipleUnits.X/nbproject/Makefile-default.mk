@@ -45,17 +45,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=source/main.c source/StateMachine.c source/Interrupts.c source/Setup.c source/StateFunctions.c source/SourceTemplate.c source/SkadiFunctions.c source/Potentiometer.c source/LedDriver.c source/ControlAlgorithm.c
+SOURCEFILES_QUOTED_IF_SPACED=Objects/Algo/Algo.c source/main.c source/StateMachine.c source/Interrupts.c source/Setup.c source/StateFunctions.c source/SourceTemplate.c source/SkadiFunctions.c source/LedDriver.c source/ControlAlgorithm.c Objects/Units/Unit.c source/Potentiometer.c Objects/Units/UnitArray.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/source/main.o ${OBJECTDIR}/source/StateMachine.o ${OBJECTDIR}/source/Interrupts.o ${OBJECTDIR}/source/Setup.o ${OBJECTDIR}/source/StateFunctions.o ${OBJECTDIR}/source/SourceTemplate.o ${OBJECTDIR}/source/SkadiFunctions.o ${OBJECTDIR}/source/Potentiometer.o ${OBJECTDIR}/source/LedDriver.o ${OBJECTDIR}/source/ControlAlgorithm.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/source/main.o.d ${OBJECTDIR}/source/StateMachine.o.d ${OBJECTDIR}/source/Interrupts.o.d ${OBJECTDIR}/source/Setup.o.d ${OBJECTDIR}/source/StateFunctions.o.d ${OBJECTDIR}/source/SourceTemplate.o.d ${OBJECTDIR}/source/SkadiFunctions.o.d ${OBJECTDIR}/source/Potentiometer.o.d ${OBJECTDIR}/source/LedDriver.o.d ${OBJECTDIR}/source/ControlAlgorithm.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/Objects/Algo/Algo.o ${OBJECTDIR}/source/main.o ${OBJECTDIR}/source/StateMachine.o ${OBJECTDIR}/source/Interrupts.o ${OBJECTDIR}/source/Setup.o ${OBJECTDIR}/source/StateFunctions.o ${OBJECTDIR}/source/SourceTemplate.o ${OBJECTDIR}/source/SkadiFunctions.o ${OBJECTDIR}/source/LedDriver.o ${OBJECTDIR}/source/ControlAlgorithm.o ${OBJECTDIR}/Objects/Units/Unit.o ${OBJECTDIR}/source/Potentiometer.o ${OBJECTDIR}/Objects/Units/UnitArray.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/Objects/Algo/Algo.o.d ${OBJECTDIR}/source/main.o.d ${OBJECTDIR}/source/StateMachine.o.d ${OBJECTDIR}/source/Interrupts.o.d ${OBJECTDIR}/source/Setup.o.d ${OBJECTDIR}/source/StateFunctions.o.d ${OBJECTDIR}/source/SourceTemplate.o.d ${OBJECTDIR}/source/SkadiFunctions.o.d ${OBJECTDIR}/source/LedDriver.o.d ${OBJECTDIR}/source/ControlAlgorithm.o.d ${OBJECTDIR}/Objects/Units/Unit.o.d ${OBJECTDIR}/source/Potentiometer.o.d ${OBJECTDIR}/Objects/Units/UnitArray.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/source/main.o ${OBJECTDIR}/source/StateMachine.o ${OBJECTDIR}/source/Interrupts.o ${OBJECTDIR}/source/Setup.o ${OBJECTDIR}/source/StateFunctions.o ${OBJECTDIR}/source/SourceTemplate.o ${OBJECTDIR}/source/SkadiFunctions.o ${OBJECTDIR}/source/Potentiometer.o ${OBJECTDIR}/source/LedDriver.o ${OBJECTDIR}/source/ControlAlgorithm.o
+OBJECTFILES=${OBJECTDIR}/Objects/Algo/Algo.o ${OBJECTDIR}/source/main.o ${OBJECTDIR}/source/StateMachine.o ${OBJECTDIR}/source/Interrupts.o ${OBJECTDIR}/source/Setup.o ${OBJECTDIR}/source/StateFunctions.o ${OBJECTDIR}/source/SourceTemplate.o ${OBJECTDIR}/source/SkadiFunctions.o ${OBJECTDIR}/source/LedDriver.o ${OBJECTDIR}/source/ControlAlgorithm.o ${OBJECTDIR}/Objects/Units/Unit.o ${OBJECTDIR}/source/Potentiometer.o ${OBJECTDIR}/Objects/Units/UnitArray.o
 
 # Source Files
-SOURCEFILES=source/main.c source/StateMachine.c source/Interrupts.c source/Setup.c source/StateFunctions.c source/SourceTemplate.c source/SkadiFunctions.c source/Potentiometer.c source/LedDriver.c source/ControlAlgorithm.c
+SOURCEFILES=Objects/Algo/Algo.c source/main.c source/StateMachine.c source/Interrupts.c source/Setup.c source/StateFunctions.c source/SourceTemplate.c source/SkadiFunctions.c source/LedDriver.c source/ControlAlgorithm.c Objects/Units/Unit.c source/Potentiometer.c Objects/Units/UnitArray.c
 
 
 CFLAGS=
@@ -94,126 +94,162 @@ endif
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: compile
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
+${OBJECTDIR}/Objects/Algo/Algo.o: Objects/Algo/Algo.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/Objects/Algo" 
+	@${RM} ${OBJECTDIR}/Objects/Algo/Algo.o.d 
+	@${RM} ${OBJECTDIR}/Objects/Algo/Algo.o 
+	@${FIXDEPS} "${OBJECTDIR}/Objects/Algo/Algo.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -MMD -MF "${OBJECTDIR}/Objects/Algo/Algo.o.d" -o ${OBJECTDIR}/Objects/Algo/Algo.o Objects/Algo/Algo.c   
+	
 ${OBJECTDIR}/source/main.o: source/main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/source" 
 	@${RM} ${OBJECTDIR}/source/main.o.d 
 	@${RM} ${OBJECTDIR}/source/main.o 
-	@${FIXDEPS} "${OBJECTDIR}/source/main.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -MMD -MF "${OBJECTDIR}/source/main.o.d" -o ${OBJECTDIR}/source/main.o source/main.c   
+	@${FIXDEPS} "${OBJECTDIR}/source/main.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -MMD -MF "${OBJECTDIR}/source/main.o.d" -o ${OBJECTDIR}/source/main.o source/main.c   
 	
 ${OBJECTDIR}/source/StateMachine.o: source/StateMachine.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/source" 
 	@${RM} ${OBJECTDIR}/source/StateMachine.o.d 
 	@${RM} ${OBJECTDIR}/source/StateMachine.o 
-	@${FIXDEPS} "${OBJECTDIR}/source/StateMachine.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -MMD -MF "${OBJECTDIR}/source/StateMachine.o.d" -o ${OBJECTDIR}/source/StateMachine.o source/StateMachine.c   
+	@${FIXDEPS} "${OBJECTDIR}/source/StateMachine.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -MMD -MF "${OBJECTDIR}/source/StateMachine.o.d" -o ${OBJECTDIR}/source/StateMachine.o source/StateMachine.c   
 	
 ${OBJECTDIR}/source/Interrupts.o: source/Interrupts.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/source" 
 	@${RM} ${OBJECTDIR}/source/Interrupts.o.d 
 	@${RM} ${OBJECTDIR}/source/Interrupts.o 
-	@${FIXDEPS} "${OBJECTDIR}/source/Interrupts.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -MMD -MF "${OBJECTDIR}/source/Interrupts.o.d" -o ${OBJECTDIR}/source/Interrupts.o source/Interrupts.c   
+	@${FIXDEPS} "${OBJECTDIR}/source/Interrupts.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -MMD -MF "${OBJECTDIR}/source/Interrupts.o.d" -o ${OBJECTDIR}/source/Interrupts.o source/Interrupts.c   
 	
 ${OBJECTDIR}/source/Setup.o: source/Setup.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/source" 
 	@${RM} ${OBJECTDIR}/source/Setup.o.d 
 	@${RM} ${OBJECTDIR}/source/Setup.o 
-	@${FIXDEPS} "${OBJECTDIR}/source/Setup.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -MMD -MF "${OBJECTDIR}/source/Setup.o.d" -o ${OBJECTDIR}/source/Setup.o source/Setup.c   
+	@${FIXDEPS} "${OBJECTDIR}/source/Setup.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -MMD -MF "${OBJECTDIR}/source/Setup.o.d" -o ${OBJECTDIR}/source/Setup.o source/Setup.c   
 	
 ${OBJECTDIR}/source/StateFunctions.o: source/StateFunctions.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/source" 
 	@${RM} ${OBJECTDIR}/source/StateFunctions.o.d 
 	@${RM} ${OBJECTDIR}/source/StateFunctions.o 
-	@${FIXDEPS} "${OBJECTDIR}/source/StateFunctions.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -MMD -MF "${OBJECTDIR}/source/StateFunctions.o.d" -o ${OBJECTDIR}/source/StateFunctions.o source/StateFunctions.c   
+	@${FIXDEPS} "${OBJECTDIR}/source/StateFunctions.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -MMD -MF "${OBJECTDIR}/source/StateFunctions.o.d" -o ${OBJECTDIR}/source/StateFunctions.o source/StateFunctions.c   
 	
 ${OBJECTDIR}/source/SourceTemplate.o: source/SourceTemplate.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/source" 
 	@${RM} ${OBJECTDIR}/source/SourceTemplate.o.d 
 	@${RM} ${OBJECTDIR}/source/SourceTemplate.o 
-	@${FIXDEPS} "${OBJECTDIR}/source/SourceTemplate.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -MMD -MF "${OBJECTDIR}/source/SourceTemplate.o.d" -o ${OBJECTDIR}/source/SourceTemplate.o source/SourceTemplate.c   
+	@${FIXDEPS} "${OBJECTDIR}/source/SourceTemplate.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -MMD -MF "${OBJECTDIR}/source/SourceTemplate.o.d" -o ${OBJECTDIR}/source/SourceTemplate.o source/SourceTemplate.c   
 	
 ${OBJECTDIR}/source/SkadiFunctions.o: source/SkadiFunctions.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/source" 
 	@${RM} ${OBJECTDIR}/source/SkadiFunctions.o.d 
 	@${RM} ${OBJECTDIR}/source/SkadiFunctions.o 
-	@${FIXDEPS} "${OBJECTDIR}/source/SkadiFunctions.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -MMD -MF "${OBJECTDIR}/source/SkadiFunctions.o.d" -o ${OBJECTDIR}/source/SkadiFunctions.o source/SkadiFunctions.c   
-	
-${OBJECTDIR}/source/Potentiometer.o: source/Potentiometer.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/source" 
-	@${RM} ${OBJECTDIR}/source/Potentiometer.o.d 
-	@${RM} ${OBJECTDIR}/source/Potentiometer.o 
-	@${FIXDEPS} "${OBJECTDIR}/source/Potentiometer.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -MMD -MF "${OBJECTDIR}/source/Potentiometer.o.d" -o ${OBJECTDIR}/source/Potentiometer.o source/Potentiometer.c   
+	@${FIXDEPS} "${OBJECTDIR}/source/SkadiFunctions.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -MMD -MF "${OBJECTDIR}/source/SkadiFunctions.o.d" -o ${OBJECTDIR}/source/SkadiFunctions.o source/SkadiFunctions.c   
 	
 ${OBJECTDIR}/source/LedDriver.o: source/LedDriver.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/source" 
 	@${RM} ${OBJECTDIR}/source/LedDriver.o.d 
 	@${RM} ${OBJECTDIR}/source/LedDriver.o 
-	@${FIXDEPS} "${OBJECTDIR}/source/LedDriver.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -MMD -MF "${OBJECTDIR}/source/LedDriver.o.d" -o ${OBJECTDIR}/source/LedDriver.o source/LedDriver.c   
+	@${FIXDEPS} "${OBJECTDIR}/source/LedDriver.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -MMD -MF "${OBJECTDIR}/source/LedDriver.o.d" -o ${OBJECTDIR}/source/LedDriver.o source/LedDriver.c   
 	
 ${OBJECTDIR}/source/ControlAlgorithm.o: source/ControlAlgorithm.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/source" 
 	@${RM} ${OBJECTDIR}/source/ControlAlgorithm.o.d 
 	@${RM} ${OBJECTDIR}/source/ControlAlgorithm.o 
-	@${FIXDEPS} "${OBJECTDIR}/source/ControlAlgorithm.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -MMD -MF "${OBJECTDIR}/source/ControlAlgorithm.o.d" -o ${OBJECTDIR}/source/ControlAlgorithm.o source/ControlAlgorithm.c   
+	@${FIXDEPS} "${OBJECTDIR}/source/ControlAlgorithm.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -MMD -MF "${OBJECTDIR}/source/ControlAlgorithm.o.d" -o ${OBJECTDIR}/source/ControlAlgorithm.o source/ControlAlgorithm.c   
+	
+${OBJECTDIR}/Objects/Units/Unit.o: Objects/Units/Unit.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/Objects/Units" 
+	@${RM} ${OBJECTDIR}/Objects/Units/Unit.o.d 
+	@${RM} ${OBJECTDIR}/Objects/Units/Unit.o 
+	@${FIXDEPS} "${OBJECTDIR}/Objects/Units/Unit.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -MMD -MF "${OBJECTDIR}/Objects/Units/Unit.o.d" -o ${OBJECTDIR}/Objects/Units/Unit.o Objects/Units/Unit.c   
+	
+${OBJECTDIR}/source/Potentiometer.o: source/Potentiometer.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/source" 
+	@${RM} ${OBJECTDIR}/source/Potentiometer.o.d 
+	@${RM} ${OBJECTDIR}/source/Potentiometer.o 
+	@${FIXDEPS} "${OBJECTDIR}/source/Potentiometer.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -MMD -MF "${OBJECTDIR}/source/Potentiometer.o.d" -o ${OBJECTDIR}/source/Potentiometer.o source/Potentiometer.c   
+	
+${OBJECTDIR}/Objects/Units/UnitArray.o: Objects/Units/UnitArray.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/Objects/Units" 
+	@${RM} ${OBJECTDIR}/Objects/Units/UnitArray.o.d 
+	@${RM} ${OBJECTDIR}/Objects/Units/UnitArray.o 
+	@${FIXDEPS} "${OBJECTDIR}/Objects/Units/UnitArray.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -MMD -MF "${OBJECTDIR}/Objects/Units/UnitArray.o.d" -o ${OBJECTDIR}/Objects/Units/UnitArray.o Objects/Units/UnitArray.c   
 	
 else
+${OBJECTDIR}/Objects/Algo/Algo.o: Objects/Algo/Algo.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/Objects/Algo" 
+	@${RM} ${OBJECTDIR}/Objects/Algo/Algo.o.d 
+	@${RM} ${OBJECTDIR}/Objects/Algo/Algo.o 
+	@${FIXDEPS} "${OBJECTDIR}/Objects/Algo/Algo.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -MMD -MF "${OBJECTDIR}/Objects/Algo/Algo.o.d" -o ${OBJECTDIR}/Objects/Algo/Algo.o Objects/Algo/Algo.c   
+	
 ${OBJECTDIR}/source/main.o: source/main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/source" 
 	@${RM} ${OBJECTDIR}/source/main.o.d 
 	@${RM} ${OBJECTDIR}/source/main.o 
-	@${FIXDEPS} "${OBJECTDIR}/source/main.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -MMD -MF "${OBJECTDIR}/source/main.o.d" -o ${OBJECTDIR}/source/main.o source/main.c   
+	@${FIXDEPS} "${OBJECTDIR}/source/main.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -MMD -MF "${OBJECTDIR}/source/main.o.d" -o ${OBJECTDIR}/source/main.o source/main.c   
 	
 ${OBJECTDIR}/source/StateMachine.o: source/StateMachine.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/source" 
 	@${RM} ${OBJECTDIR}/source/StateMachine.o.d 
 	@${RM} ${OBJECTDIR}/source/StateMachine.o 
-	@${FIXDEPS} "${OBJECTDIR}/source/StateMachine.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -MMD -MF "${OBJECTDIR}/source/StateMachine.o.d" -o ${OBJECTDIR}/source/StateMachine.o source/StateMachine.c   
+	@${FIXDEPS} "${OBJECTDIR}/source/StateMachine.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -MMD -MF "${OBJECTDIR}/source/StateMachine.o.d" -o ${OBJECTDIR}/source/StateMachine.o source/StateMachine.c   
 	
 ${OBJECTDIR}/source/Interrupts.o: source/Interrupts.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/source" 
 	@${RM} ${OBJECTDIR}/source/Interrupts.o.d 
 	@${RM} ${OBJECTDIR}/source/Interrupts.o 
-	@${FIXDEPS} "${OBJECTDIR}/source/Interrupts.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -MMD -MF "${OBJECTDIR}/source/Interrupts.o.d" -o ${OBJECTDIR}/source/Interrupts.o source/Interrupts.c   
+	@${FIXDEPS} "${OBJECTDIR}/source/Interrupts.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -MMD -MF "${OBJECTDIR}/source/Interrupts.o.d" -o ${OBJECTDIR}/source/Interrupts.o source/Interrupts.c   
 	
 ${OBJECTDIR}/source/Setup.o: source/Setup.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/source" 
 	@${RM} ${OBJECTDIR}/source/Setup.o.d 
 	@${RM} ${OBJECTDIR}/source/Setup.o 
-	@${FIXDEPS} "${OBJECTDIR}/source/Setup.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -MMD -MF "${OBJECTDIR}/source/Setup.o.d" -o ${OBJECTDIR}/source/Setup.o source/Setup.c   
+	@${FIXDEPS} "${OBJECTDIR}/source/Setup.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -MMD -MF "${OBJECTDIR}/source/Setup.o.d" -o ${OBJECTDIR}/source/Setup.o source/Setup.c   
 	
 ${OBJECTDIR}/source/StateFunctions.o: source/StateFunctions.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/source" 
 	@${RM} ${OBJECTDIR}/source/StateFunctions.o.d 
 	@${RM} ${OBJECTDIR}/source/StateFunctions.o 
-	@${FIXDEPS} "${OBJECTDIR}/source/StateFunctions.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -MMD -MF "${OBJECTDIR}/source/StateFunctions.o.d" -o ${OBJECTDIR}/source/StateFunctions.o source/StateFunctions.c   
+	@${FIXDEPS} "${OBJECTDIR}/source/StateFunctions.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -MMD -MF "${OBJECTDIR}/source/StateFunctions.o.d" -o ${OBJECTDIR}/source/StateFunctions.o source/StateFunctions.c   
 	
 ${OBJECTDIR}/source/SourceTemplate.o: source/SourceTemplate.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/source" 
 	@${RM} ${OBJECTDIR}/source/SourceTemplate.o.d 
 	@${RM} ${OBJECTDIR}/source/SourceTemplate.o 
-	@${FIXDEPS} "${OBJECTDIR}/source/SourceTemplate.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -MMD -MF "${OBJECTDIR}/source/SourceTemplate.o.d" -o ${OBJECTDIR}/source/SourceTemplate.o source/SourceTemplate.c   
+	@${FIXDEPS} "${OBJECTDIR}/source/SourceTemplate.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -MMD -MF "${OBJECTDIR}/source/SourceTemplate.o.d" -o ${OBJECTDIR}/source/SourceTemplate.o source/SourceTemplate.c   
 	
 ${OBJECTDIR}/source/SkadiFunctions.o: source/SkadiFunctions.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/source" 
 	@${RM} ${OBJECTDIR}/source/SkadiFunctions.o.d 
 	@${RM} ${OBJECTDIR}/source/SkadiFunctions.o 
-	@${FIXDEPS} "${OBJECTDIR}/source/SkadiFunctions.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -MMD -MF "${OBJECTDIR}/source/SkadiFunctions.o.d" -o ${OBJECTDIR}/source/SkadiFunctions.o source/SkadiFunctions.c   
-	
-${OBJECTDIR}/source/Potentiometer.o: source/Potentiometer.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/source" 
-	@${RM} ${OBJECTDIR}/source/Potentiometer.o.d 
-	@${RM} ${OBJECTDIR}/source/Potentiometer.o 
-	@${FIXDEPS} "${OBJECTDIR}/source/Potentiometer.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -MMD -MF "${OBJECTDIR}/source/Potentiometer.o.d" -o ${OBJECTDIR}/source/Potentiometer.o source/Potentiometer.c   
+	@${FIXDEPS} "${OBJECTDIR}/source/SkadiFunctions.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -MMD -MF "${OBJECTDIR}/source/SkadiFunctions.o.d" -o ${OBJECTDIR}/source/SkadiFunctions.o source/SkadiFunctions.c   
 	
 ${OBJECTDIR}/source/LedDriver.o: source/LedDriver.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/source" 
 	@${RM} ${OBJECTDIR}/source/LedDriver.o.d 
 	@${RM} ${OBJECTDIR}/source/LedDriver.o 
-	@${FIXDEPS} "${OBJECTDIR}/source/LedDriver.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -MMD -MF "${OBJECTDIR}/source/LedDriver.o.d" -o ${OBJECTDIR}/source/LedDriver.o source/LedDriver.c   
+	@${FIXDEPS} "${OBJECTDIR}/source/LedDriver.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -MMD -MF "${OBJECTDIR}/source/LedDriver.o.d" -o ${OBJECTDIR}/source/LedDriver.o source/LedDriver.c   
 	
 ${OBJECTDIR}/source/ControlAlgorithm.o: source/ControlAlgorithm.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/source" 
 	@${RM} ${OBJECTDIR}/source/ControlAlgorithm.o.d 
 	@${RM} ${OBJECTDIR}/source/ControlAlgorithm.o 
-	@${FIXDEPS} "${OBJECTDIR}/source/ControlAlgorithm.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -MMD -MF "${OBJECTDIR}/source/ControlAlgorithm.o.d" -o ${OBJECTDIR}/source/ControlAlgorithm.o source/ControlAlgorithm.c   
+	@${FIXDEPS} "${OBJECTDIR}/source/ControlAlgorithm.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -MMD -MF "${OBJECTDIR}/source/ControlAlgorithm.o.d" -o ${OBJECTDIR}/source/ControlAlgorithm.o source/ControlAlgorithm.c   
+	
+${OBJECTDIR}/Objects/Units/Unit.o: Objects/Units/Unit.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/Objects/Units" 
+	@${RM} ${OBJECTDIR}/Objects/Units/Unit.o.d 
+	@${RM} ${OBJECTDIR}/Objects/Units/Unit.o 
+	@${FIXDEPS} "${OBJECTDIR}/Objects/Units/Unit.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -MMD -MF "${OBJECTDIR}/Objects/Units/Unit.o.d" -o ${OBJECTDIR}/Objects/Units/Unit.o Objects/Units/Unit.c   
+	
+${OBJECTDIR}/source/Potentiometer.o: source/Potentiometer.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/source" 
+	@${RM} ${OBJECTDIR}/source/Potentiometer.o.d 
+	@${RM} ${OBJECTDIR}/source/Potentiometer.o 
+	@${FIXDEPS} "${OBJECTDIR}/source/Potentiometer.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -MMD -MF "${OBJECTDIR}/source/Potentiometer.o.d" -o ${OBJECTDIR}/source/Potentiometer.o source/Potentiometer.c   
+	
+${OBJECTDIR}/Objects/Units/UnitArray.o: Objects/Units/UnitArray.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/Objects/Units" 
+	@${RM} ${OBJECTDIR}/Objects/Units/UnitArray.o.d 
+	@${RM} ${OBJECTDIR}/Objects/Units/UnitArray.o 
+	@${FIXDEPS} "${OBJECTDIR}/Objects/Units/UnitArray.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -MMD -MF "${OBJECTDIR}/Objects/Units/UnitArray.o.d" -o ${OBJECTDIR}/Objects/Units/UnitArray.o Objects/Units/UnitArray.c   
 	
 endif
 

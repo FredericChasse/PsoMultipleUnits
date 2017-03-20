@@ -88,6 +88,8 @@ void StartInterrupts  (void);
 #define SW2           PORTEbits.RE6
 #define SW3           PORTEbits.RE7
 
-#define PI            3.14159265359f
+#define PI            (3.14159265359f)
+
+#define N_UNITS_TOTAL (8)
 
 #endif	/* __SETUP_H__ */
