@@ -28,11 +28,16 @@
 // Public definitions
 //==============================================================================
 
+typedef enum
+{
+  PSO_TYPE_PARALLEL_PSO
+ ,PSO_TYPE_PSO_1D
+} PsoType_t;
+
 
 // Public functions
 //==============================================================================
-const AlgoInterface_t * Pso1dInterface(void);
-const AlgoInterface_t * ParallelPsoInterface(void);
+const AlgoInterface_t * PsoInterface(PsoType_t psoType);
 
 
 

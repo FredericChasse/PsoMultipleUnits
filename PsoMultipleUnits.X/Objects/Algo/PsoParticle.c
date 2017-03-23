@@ -45,27 +45,31 @@ typedef struct
   BOOL oSentinelWarning;
   ParticleState_t state;
   SteadyState_t steadyState;
+  float steadyStateBuf[STEADY_STATE_MAX_SAMPLES];
+  UINT8 linkKey;
 } PsoParticle_t;
 
 
 // Private prototypes
 //==============================================================================
 
-void  _Particle_Init          (PsoParticle_t *p, UINT8 id);
-UINT8 _Particle_GetId         (PsoParticle_t *p);
-void  _Particle_SetId         (PsoParticle_t *p, UINT8 id);
-float _Particle_GetPos        (PsoParticle_t *p);
-float _Particle_GetFitness    (PsoParticle_t *p);
-float _Particle_GetSpeed      (PsoParticle_t *p);
-void  _Particle_SetPos        (PsoParticle_t *p, float pos);
-void  _Particle_SetSpeed      (PsoParticle_t *p, float speed);
-void  _Particle_SetFitness    (PsoParticle_t *p, float fitness);
-BOOL  _Particle_FsmStep       (PsoParticle_t *p, PsoSwarmInterface_t *swarm);
-BOOL  _Particle_SentinelEval  (PsoParticle_t *p);
-void  _Particle_ComputeSpeed  (PsoParticle_t *p, PsoSwarmInterface_t *swarm);
-void  _Particle_ComputePos    (PsoParticle_t *p, PsoSwarmInterface_t *swarm);
-void  _Particle_InitSpeed     (PsoParticle_t *p, PsoSwarmInterface_t *swarm);
-void  _Particle_InitPos       (PsoParticle_t *p, PsoSwarmInterface_t *swarm);
+void  _Particle_Init            (PsoParticle_t *p, UINT8 id);
+UINT8 _Particle_GetId           (PsoParticle_t *p);
+void  _Particle_SetId           (PsoParticle_t *p, UINT8 id);
+void  _Particle_Release         (PsoParticle_t *p);
+float _Particle_GetPos          (PsoParticle_t *p);
+float _Particle_GetFitness      (PsoParticle_t *p);
+float _Particle_GetSpeed        (PsoParticle_t *p);
+void  _Particle_SetPos          (PsoParticle_t *p, float pos);
+void  _Particle_SetSpeed        (PsoParticle_t *p, float speed);
+void  _Particle_SetFitness      (PsoParticle_t *p, float fitness);
+BOOL  _Particle_FsmStep         (PsoParticle_t *p, PsoSwarmInterface_t *swarm);
+BOOL  _Particle_SentinelEval    (PsoParticle_t *p);
+void  _Particle_ComputeSpeed    (PsoParticle_t *p, PsoSwarmInterface_t *swarm);
+void  _Particle_ComputePos      (PsoParticle_t *p, PsoSwarmInterface_t *swarm);
+void  _Particle_InitSpeed       (PsoParticle_t *p, PsoSwarmInterface_t *swarm);
+void  _Particle_InitPos         (PsoParticle_t *p, PsoSwarmInterface_t *swarm);
+void  _Particle_SetSteadyState  (PsoParticle_t *p, size_t bufSize, float oscAmp);
 
 
 
@@ -97,6 +101,20 @@ void _Particle_Init (PsoParticle_t *p, UINT8 id)
   Position_Reset(&p->pbestAbs);
   Position_Reset(&p->pos);
   p->id = id;
+}
+
+
+void _Particle_SetSteadyState(PsoParticle_t *p, size_t bufSize, float oscAmp)
+{
+  SteadyState_Init(&p->steadyState, p->steadyStateBuf, bufSize, oscAmp);
+}
+
+
+void _Particle_Release (PsoParticle_t *p)
+{
+  Node_t *node = &_particlesNodes[p->linkKey];
+  LinkedList_RemoveNode(node->list, node);
+  LinkedList_AddToEnd(&_unusedParticles, node);
 }
 
 
@@ -208,22 +226,25 @@ const PsoParticleInterface_t * PsoParticleInterface (void)
     {
       // Init the particle itself and its interface
       _Particle_Init(&_particles[i], 0);
-      _particles_if[i].ctx          = (void *)                      &_particles[i];
-      _particles_if[i].ComputePos   = (PsoParticleComputePos_fct)   &_Particle_ComputePos;
-      _particles_if[i].ComputeSpeed = (PsoParticleComputeSpeed_fct) &_Particle_ComputeSpeed;
-      _particles_if[i].FsmStep      = (PsoParticleFsmStep_fct)      &_Particle_FsmStep;
-      _particles_if[i].GetFitness   = (PsoParticleGetFitness_fct)   &_Particle_GetFitness;
-      _particles_if[i].GetPos       = (PsoParticleGetPos_fct)       &_Particle_GetPos;
-      _particles_if[i].GetSpeed     = (PsoParticleGetSpeed_fct)     &_Particle_GetSpeed;
-      _particles_if[i].Getid        = (PsoParticleGetId_fct)        &_Particle_GetId;
-      _particles_if[i].Init         = (PsoParticleInit_fct)         &_Particle_Init;
-      _particles_if[i].InitPos      = (PsoParticleInitPos_fct)      &_Particle_InitPos;
-      _particles_if[i].InitSpeed    = (PsoParticleInitSpeed_fct)    &_Particle_InitSpeed;
-      _particles_if[i].SentinelEval = (PsoParticleSentinelEval_fct) &_Particle_SentinelEval;
-      _particles_if[i].SetFitness   = (PsoParticleSetFitness_fct)   &_Particle_SetFitness;
-      _particles_if[i].SetId        = (PsoParticleSetId_fct)        &_Particle_SetId;
-      _particles_if[i].SetPos       = (PsoParticleSetPos_fct)       &_Particle_SetPos;
-      _particles_if[i].SetSpeed     = (PsoParticleSetSpeed_fct)     &_Particle_SetSpeed;
+      _particles[i].linkKey = i;
+      _particles_if[i].ctx            = (void *)                        &_particles[i];
+      _particles_if[i].ComputePos     = (PsoParticleComputePos_fct)     &_Particle_ComputePos;
+      _particles_if[i].ComputeSpeed   = (PsoParticleComputeSpeed_fct)   &_Particle_ComputeSpeed;
+      _particles_if[i].FsmStep        = (PsoParticleFsmStep_fct)        &_Particle_FsmStep;
+      _particles_if[i].GetFitness     = (PsoParticleGetFitness_fct)     &_Particle_GetFitness;
+      _particles_if[i].GetPos         = (PsoParticleGetPos_fct)         &_Particle_GetPos;
+      _particles_if[i].GetSpeed       = (PsoParticleGetSpeed_fct)       &_Particle_GetSpeed;
+      _particles_if[i].Getid          = (PsoParticleGetId_fct)          &_Particle_GetId;
+      _particles_if[i].Init           = (PsoParticleInit_fct)           &_Particle_Init;
+      _particles_if[i].InitPos        = (PsoParticleInitPos_fct)        &_Particle_InitPos;
+      _particles_if[i].InitSpeed      = (PsoParticleInitSpeed_fct)      &_Particle_InitSpeed;
+      _particles_if[i].SentinelEval   = (PsoParticleSentinelEval_fct)   &_Particle_SentinelEval;
+      _particles_if[i].SetFitness     = (PsoParticleSetFitness_fct)     &_Particle_SetFitness;
+      _particles_if[i].SetId          = (PsoParticleSetId_fct)          &_Particle_SetId;
+      _particles_if[i].SetPos         = (PsoParticleSetPos_fct)         &_Particle_SetPos;
+      _particles_if[i].SetSpeed       = (PsoParticleSetSpeed_fct)       &_Particle_SetSpeed;
+      _particles_if[i].Release        = (PsoParticleRelease_fct)        &_Particle_Release;
+      _particles_if[i].SetSteadyState = (PsoParticleSetSteadyState_fct) &_Particle_SetSteadyState;
       
       // Init the linked list
       _particlesNodes[i].ctx = (void *) &_particles_if[i];

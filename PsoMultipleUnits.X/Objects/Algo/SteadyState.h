@@ -26,6 +26,8 @@
 // Public definitions
 //==============================================================================
 
+#define STEADY_STATE_MAX_SAMPLES      (10)
+
 typedef struct
 {
   // Circular sample buffer
