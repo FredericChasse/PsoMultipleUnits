@@ -12,10 +12,6 @@
       <itemPath>Objects/Algo/SteadyState.c</itemPath>
       <itemPath>Objects/Algo/SteadyState.h</itemPath>
     </logicalFolder>
-    <logicalFolder name="f3" displayName="BipBuffer" projectFiles="true">
-      <itemPath>BipBuffer/BipBuffer.c</itemPath>
-      <itemPath>BipBuffer/BipBuffer.h</itemPath>
-    </logicalFolder>
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
@@ -56,6 +52,16 @@
       <itemPath>Objects/Units/Unit.h</itemPath>
       <itemPath>Objects/Units/UnitArray.h</itemPath>
     </logicalFolder>
+    <logicalFolder name="f4" displayName="Utilities" projectFiles="true">
+      <logicalFolder name="f1" displayName="BipBuffer" projectFiles="true">
+        <itemPath>Utilities/BipBuffer/BipBuffer.c</itemPath>
+        <itemPath>Utilities/BipBuffer/BipBuffer.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f2" displayName="ChainedList" projectFiles="true">
+        <itemPath>Utilities/ChainedList/LinkedList.c</itemPath>
+        <itemPath>Utilities/ChainedList/LinkedList.h</itemPath>
+      </logicalFolder>
+    </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
                    projectFiles="false">
@@ -70,6 +76,8 @@
     <Elem>Objects/Algo</Elem>
     <Elem>Objects/Units</Elem>
     <Elem>BipBuffer</Elem>
+    <Elem>Utilities/BipBuffer</Elem>
+    <Elem>Utilities/ChainedList</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -131,7 +139,7 @@
         <property key="enable-unroll-loops" value="false"/>
         <property key="exclude-floating-point" value="false"/>
         <property key="extra-include-directories"
-                  value="source;headers;Objects\Algo;Objects\Units;BipBuffer"/>
+                  value="source;headers;Objects\Algo;Objects\Units;Utilities\BipBuffer;Utilities\ChainedList"/>
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="false"/>
