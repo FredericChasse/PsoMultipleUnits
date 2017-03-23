@@ -4,13 +4,13 @@
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //
-// File    : PsoSwarm.h
+// File    : SteadyState.h
 // Author  : Frederic Chasse
 // Date    : 2017-03-19
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //
-// Purpose : This file implements the swarms of PSO.
+// Purpose : This file implements the steady state methods.
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //
@@ -18,42 +18,35 @@
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-#ifndef __PSO_SWARM_H__
-#define __PSO_SWARM_H__
+#ifndef __STEADY_STATE_H__
+#define __STEADY_STATE_H__
 
 #include "Setup.h"
-#include "UnitArray.h"
 
 // Public definitions
 //==============================================================================
 
 typedef struct
 {
-  float curPos;
-  float curFitness;
-  float prevPos;
-  float prevFitness;
-} Position_t;
-
-typedef enum
-{
-  PSO_SWARM_TYPE_PARALLEL_PSO
- ,PSO_SWARM_TYPE_PSO_1D
-} PsoSwarmType_t;
-
-typedef struct
-{
-  void *ctx;
-} PsoSwarmInterface_t;
-
+  // Circular sample buffer
+  float  *buf;
+  size_t  inIdx;
+  size_t  outIdx;
+  size_t  bufSize;
+  size_t  count;
+  
+  float   oscAmp;
+  BOOL    oInSteadyState;
+} SteadyState_t;
 
 // Public functions
 //==============================================================================
 
-const PsoSwarmInterface_t * PsoSwarmInterface(void);
+BOOL SteadyState_CheckForSteadyState (SteadyState_t *ss);
+void SteadyState_Init (SteadyState_t *ss, float *sampleBuf, size_t bufSize, float oscAmp);
+void SteadyState_AddSample (SteadyState_t *ss, float *newSample);
+void SteadyState_Reset (SteadyState_t *ss);
 
-void Position_Reset (Position_t *pos);
 
 
-
-#endif // __PSO_SWARM_H__
+#endif // __STEADY_STATE_H__

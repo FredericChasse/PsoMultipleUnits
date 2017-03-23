@@ -9,6 +9,12 @@
       <itemPath>Objects/Algo/PsoSwarm.h</itemPath>
       <itemPath>Objects/Algo/PsoParticle.c</itemPath>
       <itemPath>Objects/Algo/PsoParticle.h</itemPath>
+      <itemPath>Objects/Algo/SteadyState.c</itemPath>
+      <itemPath>Objects/Algo/SteadyState.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="f3" displayName="BipBuffer" projectFiles="true">
+      <itemPath>BipBuffer/BipBuffer.c</itemPath>
+      <itemPath>BipBuffer/BipBuffer.h</itemPath>
     </logicalFolder>
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
@@ -22,6 +28,7 @@
       <itemPath>headers/SkadiFunctions.h</itemPath>
       <itemPath>headers/LedDriver.h</itemPath>
       <itemPath>headers/ControlAlgorithm.h</itemPath>
+      <itemPath>headers/ByteBuffer.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -39,6 +46,7 @@
       <itemPath>source/SkadiFunctions.c</itemPath>
       <itemPath>source/LedDriver.c</itemPath>
       <itemPath>source/ControlAlgorithm.c</itemPath>
+      <itemPath>source/ByteBuffer.c</itemPath>
     </logicalFolder>
     <logicalFolder name="f2" displayName="Units" projectFiles="true">
       <itemPath>source/Potentiometer.c</itemPath>
@@ -61,6 +69,7 @@
     <Elem>../../ChinookLib/ChinookLibs.X/headers</Elem>
     <Elem>Objects/Algo</Elem>
     <Elem>Objects/Units</Elem>
+    <Elem>BipBuffer</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -122,7 +131,7 @@
         <property key="enable-unroll-loops" value="false"/>
         <property key="exclude-floating-point" value="false"/>
         <property key="extra-include-directories"
-                  value="source;headers;Objects\Algo;Objects\Units"/>
+                  value="source;headers;Objects\Algo;Objects\Units;BipBuffer"/>
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="false"/>

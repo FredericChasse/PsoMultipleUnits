@@ -18,8 +18,8 @@
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-#ifndef _PSO_PARTICLE_H__
-#define _PSO_PARTICLE_H__
+#ifndef __PSO_PARTICLE_H__
+#define __PSO_PARTICLE_H__
 
 #include "Setup.h"
 #include "UnitArray.h"
@@ -27,12 +27,17 @@
 // Public definitions
 //==============================================================================
 
+typedef struct
+{
+  void *ctx;
+} PsoParticleInterface_t;
+
 
 // Public functions
 //==============================================================================
 
+const PsoParticleInterface_t * PsoParticleInterface (void);
 
 
 
-
-#endif // _PSO_PARTICLE_H__
+#endif // __PSO_PARTICLE_H__
