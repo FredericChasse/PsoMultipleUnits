@@ -48,30 +48,32 @@ typedef void  (*PsoParticleSetSteadyState_fct)  (void *ctx, size_t bufSize, floa
 typedef void  (*PsoParticleSetPbest_fct)        (void *ctx, Position_t *pbest);
 typedef void  (*PsoParticleSetPbestAbs_fct)     (void *ctx, Position_t *pbestAbs);
 typedef void  (*PsoParticleComputePbest_fct)    (void *ctx);
+typedef BOOL  (*PsoParticleEvalSteadyState_fct) (void *ctx);
 
 typedef struct
 {
   void *ctx;
-  PsoParticleInit_fct           Init;
-  PsoParticleGetId_fct          Getid;
-  PsoParticleSetId_fct          SetId;
-  PsoParticleGetPos_fct         GetPos;
-  PsoParticleGetFitness_fct     GetFitness;
-  PsoParticleGetSpeed_fct       GetSpeed;
-  PsoParticleSetPos_fct         SetPos;
-  PsoParticleSetSpeed_fct       SetSpeed;
-  PsoParticleSetFitness_fct     SetFitness;
-  PsoParticleFsmStep_fct        FsmStep;
-  PsoParticleSentinelEval_fct   SentinelEval;
-  PsoParticleComputeSpeed_fct   ComputeSpeed;
-  PsoParticleComputePos_fct     ComputePos;
-  PsoParticleInitSpeed_fct      InitSpeed;
-  PsoParticleInitPos_fct        InitPos;
-  PsoParticleRelease_fct        Release;
-  PsoParticleSetSteadyState_fct SetSteadyState;
-  PsoParticleSetPbest_fct       SetPbest;
-  PsoParticleSetPbestAbs_fct    SetPbestAbs;
-  PsoParticleComputePbest_fct   ComputePbest;
+  PsoParticleInit_fct             Init;
+  PsoParticleGetId_fct            Getid;
+  PsoParticleSetId_fct            SetId;
+  PsoParticleGetPos_fct           GetPos;
+  PsoParticleGetFitness_fct       GetFitness;
+  PsoParticleGetSpeed_fct         GetSpeed;
+  PsoParticleSetPos_fct           SetPos;
+  PsoParticleSetSpeed_fct         SetSpeed;
+  PsoParticleSetFitness_fct       SetFitness;
+  PsoParticleFsmStep_fct          FsmStep;
+  PsoParticleSentinelEval_fct     SentinelEval;
+  PsoParticleComputeSpeed_fct     ComputeSpeed;
+  PsoParticleComputePos_fct       ComputePos;
+  PsoParticleInitSpeed_fct        InitSpeed;
+  PsoParticleInitPos_fct          InitPos;
+  PsoParticleRelease_fct          Release;
+  PsoParticleSetSteadyState_fct   SetSteadyState;
+  PsoParticleSetPbest_fct         SetPbest;
+  PsoParticleSetPbestAbs_fct      SetPbestAbs;
+  PsoParticleComputePbest_fct     ComputePbest;
+  PsoParticleEvalSteadyState_fct  EvalSteadyState;
 } PsoParticleInterface_t;
 
 

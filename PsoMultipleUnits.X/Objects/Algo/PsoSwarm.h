@@ -27,6 +27,8 @@
 // Public definitions
 //==============================================================================
 
+#define PSO_SWARM_MAX_PARTICLES   (10)
+
 typedef struct
 {
   float curPos;
@@ -54,20 +56,33 @@ typedef struct
   float         steadyStateOscAmp;
   size_t        nSamplesForSteadyState;
   UINT8         minParticles;
+  UINT32        iteration;
+  UINT8         currentParticle;
 } PsoSwarmParam_t;
 
-typedef INT8  (*PsoSwarmInit_fct)                       (void *ctx, UnitArrayInterface_t *unitArray, PsoSwarmParam_t *param);
-typedef void  (*PsoSwarmComputeGbest_fct)               (void *ctx);
-typedef void  (*PsoSwarmRandomizeAllParticles_fct)      (void *ctx);
-typedef void  (*PsoSwarmRandomizeCertainParticles_fct)  (void *ctx, UINT8 *idx, UINT8 nParticlesToRandomize);
-typedef INT8  (*PsoSwarmAddParticle_fct)                (void *ctx, void *p);
-typedef void* (*PsoSwarmGetParticle_fct)                (void *ctx, UINT8 idx);
-typedef void  (*PsoSwarmRemoveParticles_fct)            (void *ctx, UINT8 *idx, UINT8 nParticles);
-typedef UINT8 (*PsoSwarmCheckForPerturb_fct)            (void *ctx, UINT8 *idxPerturbed);
-typedef void  (*PsoSwarmRelease_fct)                    (void *ctx);
-typedef void  (*PsoSwarmGetParam_fct)                   (void *ctx, PsoSwarmParam_t *paramDest);
-typedef void  (*PsoSwarmGetGbest_fct)                   (void *ctx, Position_t *gbestDest);
-
+typedef INT8    (*PsoSwarmInit_fct)                       (void *ctx, UnitArrayInterface_t *unitArray, PsoSwarmParam_t *param);
+typedef void    (*PsoSwarmComputeGbest_fct)               (void *ctx);
+typedef void    (*PsoSwarmRandomizeAllParticles_fct)      (void *ctx);
+typedef void    (*PsoSwarmRandomizeCertainParticles_fct)  (void *ctx, UINT8 *idx, UINT8 nParticlesToRandomize);
+typedef INT8    (*PsoSwarmAddParticle_fct)                (void *ctx, void *p);
+typedef void*   (*PsoSwarmGetParticle_fct)                (void *ctx, UINT8 idx);
+typedef void    (*PsoSwarmRemoveParticles_fct)            (void *ctx, UINT8 *idx, UINT8 nParticles);
+typedef UINT8   (*PsoSwarmCheckForPerturb_fct)            (void *ctx, UINT8 *idxPerturbed);
+typedef void    (*PsoSwarmRelease_fct)                    (void *ctx);
+typedef void    (*PsoSwarmGetParam_fct)                   (void *ctx, PsoSwarmParam_t *paramDest);
+typedef void    (*PsoSwarmGetGbest_fct)                   (void *ctx, Position_t *gbestDest);
+typedef UINT32  (*PsoSwarmGetIteration_fct)               (void *ctx);
+typedef void    (*PsoSwarmIterationIncrement_fct)         (void *ctx);
+typedef void    (*PsoSwarmSetAllParticlesFitness_fct)     (void *ctx, float *fitBuf);
+typedef void    (*PsoSwarmSetParticleFitness_fct)         (void *ctx, UINT8 idx, float fitness);
+typedef UINT8   (*PsoSwarmGetNParticles_fct)              (void *ctx);
+typedef void    (*PsoSwarmIncrementCurParticle_fct)       (void *ctx);
+typedef UINT8   (*PsoSwarmGetCurParticle_fct)             (void *ctx);
+typedef void    (*PsoSwarmComputeAllParticlesPbest_fct)   (void *ctx);
+typedef BOOL    (*PsoSwarmEvalSteadyState_fct)            (void *ctx);
+typedef void    (*PsoSwarmComputeNextPos_fct)             (void *ctx, float *positions);
+typedef UINT8   (*PsoSwarmGetId_fct)                      (void *ctx);
+  
 typedef struct
 {
   void                                 *ctx;
@@ -82,6 +97,17 @@ typedef struct
   PsoSwarmRelease_fct                   Release;
   PsoSwarmGetParam_fct                  GetParam;
   PsoSwarmGetGbest_fct                  GetGbest;
+  PsoSwarmGetIteration_fct              GetIteration;
+  PsoSwarmIterationIncrement_fct        IterationInc;
+  PsoSwarmSetAllParticlesFitness_fct    SetAllParticlesFitness;
+  PsoSwarmSetParticleFitness_fct        SetParticleFitness;
+  PsoSwarmGetNParticles_fct             GetNParticles;
+  PsoSwarmIncrementCurParticle_fct      IncCurrentParticle;
+  PsoSwarmGetCurParticle_fct            GetCurParticle;
+  PsoSwarmComputeAllParticlesPbest_fct  ComputeAllPbest;
+  PsoSwarmEvalSteadyState_fct           EvalSteadyState;
+  PsoSwarmComputeNextPos_fct            ComputeNextPos;
+  PsoSwarmGetId_fct                     GetId;
 } PsoSwarmInterface_t;
 
 

@@ -45,17 +45,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=Objects/Algo/Pso.c Objects/Algo/PsoSwarm.c Objects/Algo/PsoParticle.c source/main.c source/StateMachine.c source/Interrupts.c source/Setup.c source/StateFunctions.c source/SourceTemplate.c source/SkadiFunctions.c source/LedDriver.c source/ControlAlgorithm.c source/Potentiometer.c Objects/Units/Unit.c Objects/Units/UnitArray.c Objects/Algo/SteadyState.c source/ByteBuffer.c Utilities/BipBuffer/BipBuffer.c Utilities/ChainedList/LinkedList.c Utilities/PcgRng/pcg_basic.c Utilities/PcgRng/Rng.c
+SOURCEFILES_QUOTED_IF_SPACED=Objects/Algo/Pso.c Objects/Algo/PsoSwarm.c Objects/Algo/PsoParticle.c Objects/Algo/SteadyState.c source/main.c source/StateMachine.c source/Interrupts.c source/Setup.c source/StateFunctions.c source/SourceTemplate.c source/SkadiFunctions.c source/LedDriver.c source/ControlAlgorithm.c source/ByteBuffer.c source/Potentiometer.c Objects/Units/Unit.c Objects/Units/UnitArray.c Utilities/BipBuffer/BipBuffer.c Utilities/ChainedList/LinkedList.c Utilities/PcgRng/pcg_basic.c Utilities/PcgRng/Rng.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/Objects/Algo/Pso.o ${OBJECTDIR}/Objects/Algo/PsoSwarm.o ${OBJECTDIR}/Objects/Algo/PsoParticle.o ${OBJECTDIR}/source/main.o ${OBJECTDIR}/source/StateMachine.o ${OBJECTDIR}/source/Interrupts.o ${OBJECTDIR}/source/Setup.o ${OBJECTDIR}/source/StateFunctions.o ${OBJECTDIR}/source/SourceTemplate.o ${OBJECTDIR}/source/SkadiFunctions.o ${OBJECTDIR}/source/LedDriver.o ${OBJECTDIR}/source/ControlAlgorithm.o ${OBJECTDIR}/source/Potentiometer.o ${OBJECTDIR}/Objects/Units/Unit.o ${OBJECTDIR}/Objects/Units/UnitArray.o ${OBJECTDIR}/Objects/Algo/SteadyState.o ${OBJECTDIR}/source/ByteBuffer.o ${OBJECTDIR}/Utilities/BipBuffer/BipBuffer.o ${OBJECTDIR}/Utilities/ChainedList/LinkedList.o ${OBJECTDIR}/Utilities/PcgRng/pcg_basic.o ${OBJECTDIR}/Utilities/PcgRng/Rng.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/Objects/Algo/Pso.o.d ${OBJECTDIR}/Objects/Algo/PsoSwarm.o.d ${OBJECTDIR}/Objects/Algo/PsoParticle.o.d ${OBJECTDIR}/source/main.o.d ${OBJECTDIR}/source/StateMachine.o.d ${OBJECTDIR}/source/Interrupts.o.d ${OBJECTDIR}/source/Setup.o.d ${OBJECTDIR}/source/StateFunctions.o.d ${OBJECTDIR}/source/SourceTemplate.o.d ${OBJECTDIR}/source/SkadiFunctions.o.d ${OBJECTDIR}/source/LedDriver.o.d ${OBJECTDIR}/source/ControlAlgorithm.o.d ${OBJECTDIR}/source/Potentiometer.o.d ${OBJECTDIR}/Objects/Units/Unit.o.d ${OBJECTDIR}/Objects/Units/UnitArray.o.d ${OBJECTDIR}/Objects/Algo/SteadyState.o.d ${OBJECTDIR}/source/ByteBuffer.o.d ${OBJECTDIR}/Utilities/BipBuffer/BipBuffer.o.d ${OBJECTDIR}/Utilities/ChainedList/LinkedList.o.d ${OBJECTDIR}/Utilities/PcgRng/pcg_basic.o.d ${OBJECTDIR}/Utilities/PcgRng/Rng.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/Objects/Algo/Pso.o ${OBJECTDIR}/Objects/Algo/PsoSwarm.o ${OBJECTDIR}/Objects/Algo/PsoParticle.o ${OBJECTDIR}/Objects/Algo/SteadyState.o ${OBJECTDIR}/source/main.o ${OBJECTDIR}/source/StateMachine.o ${OBJECTDIR}/source/Interrupts.o ${OBJECTDIR}/source/Setup.o ${OBJECTDIR}/source/StateFunctions.o ${OBJECTDIR}/source/SourceTemplate.o ${OBJECTDIR}/source/SkadiFunctions.o ${OBJECTDIR}/source/LedDriver.o ${OBJECTDIR}/source/ControlAlgorithm.o ${OBJECTDIR}/source/ByteBuffer.o ${OBJECTDIR}/source/Potentiometer.o ${OBJECTDIR}/Objects/Units/Unit.o ${OBJECTDIR}/Objects/Units/UnitArray.o ${OBJECTDIR}/Utilities/BipBuffer/BipBuffer.o ${OBJECTDIR}/Utilities/ChainedList/LinkedList.o ${OBJECTDIR}/Utilities/PcgRng/pcg_basic.o ${OBJECTDIR}/Utilities/PcgRng/Rng.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/Objects/Algo/Pso.o.d ${OBJECTDIR}/Objects/Algo/PsoSwarm.o.d ${OBJECTDIR}/Objects/Algo/PsoParticle.o.d ${OBJECTDIR}/Objects/Algo/SteadyState.o.d ${OBJECTDIR}/source/main.o.d ${OBJECTDIR}/source/StateMachine.o.d ${OBJECTDIR}/source/Interrupts.o.d ${OBJECTDIR}/source/Setup.o.d ${OBJECTDIR}/source/StateFunctions.o.d ${OBJECTDIR}/source/SourceTemplate.o.d ${OBJECTDIR}/source/SkadiFunctions.o.d ${OBJECTDIR}/source/LedDriver.o.d ${OBJECTDIR}/source/ControlAlgorithm.o.d ${OBJECTDIR}/source/ByteBuffer.o.d ${OBJECTDIR}/source/Potentiometer.o.d ${OBJECTDIR}/Objects/Units/Unit.o.d ${OBJECTDIR}/Objects/Units/UnitArray.o.d ${OBJECTDIR}/Utilities/BipBuffer/BipBuffer.o.d ${OBJECTDIR}/Utilities/ChainedList/LinkedList.o.d ${OBJECTDIR}/Utilities/PcgRng/pcg_basic.o.d ${OBJECTDIR}/Utilities/PcgRng/Rng.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/Objects/Algo/Pso.o ${OBJECTDIR}/Objects/Algo/PsoSwarm.o ${OBJECTDIR}/Objects/Algo/PsoParticle.o ${OBJECTDIR}/source/main.o ${OBJECTDIR}/source/StateMachine.o ${OBJECTDIR}/source/Interrupts.o ${OBJECTDIR}/source/Setup.o ${OBJECTDIR}/source/StateFunctions.o ${OBJECTDIR}/source/SourceTemplate.o ${OBJECTDIR}/source/SkadiFunctions.o ${OBJECTDIR}/source/LedDriver.o ${OBJECTDIR}/source/ControlAlgorithm.o ${OBJECTDIR}/source/Potentiometer.o ${OBJECTDIR}/Objects/Units/Unit.o ${OBJECTDIR}/Objects/Units/UnitArray.o ${OBJECTDIR}/Objects/Algo/SteadyState.o ${OBJECTDIR}/source/ByteBuffer.o ${OBJECTDIR}/Utilities/BipBuffer/BipBuffer.o ${OBJECTDIR}/Utilities/ChainedList/LinkedList.o ${OBJECTDIR}/Utilities/PcgRng/pcg_basic.o ${OBJECTDIR}/Utilities/PcgRng/Rng.o
+OBJECTFILES=${OBJECTDIR}/Objects/Algo/Pso.o ${OBJECTDIR}/Objects/Algo/PsoSwarm.o ${OBJECTDIR}/Objects/Algo/PsoParticle.o ${OBJECTDIR}/Objects/Algo/SteadyState.o ${OBJECTDIR}/source/main.o ${OBJECTDIR}/source/StateMachine.o ${OBJECTDIR}/source/Interrupts.o ${OBJECTDIR}/source/Setup.o ${OBJECTDIR}/source/StateFunctions.o ${OBJECTDIR}/source/SourceTemplate.o ${OBJECTDIR}/source/SkadiFunctions.o ${OBJECTDIR}/source/LedDriver.o ${OBJECTDIR}/source/ControlAlgorithm.o ${OBJECTDIR}/source/ByteBuffer.o ${OBJECTDIR}/source/Potentiometer.o ${OBJECTDIR}/Objects/Units/Unit.o ${OBJECTDIR}/Objects/Units/UnitArray.o ${OBJECTDIR}/Utilities/BipBuffer/BipBuffer.o ${OBJECTDIR}/Utilities/ChainedList/LinkedList.o ${OBJECTDIR}/Utilities/PcgRng/pcg_basic.o ${OBJECTDIR}/Utilities/PcgRng/Rng.o
 
 # Source Files
-SOURCEFILES=Objects/Algo/Pso.c Objects/Algo/PsoSwarm.c Objects/Algo/PsoParticle.c source/main.c source/StateMachine.c source/Interrupts.c source/Setup.c source/StateFunctions.c source/SourceTemplate.c source/SkadiFunctions.c source/LedDriver.c source/ControlAlgorithm.c source/Potentiometer.c Objects/Units/Unit.c Objects/Units/UnitArray.c Objects/Algo/SteadyState.c source/ByteBuffer.c Utilities/BipBuffer/BipBuffer.c Utilities/ChainedList/LinkedList.c Utilities/PcgRng/pcg_basic.c Utilities/PcgRng/Rng.c
+SOURCEFILES=Objects/Algo/Pso.c Objects/Algo/PsoSwarm.c Objects/Algo/PsoParticle.c Objects/Algo/SteadyState.c source/main.c source/StateMachine.c source/Interrupts.c source/Setup.c source/StateFunctions.c source/SourceTemplate.c source/SkadiFunctions.c source/LedDriver.c source/ControlAlgorithm.c source/ByteBuffer.c source/Potentiometer.c Objects/Units/Unit.c Objects/Units/UnitArray.c Utilities/BipBuffer/BipBuffer.c Utilities/ChainedList/LinkedList.c Utilities/PcgRng/pcg_basic.c Utilities/PcgRng/Rng.c
 
 
 CFLAGS=
@@ -112,6 +112,12 @@ ${OBJECTDIR}/Objects/Algo/PsoParticle.o: Objects/Algo/PsoParticle.c  nbproject/M
 	@${RM} ${OBJECTDIR}/Objects/Algo/PsoParticle.o 
 	@${FIXDEPS} "${OBJECTDIR}/Objects/Algo/PsoParticle.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -MMD -MF "${OBJECTDIR}/Objects/Algo/PsoParticle.o.d" -o ${OBJECTDIR}/Objects/Algo/PsoParticle.o Objects/Algo/PsoParticle.c   
 	
+${OBJECTDIR}/Objects/Algo/SteadyState.o: Objects/Algo/SteadyState.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/Objects/Algo" 
+	@${RM} ${OBJECTDIR}/Objects/Algo/SteadyState.o.d 
+	@${RM} ${OBJECTDIR}/Objects/Algo/SteadyState.o 
+	@${FIXDEPS} "${OBJECTDIR}/Objects/Algo/SteadyState.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -MMD -MF "${OBJECTDIR}/Objects/Algo/SteadyState.o.d" -o ${OBJECTDIR}/Objects/Algo/SteadyState.o Objects/Algo/SteadyState.c   
+	
 ${OBJECTDIR}/source/main.o: source/main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/source" 
 	@${RM} ${OBJECTDIR}/source/main.o.d 
@@ -166,6 +172,12 @@ ${OBJECTDIR}/source/ControlAlgorithm.o: source/ControlAlgorithm.c  nbproject/Mak
 	@${RM} ${OBJECTDIR}/source/ControlAlgorithm.o 
 	@${FIXDEPS} "${OBJECTDIR}/source/ControlAlgorithm.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -MMD -MF "${OBJECTDIR}/source/ControlAlgorithm.o.d" -o ${OBJECTDIR}/source/ControlAlgorithm.o source/ControlAlgorithm.c   
 	
+${OBJECTDIR}/source/ByteBuffer.o: source/ByteBuffer.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/source" 
+	@${RM} ${OBJECTDIR}/source/ByteBuffer.o.d 
+	@${RM} ${OBJECTDIR}/source/ByteBuffer.o 
+	@${FIXDEPS} "${OBJECTDIR}/source/ByteBuffer.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -MMD -MF "${OBJECTDIR}/source/ByteBuffer.o.d" -o ${OBJECTDIR}/source/ByteBuffer.o source/ByteBuffer.c   
+	
 ${OBJECTDIR}/source/Potentiometer.o: source/Potentiometer.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/source" 
 	@${RM} ${OBJECTDIR}/source/Potentiometer.o.d 
@@ -183,18 +195,6 @@ ${OBJECTDIR}/Objects/Units/UnitArray.o: Objects/Units/UnitArray.c  nbproject/Mak
 	@${RM} ${OBJECTDIR}/Objects/Units/UnitArray.o.d 
 	@${RM} ${OBJECTDIR}/Objects/Units/UnitArray.o 
 	@${FIXDEPS} "${OBJECTDIR}/Objects/Units/UnitArray.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -MMD -MF "${OBJECTDIR}/Objects/Units/UnitArray.o.d" -o ${OBJECTDIR}/Objects/Units/UnitArray.o Objects/Units/UnitArray.c   
-	
-${OBJECTDIR}/Objects/Algo/SteadyState.o: Objects/Algo/SteadyState.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/Objects/Algo" 
-	@${RM} ${OBJECTDIR}/Objects/Algo/SteadyState.o.d 
-	@${RM} ${OBJECTDIR}/Objects/Algo/SteadyState.o 
-	@${FIXDEPS} "${OBJECTDIR}/Objects/Algo/SteadyState.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -MMD -MF "${OBJECTDIR}/Objects/Algo/SteadyState.o.d" -o ${OBJECTDIR}/Objects/Algo/SteadyState.o Objects/Algo/SteadyState.c   
-	
-${OBJECTDIR}/source/ByteBuffer.o: source/ByteBuffer.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/source" 
-	@${RM} ${OBJECTDIR}/source/ByteBuffer.o.d 
-	@${RM} ${OBJECTDIR}/source/ByteBuffer.o 
-	@${FIXDEPS} "${OBJECTDIR}/source/ByteBuffer.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -MMD -MF "${OBJECTDIR}/source/ByteBuffer.o.d" -o ${OBJECTDIR}/source/ByteBuffer.o source/ByteBuffer.c   
 	
 ${OBJECTDIR}/Utilities/BipBuffer/BipBuffer.o: Utilities/BipBuffer/BipBuffer.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/Utilities/BipBuffer" 
@@ -238,6 +238,12 @@ ${OBJECTDIR}/Objects/Algo/PsoParticle.o: Objects/Algo/PsoParticle.c  nbproject/M
 	@${RM} ${OBJECTDIR}/Objects/Algo/PsoParticle.o.d 
 	@${RM} ${OBJECTDIR}/Objects/Algo/PsoParticle.o 
 	@${FIXDEPS} "${OBJECTDIR}/Objects/Algo/PsoParticle.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -MMD -MF "${OBJECTDIR}/Objects/Algo/PsoParticle.o.d" -o ${OBJECTDIR}/Objects/Algo/PsoParticle.o Objects/Algo/PsoParticle.c   
+	
+${OBJECTDIR}/Objects/Algo/SteadyState.o: Objects/Algo/SteadyState.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/Objects/Algo" 
+	@${RM} ${OBJECTDIR}/Objects/Algo/SteadyState.o.d 
+	@${RM} ${OBJECTDIR}/Objects/Algo/SteadyState.o 
+	@${FIXDEPS} "${OBJECTDIR}/Objects/Algo/SteadyState.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -MMD -MF "${OBJECTDIR}/Objects/Algo/SteadyState.o.d" -o ${OBJECTDIR}/Objects/Algo/SteadyState.o Objects/Algo/SteadyState.c   
 	
 ${OBJECTDIR}/source/main.o: source/main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/source" 
@@ -293,6 +299,12 @@ ${OBJECTDIR}/source/ControlAlgorithm.o: source/ControlAlgorithm.c  nbproject/Mak
 	@${RM} ${OBJECTDIR}/source/ControlAlgorithm.o 
 	@${FIXDEPS} "${OBJECTDIR}/source/ControlAlgorithm.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -MMD -MF "${OBJECTDIR}/source/ControlAlgorithm.o.d" -o ${OBJECTDIR}/source/ControlAlgorithm.o source/ControlAlgorithm.c   
 	
+${OBJECTDIR}/source/ByteBuffer.o: source/ByteBuffer.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/source" 
+	@${RM} ${OBJECTDIR}/source/ByteBuffer.o.d 
+	@${RM} ${OBJECTDIR}/source/ByteBuffer.o 
+	@${FIXDEPS} "${OBJECTDIR}/source/ByteBuffer.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -MMD -MF "${OBJECTDIR}/source/ByteBuffer.o.d" -o ${OBJECTDIR}/source/ByteBuffer.o source/ByteBuffer.c   
+	
 ${OBJECTDIR}/source/Potentiometer.o: source/Potentiometer.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/source" 
 	@${RM} ${OBJECTDIR}/source/Potentiometer.o.d 
@@ -310,18 +322,6 @@ ${OBJECTDIR}/Objects/Units/UnitArray.o: Objects/Units/UnitArray.c  nbproject/Mak
 	@${RM} ${OBJECTDIR}/Objects/Units/UnitArray.o.d 
 	@${RM} ${OBJECTDIR}/Objects/Units/UnitArray.o 
 	@${FIXDEPS} "${OBJECTDIR}/Objects/Units/UnitArray.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -MMD -MF "${OBJECTDIR}/Objects/Units/UnitArray.o.d" -o ${OBJECTDIR}/Objects/Units/UnitArray.o Objects/Units/UnitArray.c   
-	
-${OBJECTDIR}/Objects/Algo/SteadyState.o: Objects/Algo/SteadyState.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/Objects/Algo" 
-	@${RM} ${OBJECTDIR}/Objects/Algo/SteadyState.o.d 
-	@${RM} ${OBJECTDIR}/Objects/Algo/SteadyState.o 
-	@${FIXDEPS} "${OBJECTDIR}/Objects/Algo/SteadyState.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -MMD -MF "${OBJECTDIR}/Objects/Algo/SteadyState.o.d" -o ${OBJECTDIR}/Objects/Algo/SteadyState.o Objects/Algo/SteadyState.c   
-	
-${OBJECTDIR}/source/ByteBuffer.o: source/ByteBuffer.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/source" 
-	@${RM} ${OBJECTDIR}/source/ByteBuffer.o.d 
-	@${RM} ${OBJECTDIR}/source/ByteBuffer.o 
-	@${FIXDEPS} "${OBJECTDIR}/source/ByteBuffer.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -MMD -MF "${OBJECTDIR}/source/ByteBuffer.o.d" -o ${OBJECTDIR}/source/ByteBuffer.o source/ByteBuffer.c   
 	
 ${OBJECTDIR}/Utilities/BipBuffer/BipBuffer.o: Utilities/BipBuffer/BipBuffer.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/Utilities/BipBuffer" 
