@@ -26,6 +26,10 @@
 // Public definitions
 //==============================================================================
 
+#define MAX(_x, _y)   ( (_x > _y) ? _x :  _y )
+#define MIN(_x, _y)   ( (_x < _y) ? _x :  _y )
+#define ABS(_x)       ( (_x >= 0) ? _x : -_x )
+
 #define STEADY_STATE_MAX_SAMPLES      (10)
 
 typedef struct

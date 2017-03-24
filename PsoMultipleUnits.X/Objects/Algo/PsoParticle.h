@@ -45,6 +45,9 @@ typedef void  (*PsoParticleInitSpeed_fct)       (void *ctx, PsoSwarmInterface_t 
 typedef void  (*PsoParticleInitPos_fct)         (void *ctx, PsoSwarmInterface_t *swarm);
 typedef void  (*PsoParticleRelease_fct)         (void *ctx);
 typedef void  (*PsoParticleSetSteadyState_fct)  (void *ctx, size_t bufSize, float oscAmp);
+typedef void  (*PsoParticleSetPbest_fct)        (void *ctx, Position_t *pbest);
+typedef void  (*PsoParticleSetPbestAbs_fct)     (void *ctx, Position_t *pbestAbs);
+typedef void  (*PsoParticleComputePbest_fct)    (void *ctx);
 
 typedef struct
 {
@@ -66,6 +69,9 @@ typedef struct
   PsoParticleInitPos_fct        InitPos;
   PsoParticleRelease_fct        Release;
   PsoParticleSetSteadyState_fct SetSteadyState;
+  PsoParticleSetPbest_fct       SetPbest;
+  PsoParticleSetPbestAbs_fct    SetPbestAbs;
+  PsoParticleComputePbest_fct   ComputePbest;
 } PsoParticleInterface_t;
 
 

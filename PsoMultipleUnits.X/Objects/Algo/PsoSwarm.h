@@ -60,11 +60,13 @@ typedef INT8  (*PsoSwarmInit_fct)                       (void *ctx, UnitArrayInt
 typedef void  (*PsoSwarmComputeGbest_fct)               (void *ctx);
 typedef void  (*PsoSwarmRandomizeAllParticles_fct)      (void *ctx);
 typedef void  (*PsoSwarmRandomizeCertainParticles_fct)  (void *ctx, UINT8 *idx, UINT8 nParticlesToRandomize);
-typedef void  (*PsoSwarmAddParticle_fct)                (void *ctx, void *p);
+typedef INT8  (*PsoSwarmAddParticle_fct)                (void *ctx, void *p);
 typedef void* (*PsoSwarmGetParticle_fct)                (void *ctx, UINT8 idx);
 typedef void  (*PsoSwarmRemoveParticles_fct)            (void *ctx, UINT8 *idx, UINT8 nParticles);
 typedef UINT8 (*PsoSwarmCheckForPerturb_fct)            (void *ctx, UINT8 *idxPerturbed);
 typedef void  (*PsoSwarmRelease_fct)                    (void *ctx);
+typedef void  (*PsoSwarmGetParam_fct)                   (void *ctx, PsoSwarmParam_t *paramDest);
+typedef void  (*PsoSwarmGetGbest_fct)                   (void *ctx, Position_t *gbestDest);
 
 typedef struct
 {
@@ -78,6 +80,8 @@ typedef struct
   PsoSwarmRemoveParticles_fct           RemoveParticles;
   PsoSwarmCheckForPerturb_fct           CheckForPerturb;
   PsoSwarmRelease_fct                   Release;
+  PsoSwarmGetParam_fct                  GetParam;
+  PsoSwarmGetGbest_fct                  GetGbest;
 } PsoSwarmInterface_t;
 
 

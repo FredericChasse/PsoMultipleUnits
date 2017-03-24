@@ -42,17 +42,21 @@ typedef struct
 //==============================================================================
 
 BOOL    _IsSwarmParamValid                (PsoSwarmParam_t *param);
+int     _CompareFunc                      (const void *p1, const void *p2);
 void    _Swarm_SetSteadyState             (PsoSwarm_t *s);
+void    _Swarm_ShiftParticlesLeft         (PsoSwarm_t *s, UINT8 idxToShift);
 
 INT8    _Swarm_Init                       (PsoSwarm_t *s, UnitArrayInterface_t *unitArray, PsoSwarmParam_t *param);
 void    _Swarm_ComputeGbest               (PsoSwarm_t *s);
 void    _Swarm_RandomizeAllParticles      (PsoSwarm_t *s);
 void    _Swarm_RandomizeCertainParticles  (PsoSwarm_t *s, UINT8 *idx, UINT8 nParticlesToRandomize);
-void    _Swarm_AddParticle                (PsoSwarm_t *s, PsoParticleInterface_t *p);
+INT8    _Swarm_AddParticle                (PsoSwarm_t *s, PsoParticleInterface_t *p);
 void *  _Swarm_GetParticle                (PsoSwarm_t *s, UINT8 idx);
 void    _Swarm_RemoveParticles            (PsoSwarm_t *s, UINT8 *idx, UINT8 nParticles);
 UINT8   _Swarm_CheckForPerturb            (PsoSwarm_t *s, UINT8 *idxPerturbed);
 void    _Swarm_Release                    (PsoSwarm_t *s);
+void    _Swarm_GetGbest                   (PsoSwarm_t *s, Position_t *gbestDest);
+void    _Swarm_GetParam                   (PsoSwarm_t *s, PsoSwarmParam_t *paramDest);
 
 
 // Private variables
@@ -110,7 +114,24 @@ INT8 _Swarm_Init (PsoSwarm_t *s, UnitArrayInterface_t *unitArray, PsoSwarmParam_
 
 void _Swarm_Release (PsoSwarm_t *s)
 {
+  UINT8 i;
   
+  for (i = 0; i < s->nParticles; i++)
+  {
+    s->particles[i]->Release(s->particles[i]->ctx);
+  }
+}
+
+
+void _Swarm_GetGbest (PsoSwarm_t *s, Position_t *gbestDest)
+{
+  *gbestDest = s->gbest;
+}
+
+
+void _Swarm_GetParam (PsoSwarm_t *s, PsoSwarmParam_t *paramDest)
+{
+  *paramDest = s->param;
 }
 
 
@@ -125,13 +146,148 @@ void _Swarm_SetSteadyState (PsoSwarm_t *s)
 }
 
 
-void    _Swarm_ComputeGbest               (PsoSwarm_t *s) {}
-void    _Swarm_RandomizeAllParticles      (PsoSwarm_t *s) {}
-void    _Swarm_RandomizeCertainParticles  (PsoSwarm_t *s, UINT8 *idx, UINT8 nParticlesToRandomize) {}
-void    _Swarm_AddParticle                (PsoSwarm_t *s, PsoParticleInterface_t *p) {}
-void *  _Swarm_GetParticle                (PsoSwarm_t *s, UINT8 idx) {}
-void    _Swarm_RemoveParticles            (PsoSwarm_t *s, UINT8 *idx, UINT8 nParticles) {}
-UINT8   _Swarm_CheckForPerturb            (PsoSwarm_t *s, UINT8 *idxPerturbed) {}
+void _Swarm_ComputeGbest (PsoSwarm_t *s)
+{
+  float max, temp;
+  UINT8 i, iBest;
+  for (i = 0; i < s->nParticles; i++)
+  {
+    temp = max;
+    max  = MAX(max, s->particles[i]->GetFitness(s->particles[i]->ctx));
+    if (max != temp)
+    {
+      iBest = i;
+    }
+  }
+  
+  s->gbest.prevFitness = s->gbest.curFitness;
+  s->gbest.prevPos = s->gbest.curPos;
+  s->gbest.curFitness = max;
+  s->gbest.curPos = s->particles[iBest]->GetPos(s->particles[iBest]->ctx);
+}
+
+
+void _Swarm_RandomizeAllParticles (PsoSwarm_t *s)
+{
+  float range = s->param.posMax - s->param.posMin;
+  float sectionLength = range / s->nParticles;
+  float sections[PSO_SWARM_MAX_PARTICLES] = {0};
+  sections[0] = s->param.posMin;
+  sections[s->nParticles - 1] = s->param.posMax;
+  UINT8 i;
+  PsoParticleInterface_t *p;
+  float tmpPos;
+  Position_t tmpPbest = {0};
+  
+  for (i = 1; i < s->nParticles; i++)
+  {
+    sections[i] = sectionLength * (i - 1);
+  }
+  
+  for (i = 0; i < s->nParticles; i++)
+  {
+    p = s->particles[i];
+    
+    tmpPos = Rng_GetRandFloat() * sectionLength + sections[i];
+    tmpPos = MIN(MAX(s->param.posMin, tmpPos), s->param.posMax);
+    
+    p->SetPos(p->ctx, tmpPos);
+    tmpPbest.curPos = tmpPos;
+    p->SetPbest(p->ctx, &tmpPbest);
+    p->SetPbestAbs(p->ctx, &tmpPbest);
+  }
+}
+
+
+void _Swarm_RandomizeCertainParticles (PsoSwarm_t *s, UINT8 *idx, UINT8 nParticlesToRandomize)
+{
+  UINT8 i;
+  PsoParticleInterface_t *p;
+  float tmpPos;
+  Position_t tmpPbest = {0};
+  float range = s->param.posMax - s->param.posMin;
+  
+  for (i = 0; i < nParticlesToRandomize; i++)
+  {
+    p = s->particles[idx[i]];
+    
+    tmpPos = Rng_GetRandFloat() * range;
+    tmpPos = MIN(MAX(s->param.posMin, tmpPos), s->param.posMax);
+    
+    p->SetPos(p->ctx, tmpPos);
+    tmpPbest.curPos = tmpPos;
+    p->SetPbest(p->ctx, &tmpPbest);
+    p->SetPbestAbs(p->ctx, &tmpPbest);
+  }
+}
+
+
+INT8 _Swarm_AddParticle (PsoSwarm_t *s, PsoParticleInterface_t *p)
+{
+  if (s->nParticles == PSO_SWARM_MAX_PARTICLES)
+  {
+    return -1;
+  }
+  
+  s->particles[s->nParticles] = p;
+  p->SetId(p->ctx, s->nParticles);
+  s->nParticles++;
+  return 0;
+}
+
+
+void * _Swarm_GetParticle (PsoSwarm_t *s, UINT8 idx)
+{
+  if (idx >= PSO_SWARM_MAX_PARTICLES)
+  {
+    return NULL;
+  }
+  return s->particles[idx];
+}
+
+
+void _Swarm_RemoveParticles (PsoSwarm_t *s, UINT8 *idx, UINT8 nParticles)
+{
+  UINT8 i;
+  
+  if (nParticles > s->nParticles)
+  {
+    return;
+  }
+  
+  qsort( (void *) idx, (size_t) nParticles, sizeof(UINT8), &_CompareFunc);
+  
+  for (i = 0; i < nParticles; i++)
+  {
+    s->particles[idx[i]]->Release(s->particles[idx[i]]->ctx);
+    _Swarm_ShiftParticlesLeft(s, idx[i]);
+    s->nParticles--;
+  }
+  
+  for (i = 0; i < s->nParticles; i++)
+  {
+    s->particles[i]->SetId(s->particles[i]->ctx, i);
+  }
+}
+
+
+UINT8 _Swarm_CheckForPerturb (PsoSwarm_t *s, UINT8 *idxPerturbed)
+{
+  UINT8  nPerturbed = 0
+        ,i = 0
+        ;
+  
+  for (i = 0; i < s->nParticles; i++)
+  {
+    if (s->particles[i]->SentinelEval(s->particles[i]->ctx))
+    {
+      idxPerturbed[nPerturbed] = i;
+      nPerturbed++;
+    }
+  }
+  
+  return nPerturbed;
+}
 
 
 BOOL _IsSwarmParamValid (PsoSwarmParam_t *param)
@@ -151,6 +307,24 @@ BOOL _IsSwarmParamValid (PsoSwarmParam_t *param)
   ;
 }
 
+
+void _Swarm_ShiftParticlesLeft (PsoSwarm_t *s, UINT8 idxToShift)
+{
+  if (idxToShift == (s->nParticles - 1))
+  {
+    return;
+  }
+  UINT8 offset = s->nParticles - idxToShift - 1;
+  memmove(&s->particles[idxToShift], &s->particles[idxToShift + 1], offset * sizeof(PsoParticleInterface_t *));
+}
+
+
+int _CompareFunc (const void *p1, const void *p2)
+{
+  if ( *(float *) p1  > *(float *) p2 ) return -1;
+  if ( *(float *) p1 == *(float *) p2 ) return 0;
+  if ( *(float *) p1  < *(float *) p2 ) return 1;
+}
 
 
 // Public functions
@@ -185,6 +359,8 @@ const PsoSwarmInterface_t * PsoSwarmInterface (UINT8 id)
       _swarms_if[i].RandomizeCertainParticles   = (PsoSwarmRandomizeCertainParticles_fct) &_Swarm_RandomizeCertainParticles;
       _swarms_if[i].RemoveParticles             = (PsoSwarmRemoveParticles_fct)           &_Swarm_RemoveParticles;
       _swarms_if[i].Release                     = (PsoSwarmRelease_fct)                   &_Swarm_Release;
+      _swarms_if[i].GetGbest                    = (PsoSwarmGetGbest_fct)                  &_Swarm_GetGbest;
+      _swarms_if[i].GetParam                    = (PsoSwarmGetParam_fct)                  &_Swarm_GetParam;
     }
   }
   

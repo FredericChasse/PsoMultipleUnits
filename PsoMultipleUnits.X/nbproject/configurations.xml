@@ -61,6 +61,12 @@
         <itemPath>Utilities/ChainedList/LinkedList.c</itemPath>
         <itemPath>Utilities/ChainedList/LinkedList.h</itemPath>
       </logicalFolder>
+      <logicalFolder name="f3" displayName="PcgRng" projectFiles="true">
+        <itemPath>Utilities/PcgRng/pcg_basic.c</itemPath>
+        <itemPath>Utilities/PcgRng/pcg_basic.h</itemPath>
+        <itemPath>Utilities/PcgRng/Rng.c</itemPath>
+        <itemPath>Utilities/PcgRng/Rng.h</itemPath>
+      </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -78,6 +84,7 @@
     <Elem>BipBuffer</Elem>
     <Elem>Utilities/BipBuffer</Elem>
     <Elem>Utilities/ChainedList</Elem>
+    <Elem>Utilities/PcgRng</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -139,7 +146,7 @@
         <property key="enable-unroll-loops" value="false"/>
         <property key="exclude-floating-point" value="false"/>
         <property key="extra-include-directories"
-                  value="source;headers;Objects\Algo;Objects\Units;Utilities\BipBuffer;Utilities\ChainedList"/>
+                  value="source;headers;Objects\Algo;Objects\Units;Utilities\BipBuffer;Utilities\ChainedList;Utilities\PcgRng"/>
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="false"/>
