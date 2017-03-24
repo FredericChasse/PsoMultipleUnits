@@ -57,7 +57,7 @@
         <itemPath>Utilities/BipBuffer/BipBuffer.c</itemPath>
         <itemPath>Utilities/BipBuffer/BipBuffer.h</itemPath>
       </logicalFolder>
-      <logicalFolder name="f2" displayName="ChainedList" projectFiles="true">
+      <logicalFolder name="f2" displayName="LinkedList" projectFiles="true">
         <itemPath>Utilities/ChainedList/LinkedList.c</itemPath>
         <itemPath>Utilities/ChainedList/LinkedList.h</itemPath>
       </logicalFolder>

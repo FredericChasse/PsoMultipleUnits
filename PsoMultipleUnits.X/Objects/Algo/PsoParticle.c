@@ -35,12 +35,22 @@ typedef enum
 
 typedef struct
 {
+  float  jinit
+        ,dinit
+        ,jpos
+        ,dpos
+        ,jminus
+        ,dminus
+        ;
+} ParticleOptPos_t;
+
+typedef struct
+{
   UINT8 id;
   Position_t pbest;
   Position_t pbestAbs;
   Position_t pos;
-#warning "optPos is not supposed to be a Position_t."
-  Position_t optPos;
+  ParticleOptPos_t optPos;
   float curSpeed;
   float prevSpeed;
   float jSteady;
@@ -54,6 +64,8 @@ typedef struct
 
 // Private prototypes
 //==============================================================================
+
+void  _Particle_ResetOptPos     (ParticleOptPos_t *optPos);
 
 void  _Particle_Init            (PsoParticle_t *p, UINT8 id);
 UINT8 _Particle_GetId           (PsoParticle_t *p);
@@ -93,6 +105,18 @@ Node_t       _particlesNodes[N_PARTICLES_TOTAL];
 // Private functions
 //==============================================================================
 
+void _Particle_ResetOptPos (ParticleOptPos_t *optPos)
+{
+    optPos->dinit
+  = optPos->dminus
+  = optPos->dpos
+  = optPos->jinit
+  = optPos->jminus
+  = optPos->jpos
+  = 0
+  ;
+}
+
 void _Particle_Init (PsoParticle_t *p, UINT8 id)
 {
   p->curSpeed = 0;
@@ -101,7 +125,7 @@ void _Particle_Init (PsoParticle_t *p, UINT8 id)
   p->oSentinelWarning = 0;
   p->state = PARTICLE_STATE_SEARCHING;
   SteadyState_Reset(&p->steadyState);
-  Position_Reset(&p->optPos);
+  _Particle_ResetOptPos(&p->optPos);
   Position_Reset(&p->pbest);
   Position_Reset(&p->pbestAbs);
   Position_Reset(&p->pos);
@@ -312,7 +336,7 @@ void _Particle_ComputePbest (PsoParticle_t *p)
 
 void _Particle_InitSpeed (PsoParticle_t *p, PsoSwarmInterface_t *swarm)
 {
-  Position_Reset(&p->optPos);
+  _Particle_ResetOptPos(&p->optPos);
   
   PsoSwarmParam_t param;
   Position_t gbest;
