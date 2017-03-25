@@ -28,6 +28,7 @@
 //==============================================================================
 
 #define PSO_SWARM_MAX_PARTICLES   (10)
+#define N_SWARMS_TOTAL            (N_UNITS_TOTAL + 1)
 
 typedef struct
 {
@@ -65,7 +66,7 @@ typedef void    (*PsoSwarmComputeGbest_fct)               (void *ctx);
 typedef void    (*PsoSwarmRandomizeAllParticles_fct)      (void *ctx);
 typedef void    (*PsoSwarmRandomizeCertainParticles_fct)  (void *ctx, UINT8 *idx, UINT8 nParticlesToRandomize);
 typedef INT8    (*PsoSwarmAddParticle_fct)                (void *ctx, void *p);
-typedef void*   (*PsoSwarmGetParticle_fct)                (void *ctx, UINT8 idx);
+typedef void *  (*PsoSwarmGetParticle_fct)                (void *ctx, UINT8 idx);
 typedef void    (*PsoSwarmRemoveParticles_fct)            (void *ctx, UINT8 *idx, UINT8 nParticles);
 typedef UINT8   (*PsoSwarmCheckForPerturb_fct)            (void *ctx, UINT8 *idxPerturbed);
 typedef void    (*PsoSwarmRelease_fct)                    (void *ctx);
@@ -82,6 +83,8 @@ typedef void    (*PsoSwarmComputeAllParticlesPbest_fct)   (void *ctx);
 typedef BOOL    (*PsoSwarmEvalSteadyState_fct)            (void *ctx);
 typedef void    (*PsoSwarmComputeNextPos_fct)             (void *ctx, float *positions);
 typedef UINT8   (*PsoSwarmGetId_fct)                      (void *ctx);
+typedef void *  (*PsoSwarmGetUnitArray_fct)               (void *ctx);
+typedef void    (*PsoSwarmSetId_fct)                      (void *ctx, UINT8 id);
   
 typedef struct
 {
@@ -108,6 +111,8 @@ typedef struct
   PsoSwarmEvalSteadyState_fct           EvalSteadyState;
   PsoSwarmComputeNextPos_fct            ComputeNextPos;
   PsoSwarmGetId_fct                     GetId;
+  PsoSwarmGetUnitArray_fct              GetUnitArray;
+  PsoSwarmSetId_fct                     SetId;
 } PsoSwarmInterface_t;
 
 

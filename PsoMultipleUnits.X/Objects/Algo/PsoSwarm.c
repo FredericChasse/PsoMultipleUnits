@@ -69,6 +69,10 @@ void    _Swarm_IncrementCurrentParticle   (PsoSwarm_t *s);
 void    _Swarm_ComputeAllParticlesPbest   (PsoSwarm_t *s);
 BOOL    _Swarm_EvalSteadyState            (PsoSwarm_t *s);
 UINT8   _Swarm_GetId                      (PsoSwarm_t *s);
+void    _Swarm_SetId                      (PsoSwarm_t *s, UINT8 id);
+void *  _Swarm_GetUnitArray               (PsoSwarm_t *s);
+void    _Swarm1d_ComputeNextPositions     (PsoSwarm_t *s, float *positions);
+void    _SwarmPara_ComputeNextPositions   (PsoSwarm_t *s, float *positions);
 
 
 // Private variables
@@ -78,7 +82,6 @@ extern const float potRealValues[256];
 
 static BOOL _oSwarmsInitialized = 0;
 
-#define N_SWARMS_TOTAL        (N_UNITS_TOTAL + 1)
 PsoSwarm_t          _swarms   [N_SWARMS_TOTAL] = {0};
 PsoSwarmInterface_t _swarms_if[N_SWARMS_TOTAL];
 
@@ -111,11 +114,13 @@ INT8 _Swarm_Init (PsoSwarm_t *s, UnitArrayInterface_t *unitArray, PsoSwarmParam_
   {
     s->nParticles = s->unitArray->GetNUnits(s->unitArray->ctx);
     s->nParticlesPerUnit = 1;
+    _swarms_if[s->linkKey].ComputeNextPos = (PsoSwarmComputeNextPos_fct) &_SwarmPara_ComputeNextPositions;
   }
   else if (s->param.type == PSO_SWARM_TYPE_PSO_1D)
   {
     s->nParticles = s->param.minParticles;
     s->nParticlesPerUnit = s->param.minParticles;
+    _swarms_if[s->linkKey].ComputeNextPos = (PsoSwarmComputeNextPos_fct) &_Swarm1d_ComputeNextPositions;
   }
   
   for (i = 0; i < s->nParticles; i++)
@@ -381,49 +386,65 @@ void _Swarm_SetAllParticlesFitness (PsoSwarm_t *s, float *fitBuf)
 }
 
 
+void * _Swarm_GetUnitArray (PsoSwarm_t *s)
+{
+  return s->unitArray;
+}
+
+
 void _Swarm_SetParticleFitness (PsoSwarm_t *s, UINT8 idx, float fitness)
 {
   s->particles[idx]->SetFitness(s->particles[idx]->ctx, fitness);
 }
 
 
-void _Swarm_ComputeNextPositions (PsoSwarm_t *s, float *positions)
+void _SwarmPara_ComputeNextPositions (PsoSwarm_t *s, float *positions)
+{
+  UINT8 i;
+  UINT8 idxPerturbed[PSO_SWARM_MAX_PARTICLES];
+  UINT8 nPerturbed = 0;
+  PsoParticleInterface_t *p;
+  for (i = 0; i < s->nParticles; i++)
+  {
+    p = s->particles[i];
+    if ( (idxPerturbed[nPerturbed] = p->FsmStep(p->ctx, &_swarms_if[s->linkKey])) != 0)
+    {
+      nPerturbed++;
+    }
+  }
+}
+
+
+void _Swarm1d_ComputeNextPositions (PsoSwarm_t *s, float *positions)
 {
   UINT8 i;
   
-  if (s->param.type == PSO_SWARM_TYPE_PSO_1D)
+  if (s->oResetParticles)
   {
-    if (s->oResetParticles)
+    s->oResetParticles = 0;
+    for (i = 0; i < s->nParticles; i++)
     {
-      s->oResetParticles = 0;
+      s->particles[i]->Init     (s->particles[i]->ctx, i);
+      s->particles[i]->InitSpeed(s->particles[i]->ctx, &_swarms_if[s->linkKey]);
+    }
+    _Swarm_RandomizeAllParticles(s);
+    Position_Reset(&s->gbest);
+  }
+  else
+  {
+    if ( (s->param.iteration == 1) /* && (!s->oInSteadyState) */ )
+    {
       for (i = 0; i < s->nParticles; i++)
       {
-        s->particles[i]->Init     (s->particles[i]->ctx, i);
-        s->particles[i]->InitSpeed(s->particles[i]->ctx, &_swarms_if[s->id]);
+        s->particles[i]->InitSpeed (s->particles[i]->ctx, &_swarms_if[s->linkKey]);
+        s->particles[i]->ComputePos(s->particles[i]->ctx, &_swarms_if[s->linkKey]);
       }
-      _Swarm_RandomizeAllParticles(s);
-      Position_Reset(&s->gbest);
     }
     else
     {
-      if ( (s->param.iteration == 1) /* && (!s->oInSteadyState) */ )
-      {
-        for (i = 0; i < s->nParticles; i++)
-        {
-          s->particles[i]->InitSpeed (s->particles[i]->ctx, &_swarms_if[s->id]);
-          s->particles[i]->ComputePos(s->particles[i]->ctx, &_swarms_if[s->id]);
-        }
-      }
-      else
-      {
-        s->particles[i]->ComputeSpeed (s->particles[i]->ctx, &_swarms_if[s->id]);
-        s->particles[i]->ComputePos   (s->particles[i]->ctx, &_swarms_if[s->id]);
-      }
+      s->particles[i]->ComputeSpeed (s->particles[i]->ctx, &_swarms_if[s->linkKey]);
+      s->particles[i]->ComputePos   (s->particles[i]->ctx, &_swarms_if[s->linkKey]);
     }
-  }
-  else if (s->param.type == PSO_SWARM_TYPE_PARALLEL_PSO)
-  {
-    
   }
   
   for (i = 0; i < s->nParticles; i++)
@@ -436,6 +457,12 @@ void _Swarm_ComputeNextPositions (PsoSwarm_t *s, float *positions)
 UINT8 _Swarm_GetId (PsoSwarm_t *s)
 {
   return s->id;
+}
+
+
+void _Swarm_SetId (PsoSwarm_t *s, UINT8 id)
+{
+  s->id = id;
 }
 
 
@@ -538,8 +565,10 @@ const PsoSwarmInterface_t * PsoSwarmInterface (void)
       _swarms_if[i].GetCurParticle              = (PsoSwarmGetCurParticle_fct)            &_Swarm_GetCurrentParticle;
       _swarms_if[i].ComputeAllPbest             = (PsoSwarmComputeAllParticlesPbest_fct)  &_Swarm_ComputeAllParticlesPbest;
       _swarms_if[i].EvalSteadyState             = (PsoSwarmEvalSteadyState_fct)           &_Swarm_EvalSteadyState;
-      _swarms_if[i].ComputeNextPos              = (PsoSwarmComputeNextPos_fct)            &_Swarm_ComputeNextPositions;
+      _swarms_if[i].ComputeNextPos              = (PsoSwarmComputeNextPos_fct)            0;
       _swarms_if[i].GetId                       = (PsoSwarmGetId_fct)                     &_Swarm_GetId;
+      _swarms_if[i].GetUnitArray                = (PsoSwarmGetUnitArray_fct)              &_Swarm_GetUnitArray;
+      _swarms_if[i].SetId                       = (PsoSwarmSetId_fct)                     &_Swarm_SetId;
       
       // Init the linked list
       _swarmsNodes[i].ctx = (void *) &_swarms_if[i];

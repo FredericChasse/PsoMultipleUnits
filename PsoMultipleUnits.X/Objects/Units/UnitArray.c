@@ -146,6 +146,13 @@ INT8 _UnitArray_AddUnitToArray (UnitArray_t *array, UnitInterface_t *unit)
 }
 
 
+void _UnitArray_SplitInto2Arrays (UnitArray_t *array, UINT8 *idxToSplit, UINT8 nToSplit, void *splitArray, void *keepArray)
+{
+  UnitInterface_t *unitsToKeep[N_UNITS_TOTAL];
+  UnitInterface_t *unitsToSplit[N_UNITS_TOTAL];
+}
+
+
 INT8 _UnitArray_RemoveUnitFromArray (UnitArray_t *array, UINT8 idx)
 {
   UINT8 len;

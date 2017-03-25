@@ -159,39 +159,77 @@ INT8 _Pso1d_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
 
 INT8 _ParallelPso_Run (Pso_t *pso)
 {
-  UnitArrayInterface_t *array = pso->unitArray;
+  UnitArrayInterface_t *array;
   PsoSwarmInterface_t *swarm;
   UINT8  i            = 0
         ,iSwarm       = 0
-        ,nUnits       = array->GetNUnits(array->ctx)
+        ,nSwarmsMem   = pso->nSwarms    // So we don't do a swarm twice in the same iteration
         ,curParticle  = 0
         ,nParticles   = 0
         ;
   UINT8 idxPerturbed[PSO_SWARM_MAX_PARTICLES];
+  UINT8 swarmsToDelete[N_SWARMS_TOTAL];
+  UINT8 nSwarmsToDelete = 0;
+  UINT8 idxToRemove[N_SWARMS_TOTAL];
+  UINT8 nIdxToRemove;
   float fitness[N_UNITS_TOTAL];
-  static float nextPositions[N_UNITS_TOTAL+1][PSO_SWARM_MAX_PARTICLES];
+  static float nextPositions[N_SWARMS_TOTAL][PSO_SWARM_MAX_PARTICLES];
   
   pso->iteration++;
   pso->timeElapsed += pso->sampleTime;
-  
-  for (i = 0; i < nUnits; i++)
+
+  // Parallel swarm
+  //----------------------------------------------------------------------------
+  iSwarm = 0;
+  swarm = pso->swarms[0];
+  array = swarm->GetUnitArray(swarm->ctx);
+  nParticles = swarm->GetNParticles(swarm->ctx);
+  if (nParticles != 0)
   {
-    fitness[i] = array->GetPower(array->ctx, i);
+    // Set the fitness of each particle
+    //--------------------------------------
+    for (i = 0; i < nParticles; i++)
+    {
+      swarm->SetParticleFitness(swarm->ctx, i, array->GetPower(array->ctx, i));
+    }
+    //--------------------------------------
+    
+    // Compute pbest and gbest
+    //--------------------------------------
+    swarm->ComputeAllPbest(swarm->ctx);
+    swarm->ComputeGbest   (swarm->ctx);
+    //--------------------------------------
+        
+    // Check for perturbations
+    //-----------------------------------
+    swarm->CheckForPerturb(swarm->ctx, idxPerturbed);
+    //-----------------------------------
+
+    // Check for steady state of the particles
+    //-----------------------------------
+    swarm->EvalSteadyState(swarm->ctx);
+    //-----------------------------------
+        
+    // Compute next positions
+    //-----------------------------------
+    swarm->ComputeNextPos(swarm->ctx, &nextPositions[iSwarm][0]);
+    //-----------------------------------
   }
-  
-#warning "TBD."
+  //----------------------------------------------------------------------------
   
   // Swarms 1D
   //----------------------------------------------------------------------------
-  for (iSwarm = 1; iSwarm < pso->nSwarms; iSwarm++)
+  for (iSwarm = 1; iSwarm < nSwarmsMem; iSwarm++)
   {
     swarm = pso->swarms[iSwarm];
     nParticles = swarm->GetNParticles(swarm->ctx);
     
     if (nParticles != 0)
     {
+      array = swarm->GetUnitArray(swarm->ctx);
+      fitness[0] = array->GetPower(array->ctx, 0);
       curParticle = swarm->GetCurParticle(swarm->ctx);
-      swarm->SetParticleFitness(swarm->ctx, i, fitness[i]);
+      swarm->SetParticleFitness(swarm->ctx, i, fitness[0]);
       
       if (curParticle == (nParticles - 1))  // Ready for a real iteration
       {
