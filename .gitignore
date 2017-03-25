@@ -21,3 +21,4 @@ nbproject/Makefile-*
 disassembly/
 *.map
 dist\
+PsoMultipleUnits.X/nbproject/Makefile-genesis.properties
