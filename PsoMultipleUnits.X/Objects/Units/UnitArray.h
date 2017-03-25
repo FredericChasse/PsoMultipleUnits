@@ -19,7 +19,7 @@
 
 #include "Setup.h"  
 
-typedef void  (*UnitArrayInit_fct)                (void *ctx);
+typedef void  (*UnitArrayInit_fct)                (void *ctx, UINT8 id);
 typedef void  (*UnitArraySetUnitPos_fct)          (void *ctx, UINT8 idx, float pos);
 typedef float (*UnitArrayGetUnitPos_fct)          (void *ctx, UINT8 idx);
 typedef float (*UnitArrayGetUnitPower_fct)        (void *ctx, UINT8 idx);
@@ -27,6 +27,7 @@ typedef INT8  (*UnitArrayAddUnitToArray_fct)      (void *ctx, void *unit);
 typedef INT8  (*UnitArrayRemoveUnitFromArray_fct) (void *ctx, UINT8 idx);
 typedef UINT8 (*UnitArrayGetNUnits_fct)           (void *ctx);
 typedef void* (*UnitArrayGetUnitHandle_fct)       (void *ctx, UINT8 idx);
+typedef void  (*UnitArrayRelease_fct)             (void *ctx);
 
 typedef struct UnitArrayInterface
 {
@@ -39,6 +40,7 @@ typedef struct UnitArrayInterface
   UnitArrayRemoveUnitFromArray_fct  RemoveUnitFromArray;
   UnitArrayGetNUnits_fct            GetNUnits;
   UnitArrayGetUnitHandle_fct        GetUnitHandle;
+  UnitArrayRelease_fct              Release;
 } UnitArrayInterface_t;
 
 

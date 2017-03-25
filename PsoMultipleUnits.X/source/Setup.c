@@ -37,19 +37,6 @@
 //	Variable Declaration
 //==============================================================================
 
-/***********************************
- * Table of functions used in Skadi
- **********************************/
-sSkadiCommand_t skadiCommandTable[] =
-{
-   {"led"         , LedToggle       , 1 , "     | flash Led 1 or 2               | 1 arg"}    // 1 argument
-  ,{"pwm"         , SetPwmSkadi     , 2 , "     | Set the duty cycle of a LED    | 2 arg"}    // 2 arguments
-  ,{"pwmall"      , SetAllPwmSkadi  , 1 , "     | Set the duty cycle of all LEDs | 1 arg"}    // 1 argument
-  ,{"pot"         , SetPotSkadi     , 3 , "     | Set the value of a single pot  | 3 arg"}    // 3 arguments
-  ,{"allpot"      , SetAllPotSkadi  , 2 ,    "  | Set the value of 4 pots        | 2 arg"}    // 2 arguments
-  ,{"clc"         , ClearScreen     , 0 , "     | Clear terminal window          | 0 arg"}    // 0 arguments
-};
-
 
 //==============================================================================
 //	INIT FUNCTIONS
@@ -71,7 +58,7 @@ void InitTimer(void)
 //  timerCounterValue = Timer.Open(TIMER_2, 500, SCALE_US);   // Open Timer 2 with a period of 500 us
 //  timerCounterValue = Timer.Open(TIMER_3, 50, SCALE_MS);   // Timer used for ADC
 //  timerCounterValue = Timer.Open(TIMER_3, 1, SCALE_MS);   // Timer used for ADC
-  timerCounterValue = Timer.Open(TIMER_3, 100, SCALE_US);   // Timer used for ADC
+  timerCounterValue = Timer.Open(TIMER_3, ADC_TIMER_PERIOD, ADC_TIMER_SCALE);   // Timer used for ADC
   if (timerCounterValue < 0)
   {
     LED1_ON;
@@ -267,7 +254,7 @@ void InitUart (void)
 void InitSkadi(void)
 {
 //  Skadi.Init(skadiCommandTable, sizeof(skadiCommandTable)/sizeof(sSkadiCommand_t), UART1, FALSE);   // This system does not use UART interrupts
-  Skadi.Init(skadiCommandTable, sizeof(skadiCommandTable)/sizeof(sSkadiCommand_t), UART3, TRUE);   // This system uses UART interrupts
+  Skadi.Init((sSkadiCommand_t *) skadiCommandTable, sizeof(skadiCommandTable)/sizeof(sSkadiCommand_t), UART3, TRUE);   // This system uses UART interrupts
 }
 
 

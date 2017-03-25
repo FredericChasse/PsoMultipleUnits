@@ -60,7 +60,7 @@ typedef struct
   UINT8         currentParticle;
 } PsoSwarmParam_t;
 
-typedef INT8    (*PsoSwarmInit_fct)                       (void *ctx, UnitArrayInterface_t *unitArray, PsoSwarmParam_t *param);
+typedef INT8    (*PsoSwarmInit_fct)                       (void *ctx, UnitArrayInterface_t *unitArray, PsoSwarmParam_t *param, UINT8 id);
 typedef void    (*PsoSwarmComputeGbest_fct)               (void *ctx);
 typedef void    (*PsoSwarmRandomizeAllParticles_fct)      (void *ctx);
 typedef void    (*PsoSwarmRandomizeCertainParticles_fct)  (void *ctx, UINT8 *idx, UINT8 nParticlesToRandomize);
@@ -114,7 +114,7 @@ typedef struct
 // Public functions
 //==============================================================================
 
-const PsoSwarmInterface_t * PsoSwarmInterface (UINT8 id);
+const PsoSwarmInterface_t * PsoSwarmInterface (void);
 
 void Position_Reset (Position_t *pos);
 

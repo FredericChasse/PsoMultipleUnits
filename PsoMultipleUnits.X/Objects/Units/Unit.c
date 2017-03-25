@@ -25,8 +25,10 @@ typedef struct
   UINT8 id;
   UINT8 adcNum;
   UINT8 potNum;
+  UINT8 posIdx;
   float pos;
   float power;
+  UINT16 adcRaw;
 } Unit_t;
 
 
@@ -45,14 +47,14 @@ extern struct sAllCells sCellValues;
 
 Unit_t _units[N_UNITS_TOTAL] = 
 {
-  {.id = 0, .adcNum =  8, .potNum =  8, .pos = 50, .power = 0}
- ,{.id = 1, .adcNum =  9, .potNum =  9, .pos = 50, .power = 0}
- ,{.id = 2, .adcNum = 10, .potNum = 10, .pos = 50, .power = 0}
- ,{.id = 3, .adcNum = 11, .potNum = 11, .pos = 50, .power = 0}
- ,{.id = 4, .adcNum = 12, .potNum = 12, .pos = 50, .power = 0}
- ,{.id = 5, .adcNum = 13, .potNum = 13, .pos = 50, .power = 0}
- ,{.id = 6, .adcNum = 14, .potNum = 14, .pos = 50, .power = 0}
- ,{.id = 7, .adcNum = 15, .potNum = 15, .pos = 50, .power = 0}
+  {.id = 0, .adcNum =  8, .potNum =  8, .pos = 50, .posIdx = 0, .power = 0, .adcRaw = 0}
+ ,{.id = 1, .adcNum =  9, .potNum =  9, .pos = 50, .posIdx = 0, .power = 0, .adcRaw = 0}
+ ,{.id = 2, .adcNum = 10, .potNum = 10, .pos = 50, .posIdx = 0, .power = 0, .adcRaw = 0}
+ ,{.id = 3, .adcNum = 11, .potNum = 11, .pos = 50, .posIdx = 0, .power = 0, .adcRaw = 0}
+ ,{.id = 4, .adcNum = 12, .potNum = 12, .pos = 50, .posIdx = 0, .power = 0, .adcRaw = 0}
+ ,{.id = 5, .adcNum = 13, .potNum = 13, .pos = 50, .posIdx = 0, .power = 0, .adcRaw = 0}
+ ,{.id = 6, .adcNum = 14, .potNum = 14, .pos = 50, .posIdx = 0, .power = 0, .adcRaw = 0}
+ ,{.id = 7, .adcNum = 15, .potNum = 15, .pos = 50, .posIdx = 0, .power = 0, .adcRaw = 0}
 };
 
 const UnitInterface_t _unit0_if = 
@@ -157,6 +159,7 @@ INT8 _Unit_SetPos (Unit_t *unit, float pos)
     {
       SetPot(unit->potNum, ret);
       unit->pos = pos;
+      unit->posIdx = ret;
       return 0;
     }
     else

@@ -24,7 +24,6 @@
       <itemPath>headers/SkadiFunctions.h</itemPath>
       <itemPath>headers/LedDriver.h</itemPath>
       <itemPath>headers/ControlAlgorithm.h</itemPath>
-      <itemPath>headers/ByteBuffer.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -42,7 +41,6 @@
       <itemPath>source/SkadiFunctions.c</itemPath>
       <itemPath>source/LedDriver.c</itemPath>
       <itemPath>source/ControlAlgorithm.c</itemPath>
-      <itemPath>source/ByteBuffer.c</itemPath>
     </logicalFolder>
     <logicalFolder name="f2" displayName="Units" projectFiles="true">
       <itemPath>source/Potentiometer.c</itemPath>
@@ -56,6 +54,10 @@
       <logicalFolder name="f1" displayName="BipBuffer" projectFiles="true">
         <itemPath>Utilities/BipBuffer/BipBuffer.c</itemPath>
         <itemPath>Utilities/BipBuffer/BipBuffer.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f4" displayName="ByteBuffer" projectFiles="true">
+        <itemPath>Utilities/ByteBuffer/ByteBuffer.c</itemPath>
+        <itemPath>Utilities/ByteBuffer/ByteBuffer.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f2" displayName="LinkedList" projectFiles="true">
         <itemPath>Utilities/ChainedList/LinkedList.c</itemPath>
@@ -85,6 +87,7 @@
     <Elem>Utilities/BipBuffer</Elem>
     <Elem>Utilities/ChainedList</Elem>
     <Elem>Utilities/PcgRng</Elem>
+    <Elem>Utilities/ByteBuffer</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -146,7 +149,7 @@
         <property key="enable-unroll-loops" value="false"/>
         <property key="exclude-floating-point" value="false"/>
         <property key="extra-include-directories"
-                  value="source;headers;Objects\Algo;Objects\Units;Utilities\BipBuffer;Utilities\ChainedList;Utilities\PcgRng"/>
+                  value="source;headers;Objects\Algo;Objects\Units;Utilities\BipBuffer;Utilities\ChainedList;Utilities\PcgRng;Utilities\ByteBuffer"/>
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="false"/>

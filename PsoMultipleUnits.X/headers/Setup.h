@@ -90,6 +90,12 @@ void StartInterrupts  (void);
 
 #define PI            (3.14159265359f)
 
-#define N_UNITS_TOTAL (8)
+#define N_UNITS_TOTAL (8u)
+
+#define ADC_TIMER_PERIOD        (100)
+#define ADC_TIMER_SCALE         (SCALE_US)
+#define N_SAMPLES_PER_ADC_READ  (100)    // Number of samples / ADC value
+
+#define SAMPLING_TIME_FLOAT     (TIMER_SCALE_US * ADC_TIMER_PERIOD * N_SAMPLES_PER_ADC_READ)
 
 #endif	/* __SETUP_H__ */

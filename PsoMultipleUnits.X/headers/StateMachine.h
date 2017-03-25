@@ -28,6 +28,9 @@
 #include "Potentiometer.h"
 #include "LedDriver.h"
 #include "ControlAlgorithm.h"
+#include "AlgoInterface.h"
+#include "Pso.h"
+#include "UnitArray.h"
 
 
 //==============================================================================
@@ -107,7 +110,6 @@ void (*pState)(void);       // State pointer, used to navigate between states
 //==============================================================================
 // Definitions
 //==============================================================================
-#define N_SAMPLES_PER_ADC_READ 100    // Number of samples / ADC value
 
 struct sCell
 {

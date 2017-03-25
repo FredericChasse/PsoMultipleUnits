@@ -17,6 +17,8 @@
 #include "PsoSwarm.h"
 #include "SteadyState.h"
 #include "PsoParticle.h"
+#include "LinkedList.h"
+#include "Potentiometer.h"  // To compute positions
 
 
 // Private definitions
@@ -25,6 +27,7 @@
 typedef struct
 {
   UINT8                   id;
+  UINT8                   linkKey;
   UINT8                   nParticles;
   PsoParticleInterface_t *particles[PSO_SWARM_MAX_PARTICLES];
   UnitArrayInterface_t   *unitArray;
@@ -41,11 +44,11 @@ typedef struct
 //==============================================================================
 
 BOOL    _IsSwarmParamValid                (PsoSwarmParam_t *param);
-int     _CompareFunc                      (const void *p1, const void *p2);
+static int _CompareFunc                   (const void *p1, const void *p2);
 void    _Swarm_SetSteadyState             (PsoSwarm_t *s);
 void    _Swarm_ShiftParticlesLeft         (PsoSwarm_t *s, UINT8 idxToShift);
 
-INT8    _Swarm_Init                       (PsoSwarm_t *s, UnitArrayInterface_t *unitArray, PsoSwarmParam_t *param);
+INT8    _Swarm_Init                       (PsoSwarm_t *s, UnitArrayInterface_t *unitArray, PsoSwarmParam_t *param, UINT8 id);
 void    _Swarm_ComputeGbest               (PsoSwarm_t *s);
 void    _Swarm_RandomizeAllParticles      (PsoSwarm_t *s);
 void    _Swarm_RandomizeCertainParticles  (PsoSwarm_t *s, UINT8 *idx, UINT8 nParticlesToRandomize);
@@ -71,19 +74,23 @@ UINT8   _Swarm_GetId                      (PsoSwarm_t *s);
 // Private variables
 //==============================================================================
 
+extern const float potRealValues[256];
+
 static BOOL _oSwarmsInitialized = 0;
 
-#define N_SWARMS_TOTAL    (N_UNITS_TOTAL + 1)
-
-PsoSwarm_t _swarms[N_SWARMS_TOTAL] = {0};
-
+#define N_SWARMS_TOTAL        (N_UNITS_TOTAL + 1)
+PsoSwarm_t          _swarms   [N_SWARMS_TOTAL] = {0};
 PsoSwarmInterface_t _swarms_if[N_SWARMS_TOTAL];
+
+LinkedList_t _unusedSwarms =  {NULL, NULL, 0, N_SWARMS_TOTAL};
+LinkedList_t _usedSwarms   =  {NULL, NULL, 0, N_SWARMS_TOTAL};
+Node_t       _swarmsNodes     [N_SWARMS_TOTAL];
 
 
 // Private functions
 //==============================================================================
 
-INT8 _Swarm_Init (PsoSwarm_t *s, UnitArrayInterface_t *unitArray, PsoSwarmParam_t *param)
+INT8 _Swarm_Init (PsoSwarm_t *s, UnitArrayInterface_t *unitArray, PsoSwarmParam_t *param, UINT8 id)
 {
   UINT8 i;
   
@@ -92,6 +99,7 @@ INT8 _Swarm_Init (PsoSwarm_t *s, UnitArrayInterface_t *unitArray, PsoSwarmParam_
     return -1;
   }
   
+  s->id               = id;
   s->unitArray        = unitArray;
   s->oInSteadyState   = 0;
   s->oResetParticles  = 0;
@@ -153,6 +161,7 @@ UINT32 _Swarm_IterationIncrement (PsoSwarm_t *s)
 void _Swarm_Release (PsoSwarm_t *s)
 {
   UINT8 i;
+  Node_t *node = &_swarmsNodes[s->linkKey];
   
   s->param.iteration = 0;
   
@@ -160,6 +169,9 @@ void _Swarm_Release (PsoSwarm_t *s)
   {
     s->particles[i]->Release(s->particles[i]->ctx);
   }
+  
+  LinkedList_RemoveNode(node->list, node);
+  LinkedList_AddToEnd(&_unusedSwarms, node);
 }
 
 
@@ -209,15 +221,22 @@ void _Swarm_ComputeGbest (PsoSwarm_t *s)
 
 void _Swarm_RandomizeAllParticles (PsoSwarm_t *s)
 {
-  float range = s->param.posMax - s->param.posMin;
-  float sectionLength = range / s->nParticles;
-  float sections[PSO_SWARM_MAX_PARTICLES] = {0};
-  sections[0] = s->param.posMin;
-  sections[s->nParticles - 1] = s->param.posMax;
+//  float range = s->param.posMax - s->param.posMin;
+//  float sectionLength = range / s->nParticles;
+//  float sections[PSO_SWARM_MAX_PARTICLES] = {0};
+//  sections[0] = s->param.posMin;
+//  sections[s->nParticles - 1] = s->param.posMax;
+  UINT8 range = POT_MAX_INDEX - POT_MIN_INDEX;
+  UINT8 sectionLength = (float) range / (float) s->nParticles + 0.5f;
+  UINT8 sections[PSO_SWARM_MAX_PARTICLES + 1] = {0};
+  sections[0] = POT_MIN_INDEX;
+  sections[s->nParticles] = POT_MAX_INDEX;
+  
   UINT8 i;
   PsoParticleInterface_t *p;
   float tmpPos;
   Position_t tmpPbest = {0};
+  UINT8 potIdx;   // Potentiometer index
   
   for (i = 1; i < s->nParticles; i++)
   {
@@ -228,10 +247,13 @@ void _Swarm_RandomizeAllParticles (PsoSwarm_t *s)
   {
     p = s->particles[i];
     
-    tmpPos = Rng_GetRandFloat() * sectionLength + sections[i];
-    tmpPos = MIN(MAX(s->param.posMin, tmpPos), s->param.posMax);
-    
+//    tmpPos = Rng_GetRandFloat() * sectionLength + sections[i];
+//    tmpPos = MIN(MAX(s->param.posMin, tmpPos), s->param.posMax);
+//    potIdx = ComputePotValueFloat2Dec(tmpPos);
+    potIdx = Rng_GetRandBoundedUint32(sections[i], sections[i + 1]);
+    tmpPos = potRealValues[potIdx];
     p->SetPos(p->ctx, tmpPos);
+    tmpPos = p->GetPos(p->ctx);
     tmpPbest.curPos = tmpPos;
     p->SetPbest(p->ctx, &tmpPbest);
     p->SetPbestAbs(p->ctx, &tmpPbest);
@@ -241,7 +263,7 @@ void _Swarm_RandomizeAllParticles (PsoSwarm_t *s)
 
 void _Swarm_RandomizeCertainParticles (PsoSwarm_t *s, UINT8 *idx, UINT8 nParticlesToRandomize)
 {
-  UINT8 i;
+  UINT8 i, potIdx;
   PsoParticleInterface_t *p;
   float tmpPos;
   Position_t tmpPbest = {0};
@@ -251,10 +273,13 @@ void _Swarm_RandomizeCertainParticles (PsoSwarm_t *s, UINT8 *idx, UINT8 nParticl
   {
     p = s->particles[idx[i]];
     
-    tmpPos = Rng_GetRandFloat() * range;
-    tmpPos = MIN(MAX(s->param.posMin, tmpPos), s->param.posMax);
+//    tmpPos = Rng_GetRandFloat() * range;
+//    tmpPos = MIN(MAX(s->param.posMin, tmpPos), s->param.posMax);
+    potIdx = Rng_GetRandBoundedUint32(POT_MIN_INDEX, POT_MAX_INDEX);
+    tmpPos = potRealValues[potIdx];
     
     p->SetPos(p->ctx, tmpPos);
+    tmpPos = p->GetPos(p->ctx);
     tmpPbest.curPos = tmpPos;
     p->SetPbest(p->ctx, &tmpPbest);
     p->SetPbestAbs(p->ctx, &tmpPbest);
@@ -365,7 +390,6 @@ void _Swarm_SetParticleFitness (PsoSwarm_t *s, UINT8 idx, float fitness)
 void _Swarm_ComputeNextPositions (PsoSwarm_t *s, float *positions)
 {
   UINT8 i;
-  Position_t tmpGbest;
   
   if (s->param.type == PSO_SWARM_TYPE_PSO_1D)
   {
@@ -459,11 +483,11 @@ void _Swarm_ShiftParticlesLeft (PsoSwarm_t *s, UINT8 idxToShift)
 }
 
 
-int _CompareFunc (const void *p1, const void *p2)
+static int _CompareFunc (const void *p1, const void *p2)
 {
-  if ( *(float *) p1  > *(float *) p2 ) return -1;
-  if ( *(float *) p1 == *(float *) p2 ) return 0;
-  if ( *(float *) p1  < *(float *) p2 ) return 1;
+  if ( *(UINT8 *) p1  > *(UINT8 *) p2 ) return -1;
+  if ( *(UINT8 *) p1 == *(UINT8 *) p2 ) return  0;
+  if ( *(UINT8 *) p1  < *(UINT8 *) p2 ) return  1;
 }
 
 
@@ -479,16 +503,20 @@ void Position_Reset (Position_t *pos)
 }
 
 
-const PsoSwarmInterface_t * PsoSwarmInterface (UINT8 id)
+const PsoSwarmInterface_t * PsoSwarmInterface (void)
 {
   UINT8 i;
+  Node_t *temp;
   if (!_oSwarmsInitialized)
   {
     _oSwarmsInitialized = 1;
     
+    _unusedSwarms.head = (void *) &_swarmsNodes[0];
+    _unusedSwarms.count = 1;
+    
     for (i = 0; i < N_SWARMS_TOTAL; i++)
     {
-      _swarms   [i].id                          = i;
+      _swarms   [i].linkKey                     = i;
       _swarms_if[i].ctx                         = (void *)                                &_swarms[i];
       _swarms_if[i].AddParticle                 = (PsoSwarmAddParticle_fct)               &_Swarm_AddParticle;
       _swarms_if[i].CheckForPerturb             = (PsoSwarmCheckForPerturb_fct)           &_Swarm_CheckForPerturb;
@@ -512,14 +540,29 @@ const PsoSwarmInterface_t * PsoSwarmInterface (UINT8 id)
       _swarms_if[i].EvalSteadyState             = (PsoSwarmEvalSteadyState_fct)           &_Swarm_EvalSteadyState;
       _swarms_if[i].ComputeNextPos              = (PsoSwarmComputeNextPos_fct)            &_Swarm_ComputeNextPositions;
       _swarms_if[i].GetId                       = (PsoSwarmGetId_fct)                     &_Swarm_GetId;
+      
+      // Init the linked list
+      _swarmsNodes[i].ctx = (void *) &_swarms_if[i];
+      _swarmsNodes[i].key = i;
+      if (i < (N_SWARMS_TOTAL - 1))
+      {
+        _swarmsNodes[i].next = &_swarmsNodes[i + 1];
+      }
+      else
+      {
+        _swarmsNodes[i].next = NULL;
+      }
     }
+    LinkedList_Init(&_unusedSwarms, &_swarmsNodes[0]);
   }
   
-  if (id >= (N_SWARMS_TOTAL))
+  if (_unusedSwarms.count == 0)
   {
     return NULL;
   }
   
-#warning "Need to implement nodes for swarms, same as particles."
-  return &_swarms_if[id];
+  temp = _unusedSwarms.tail;
+  LinkedList_RemoveNode(&_unusedSwarms, temp);
+  LinkedList_AddToEnd(&_usedSwarms, temp);
+  return temp->ctx;
 }

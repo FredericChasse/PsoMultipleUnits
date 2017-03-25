@@ -18,6 +18,7 @@
 #include "SteadyState.h"
 #include "LinkedList.h"
 #include "Rng.h"
+#include "Potentiometer.h"  // To compute positions
 
 
 // Private definitions
@@ -93,6 +94,8 @@ BOOL  _Particle_EvalSteadyState (PsoParticle_t *p);
 
 // Private variables
 //==============================================================================
+
+extern const float potRealValues[256];
 
 static BOOL _oParticleArrayInitialized = 0;
 
@@ -198,8 +201,9 @@ float _Particle_GetSpeed (PsoParticle_t *p)
 
 void _Particle_SetPos (PsoParticle_t *p, float pos)
 {
+  UINT8 potIdx = ComputePotValueFloat2Dec(pos);
   p->pos.prevPos = p->pos.curPos;
-  p->pos.curPos  = pos;
+  p->pos.curPos  = potRealValues[potIdx];
 }
 
 
@@ -220,6 +224,7 @@ void _Particle_SetFitness (PsoParticle_t *p, float fitness)
 BOOL _Particle_FsmStep (PsoParticle_t *p, PsoSwarmInterface_t *swarm)
 {
   BOOL oRemoveParticle = 0;
+  UINT8 potIdx;
   PsoSwarmParam_t param;
   swarm->GetParam(swarm->ctx, &param);
   
@@ -262,7 +267,11 @@ BOOL _Particle_FsmStep (PsoParticle_t *p, PsoSwarmInterface_t *swarm)
         p->optPos.jinit   = p->pos.curFitness;
         p->optPos.dinit   = p->pos.curPos;
         p->optPos.dminus  = p->pos.curPos - param.perturbAmp;
+        potIdx = ComputePotValueFloat2Dec(p->optPos.dminus);
+        p->optPos.dminus  = potRealValues[potIdx];
         p->optPos.dpos    = p->pos.curPos + param.perturbAmp;
+        potIdx = ComputePotValueFloat2Dec(p->optPos.dpos);
+        p->optPos.dpos    = potRealValues[potIdx];
         
         p->pos.prevPos    = p->pos.curPos;
         p->pos.curPos     = p->optPos.dminus;
@@ -401,11 +410,14 @@ void _Particle_InitSpeed (PsoParticle_t *p, PsoSwarmInterface_t *swarm)
 
 void _Particle_ComputePos (PsoParticle_t *p, PsoSwarmInterface_t *swarm)
 {
+  UINT8 potIdx;
   PsoSwarmParam_t param;
   swarm->GetParam(swarm->ctx, &param);
   p->pos.prevPos = p->pos.curPos;
   p->pos.curPos = p->pos.prevPos + p->curSpeed;
   p->pos.curPos = MIN(MAX(param.posMin, p->pos.curPos), param.posMax);
+  potIdx = ComputePotValueFloat2Dec(p->pos.curPos);
+  p->pos.curPos = potRealValues[potIdx];
 }
 
 
@@ -449,11 +461,14 @@ BOOL _Particle_EvalSteadyState (PsoParticle_t *p)
 
 void _Particle_InitPos (PsoParticle_t *p, PsoSwarmInterface_t *swarm)
 {
+  UINT8 potIdx;
   PsoSwarmParam_t param;
   swarm->GetParam(swarm->ctx, &param);
   p->pos.prevPos = p->pos.curPos;
-  p->pos.curPos = Rng_GetRandFloat() * (param.posMax - param.posMin) + param.posMin;
-  p->pos.curPos = MIN(MAX(param.posMin, p->pos.curPos), param.posMax);
+  potIdx = Rng_GetRandBoundedUint32(POT_MIN_INDEX, POT_MAX_INDEX);
+//  p->pos.curPos = Rng_GetRandFloat() * (param.posMax - param.posMin) + param.posMin;
+//  p->pos.curPos = MIN(MAX(param.posMin, p->pos.curPos), param.posMax);
+  p->pos.curPos = potRealValues[potIdx];
   Position_Reset(&p->pbestAbs);
 }
 

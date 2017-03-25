@@ -24,21 +24,11 @@
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-#include "..\headers\Setup.h"
-#include "..\headers\SkadiFunctions.h"
-#include "..\headers\Interrupts.h"
-#include "..\headers\StateMachine.h"
-#include "..\headers\HardwareProfile.h"
-
-
-//==============================================================================
-// FUNCTION PROTOTYPES
-//==============================================================================
-
-
-//==============================================================================
-// VARIABLE DECLARATIONS
-//==============================================================================
+#include "Setup.h"
+#include "SkadiFunctions.h"
+#include "Interrupts.h"
+#include "StateMachine.h"
+#include "HardwareProfile.h"
 
 
 //==============================================================================

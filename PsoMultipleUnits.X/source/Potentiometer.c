@@ -218,7 +218,7 @@ inline INT8 SetPot (UINT8 numPot, UINT8 value)
   
   while(Spi.IsSpiBusy(SPI3));
   Port.D.ClearBits(1 << (pot + 4));
-  Spi.BlockingTransaction(SPI3, (index << 8) | value);
+  Spi.BlockingTransfer(SPI3, (index << 8) | value);
   Port.D.SetBits(1 << (pot + 4));
 
   return 0;

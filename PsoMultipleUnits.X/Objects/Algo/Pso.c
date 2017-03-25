@@ -16,6 +16,7 @@
 
 #include "Pso.h"
 #include "PsoSwarm.h"
+#include "Potentiometer.h"
 
 // Private definitions
 //==============================================================================
@@ -42,6 +43,9 @@ INT8  _Pso1d_Run          (Pso_t *pso);
 INT8  _Pso_Close          (Pso_t *pso);
 float _Pso_GetTimeElapsed (Pso_t *pso);
 
+void _Pso_ShiftSwarmsLeft (Pso_t *pso, UINT8 idxToShift);
+static int _CompareFunc   (const void *p1, const void *p2);
+
 // Private variables
 //==============================================================================
 
@@ -51,7 +55,7 @@ Pso_t _parallelPso =
  ,.nSwarms      = 0
  ,.swarms       = {0}
  ,.unitArray    = 0
- ,.sampleTime   = 0.08
+ ,.sampleTime   = SAMPLING_TIME_FLOAT
  ,.timeElapsed  = 0
  ,.iteration    = 0
 };
@@ -62,7 +66,7 @@ Pso_t _pso1d =
  ,.nSwarms      = 0
  ,.swarms       = {0}
  ,.unitArray    = 0
- ,.sampleTime   = 0.08
+ ,.sampleTime   = SAMPLING_TIME_FLOAT
  ,.timeElapsed  = 0
  ,.iteration    = 0
 };
@@ -90,19 +94,20 @@ const AlgoInterface_t _pso1d_if =
 
 INT8 _ParallelPso_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
 {
-  pso->unitArray = unitArray;
-  pso->nSwarms = 1;
-  pso->timeElapsed = 0;
+  pso->unitArray    = unitArray;
+  pso->nSwarms      = 1;
+  pso->timeElapsed  = 0;
+  pso->sampleTime   = SAMPLING_TIME_FLOAT;
   
   const PsoSwarmParam_t swarmParam = 
   {
     .c1                     = 1
    ,.c2                     = 2
    ,.omega                  = 0.4
-   ,.posMin                 = 50
-   ,.posMax                 = 1050
+   ,.posMin                 = MIN_POT_VALUE
+   ,.posMax                 = MAX_POT_VALUE
    ,.minParticles           = 3
-   ,.perturbAmp             = 15
+   ,.perturbAmp             = 15.7
    ,.sentinelMargin         = 0.05
    ,.type                   = PSO_SWARM_TYPE_PARALLEL_PSO
    ,.nSamplesForSteadyState = 5
@@ -111,8 +116,8 @@ INT8 _ParallelPso_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
    ,.currentParticle        = 0
   };
   
-  pso->swarms[0] = (PsoSwarmInterface_t *) PsoSwarmInterface(0);
-  pso->swarms[0]->Init(pso->swarms[0]->ctx, unitArray, (PsoSwarmParam_t *) &swarmParam);
+  pso->swarms[0] = (PsoSwarmInterface_t *) PsoSwarmInterface();
+  pso->swarms[0]->Init(pso->swarms[0]->ctx, unitArray, (PsoSwarmParam_t *) &swarmParam, 0);
   
   return 0;
 }
@@ -121,19 +126,20 @@ INT8 _ParallelPso_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
 INT8 _Pso1d_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
 {
   UINT8 i;
-  pso->unitArray = unitArray;
-  pso->nSwarms = pso->unitArray->GetNUnits(pso->unitArray->ctx);
-  pso->timeElapsed = 0;
+  pso->unitArray    = unitArray;
+  pso->nSwarms      = pso->unitArray->GetNUnits(pso->unitArray->ctx);
+  pso->timeElapsed  = 0;
+  pso->sampleTime   = SAMPLING_TIME_FLOAT;
   
   const PsoSwarmParam_t swarmParam = 
   {
     .c1                     = 1
    ,.c2                     = 2
    ,.omega                  = 0.4
-   ,.posMin                 = 50
-   ,.posMax                 = 1050
+   ,.posMin                 = MIN_POT_VALUE
+   ,.posMax                 = MAX_POT_VALUE
    ,.minParticles           = 3
-   ,.perturbAmp             = 15
+   ,.perturbAmp             = 15.7
    ,.sentinelMargin         = 0.05
    ,.type                   = PSO_SWARM_TYPE_PSO_1D
    ,.nSamplesForSteadyState = 5
@@ -144,8 +150,8 @@ INT8 _Pso1d_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
   
   for (i = 0; i < pso->nSwarms; i++)
   {
-    pso->swarms[i] = (PsoSwarmInterface_t *) PsoSwarmInterface(i);
-    pso->swarms[i]->Init(pso->swarms[i]->ctx, unitArray, (PsoSwarmParam_t *) &swarmParam);
+    pso->swarms[i] = (PsoSwarmInterface_t *) PsoSwarmInterface();
+    pso->swarms[i]->Init(pso->swarms[i]->ctx, unitArray, (PsoSwarmParam_t *) &swarmParam, i);
   }
   return 0;
 }
@@ -153,7 +159,75 @@ INT8 _Pso1d_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
 
 INT8 _ParallelPso_Run (Pso_t *pso)
 {
+  UnitArrayInterface_t *array = pso->unitArray;
+  PsoSwarmInterface_t *swarm;
+  UINT8  i            = 0
+        ,iSwarm       = 0
+        ,nUnits       = array->GetNUnits(array->ctx)
+        ,curParticle  = 0
+        ,nParticles   = 0
+        ;
+  UINT8 idxPerturbed[PSO_SWARM_MAX_PARTICLES];
+  float fitness[N_UNITS_TOTAL];
+  static float nextPositions[N_UNITS_TOTAL+1][PSO_SWARM_MAX_PARTICLES];
   
+  pso->iteration++;
+  pso->timeElapsed += pso->sampleTime;
+  
+  for (i = 0; i < nUnits; i++)
+  {
+    fitness[i] = array->GetPower(array->ctx, i);
+  }
+  
+#warning "TBD."
+  
+  // Swarms 1D
+  //----------------------------------------------------------------------------
+  for (iSwarm = 1; iSwarm < pso->nSwarms; iSwarm++)
+  {
+    swarm = pso->swarms[iSwarm];
+    nParticles = swarm->GetNParticles(swarm->ctx);
+    
+    if (nParticles != 0)
+    {
+      curParticle = swarm->GetCurParticle(swarm->ctx);
+      swarm->SetParticleFitness(swarm->ctx, i, fitness[i]);
+      
+      if (curParticle == (nParticles - 1))  // Ready for a real iteration
+      {
+        swarm->IterationInc(swarm->ctx);
+        
+        // Compute Pbest and Gbest
+        //-----------------------------------
+        swarm->ComputeAllPbest(swarm->ctx);
+        swarm->ComputeGbest   (swarm->ctx);
+        //-----------------------------------
+        
+        // Check for perturbations
+        //-----------------------------------
+        swarm->CheckForPerturb(swarm->ctx, idxPerturbed);
+        //-----------------------------------
+        
+        // Check for steady state of the particles and the swarm
+        //-----------------------------------
+        swarm->EvalSteadyState(swarm->ctx);
+        //-----------------------------------
+        
+        // Compute next positions
+        //-----------------------------------
+        swarm->ComputeNextPos(swarm->ctx, &nextPositions[iSwarm][0]);
+        //-----------------------------------
+      }
+      
+      swarm->IncCurrentParticle(swarm->ctx);
+      curParticle = swarm->GetCurParticle(swarm->ctx);
+      
+      pso->unitArray->SetPos(pso->unitArray->ctx, iSwarm, nextPositions[iSwarm][curParticle]);
+    }
+  }
+  //----------------------------------------------------------------------------
+  
+  return 0;
 }
 
 
@@ -221,8 +295,7 @@ INT8 _Pso1d_Run (Pso_t *pso)
       pso->unitArray->SetPos(pso->unitArray->ctx, iSwarm, nextPositions[iSwarm][curParticle]);
     }
   }
-  
-  
+  return 0;
 }
 
 
@@ -244,6 +317,25 @@ INT8 _Pso_Close (Pso_t *pso)
 float _Pso_GetTimeElapsed (Pso_t *pso)
 {
   return pso->timeElapsed;
+}
+
+
+void _Pso_ShiftSwarmsLeft (Pso_t *pso, UINT8 idxToShift)
+{
+  if (idxToShift == (pso->nSwarms - 1))
+  {
+    return;
+  }
+  UINT8 offset = pso->nSwarms - idxToShift - 1;
+  memmove(&pso->swarms[idxToShift], &pso->swarms[idxToShift + 1], offset * sizeof(PsoSwarmInterface_t *));
+}
+
+
+static int _CompareFunc (const void *p1, const void *p2)
+{
+  if ( *(UINT8 *) p1  > *(UINT8 *) p2 ) return -1;
+  if ( *(UINT8 *) p1 == *(UINT8 *) p2 ) return  0;
+  if ( *(UINT8 *) p1  < *(UINT8 *) p2 ) return  1;
 }
 
 

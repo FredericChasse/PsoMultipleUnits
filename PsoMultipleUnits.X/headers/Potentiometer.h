@@ -24,6 +24,12 @@
 
 #include "Setup.h"
 
+// Public definitions
+//==============================================================================
+#define POT_MAX_INDEX   (255)
+#define POT_MIN_INDEX   (0)
+//==============================================================================
+
 
 //==============================================================================
 // Potentiometer public functions prototypes
@@ -117,9 +123,10 @@ inline INT8 SetPotAllUnits (UINT8 numPot, UINT8 value);
 //#define WIPER_VALUE     (51.7 + 50.9 + 52.3 + 50.2) / 4
 //#define WIPER_VALUE     51
 #define WIPER_VALUE     50.0f
+#define MIN_POT_VALUE   (WIPER_VALUE)
 //#define MID_VALUE       4.79k+4.88k+4.79k+4.79k
 //#define MID_VALUE       4800
-#define MID_VALUE       545.3.0f
+#define MID_VALUE       545.30f
 
 #define VREF            2.489f
 //#define VREF            3.268f

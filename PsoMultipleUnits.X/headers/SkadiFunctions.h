@@ -86,21 +86,13 @@ void ClearScreen();
 //==============================================================================
 // Variable declarations
 //==============================================================================
-//
-///***********************************
-// * Table of functions used in Skadi
-// **********************************/
-//sSkadiCommand_t skadiCommandTable[] =
-//{
-//   {"LedDebug"    , LedDebug    , 1, "Usage : flash Led DEBUG"}   // 1 argument
-//  ,{"LedCan"      , LedCan      , 1, "Usage : flash Led CAN"}     // 1 argument
-//  ,{"ReInitSystem", ReInitSystem, 0, "Redo StateInit()"}          // 0 argument
-//};
-//
-///***************************************************
-// * Length of the table of functions used in Skadi
-// **************************************************/
-//const size_t lengthSkadiCommandTable = 3;
+
+#define N_SKADI_CMDS    (6)
+
+/***********************************
+ * Table of functions used in Skadi
+ **********************************/
+extern const sSkadiCommand_t skadiCommandTable[N_SKADI_CMDS];
 
 
 #endif	/* __SKADI_FUNCTIONS__ */
