@@ -19,6 +19,11 @@
 
 #include "Setup.h"
 
+typedef enum
+{
+  UNIT_TYPE_STATIC_FUNC
+ ,UNIT_TYPE_PV_CELL
+} UnitType_t;
 
 typedef void  (*UnitInit_fct)       (void *ctx);
 typedef INT8  (*UnitSetPos_fct)     (void *ctx, float pos);

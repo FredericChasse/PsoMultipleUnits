@@ -179,7 +179,7 @@ INT8 _UnitArray_RemoveUnitFromArray (UnitArray_t *array, UINT8 idx)
 
 // Public functions
 //==============================================================================
-const UnitArrayInterface_t * UnitArrayInterface(UINT8 idx)
+const UnitArrayInterface_t * UnitArrayInterface(void)
 {
   UINT8 i;
   Node_t *temp;

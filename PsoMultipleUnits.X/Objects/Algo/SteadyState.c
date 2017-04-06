@@ -16,6 +16,7 @@
 
 #include "SteadyState.h"
 #include "ByteBuffer.h"
+#include "MathFunctions.h"
 
 
 // Private definitions
@@ -125,4 +126,5 @@ void SteadyState_AddSample (SteadyState_t *ss, float *newSample)
 void SteadyState_Reset (SteadyState_t *ss)
 {
   BUFFER_RESET(ss);
+  ss->oInSteadyState = 0;
 }

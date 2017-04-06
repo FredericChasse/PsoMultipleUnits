@@ -43,6 +43,8 @@ INT8  _Pso1d_Run          (Pso_t *pso);
 INT8  _Pso_Close          (Pso_t *pso);
 float _Pso_GetTimeElapsed (Pso_t *pso);
 
+void _Pso_RemoveSubSwarm  (Pso_t *pso, UINT8 swarmId);
+void _Pso_CreateSubSwarms (Pso_t *pso, UINT8 *particlesToRemove, UINT8 nParticlesToRemove);
 void _Pso_ShiftSwarmsLeft (Pso_t *pso, UINT8 idxToShift);
 static int _CompareFunc   (const void *p1, const void *p2);
 
@@ -94,10 +96,21 @@ const AlgoInterface_t _pso1d_if =
 
 INT8 _ParallelPso_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
 {
+  UnitArrayInterface_t *swarmArray;
+  UINT8 nUnits, i;
+  
   pso->unitArray    = unitArray;
   pso->nSwarms      = 1;
   pso->timeElapsed  = 0;
   pso->sampleTime   = SAMPLING_TIME_FLOAT;
+  
+  swarmArray  = (UnitArrayInterface_t *) UnitArrayInterface();
+  swarmArray->Init(swarmArray->ctx, 1);
+  nUnits      = unitArray->GetNUnits(unitArray->ctx);
+  for (i = 0; i < nUnits; i++)
+  {
+    swarmArray->AddUnitToArray(swarmArray->ctx, unitArray->GetUnitHandle(unitArray->ctx, i));
+  }
   
   const PsoSwarmParam_t swarmParam = 
   {
@@ -117,7 +130,7 @@ INT8 _ParallelPso_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
   };
   
   pso->swarms[0] = (PsoSwarmInterface_t *) PsoSwarmInterface();
-  pso->swarms[0]->Init(pso->swarms[0]->ctx, unitArray, (PsoSwarmParam_t *) &swarmParam, 0);
+  pso->swarms[0]->Init(pso->swarms[0]->ctx, swarmArray, (PsoSwarmParam_t *) &swarmParam, 0);
   
   return 0;
 }
@@ -161,19 +174,22 @@ INT8 _ParallelPso_Run (Pso_t *pso)
 {
   UnitArrayInterface_t *array;
   PsoSwarmInterface_t *swarm;
-  UINT8  i            = 0
-        ,iSwarm       = 0
-        ,nSwarmsMem   = pso->nSwarms    // So we don't do a swarm twice in the same iteration
-        ,curParticle  = 0
-        ,nParticles   = 0
+  UINT8  i              = 0
+        ,iSwarm         = 0
+        ,nSwarmsMem     = pso->nSwarms    // So we don't do a swarm twice in the same iteration
+        ,curParticle    = 0
+        ,nParticles     = 0
+        ,nParticlesMem  = 0
+        ,nUnits         = 0
         ;
   UINT8 idxPerturbed[PSO_SWARM_MAX_PARTICLES];
+  UINT8 nPerturbed = 0;
   UINT8 swarmsToDelete[N_SWARMS_TOTAL];
   UINT8 nSwarmsToDelete = 0;
   UINT8 idxToRemove[N_SWARMS_TOTAL];
-  UINT8 nIdxToRemove;
+  UINT8 nIdxToRemove = 0;
   float fitness[N_UNITS_TOTAL];
-  static float nextPositions[N_SWARMS_TOTAL][PSO_SWARM_MAX_PARTICLES];
+  float nextPositions[PSO_SWARM_MAX_PARTICLES];
   
   pso->iteration++;
   pso->timeElapsed += pso->sampleTime;
@@ -186,6 +202,8 @@ INT8 _ParallelPso_Run (Pso_t *pso)
   nParticles = swarm->GetNParticles(swarm->ctx);
   if (nParticles != 0)
   {
+    swarm->IterationInc(swarm->ctx);
+    
     // Set the fitness of each particle
     //--------------------------------------
     for (i = 0; i < nParticles; i++)
@@ -202,7 +220,7 @@ INT8 _ParallelPso_Run (Pso_t *pso)
         
     // Check for perturbations
     //-----------------------------------
-    swarm->CheckForPerturb(swarm->ctx, idxPerturbed);
+    nPerturbed = swarm->CheckForPerturb(swarm->ctx, idxPerturbed);
     //-----------------------------------
 
     // Check for steady state of the particles
@@ -212,8 +230,38 @@ INT8 _ParallelPso_Run (Pso_t *pso)
         
     // Compute next positions
     //-----------------------------------
-    swarm->ComputeNextPos(swarm->ctx, &nextPositions[iSwarm][0]);
+    nIdxToRemove = swarm->ComputeNextPos(swarm->ctx, nextPositions, idxToRemove);
     //-----------------------------------
+    
+    if (nPerturbed)
+    {
+      if (nPerturbed == nParticles)
+      {
+        swarm->RandomizeAllParticles(swarm->ctx);
+      }
+      else
+      {
+        swarm->RandomizeCertainParticles(swarm->ctx, idxPerturbed, nPerturbed);
+      }
+    }
+    
+    if (nIdxToRemove)
+    {
+      _Pso_CreateSubSwarms(pso, idxToRemove, nIdxToRemove);
+    }
+    
+    nUnits = array->GetNUnits(array->ctx);
+    for (i = 0; i < nUnits; i++)
+    {
+      array->SetPos(array->ctx, i, nextPositions[i]);
+    }
+    
+    for (i = nSwarmsMem; i < pso->nSwarms; i++)
+    {
+      swarm = pso->swarms[i];
+      array = swarm->GetUnitArray(swarm->ctx);
+      array->SetPos(array->ctx, 0, swarm->GetParticlePos(swarm->ctx, 0));
+    }
   }
   //----------------------------------------------------------------------------
   
@@ -253,19 +301,104 @@ INT8 _ParallelPso_Run (Pso_t *pso)
         
         // Compute next positions
         //-----------------------------------
-        swarm->ComputeNextPos(swarm->ctx, &nextPositions[iSwarm][0]);
+        nIdxToRemove = swarm->ComputeNextPos(swarm->ctx, nextPositions, 0);
         //-----------------------------------
+        
+        if (nIdxToRemove)
+        {
+          swarmsToDelete[nSwarmsToDelete++] = iSwarm;
+        }
       }
       
       swarm->IncCurrentParticle(swarm->ctx);
       curParticle = swarm->GetCurParticle(swarm->ctx);
-      
-      pso->unitArray->SetPos(pso->unitArray->ctx, iSwarm, nextPositions[iSwarm][curParticle]);
+      array->SetPos(array->ctx, 0, swarm->GetParticlePos(swarm->ctx, curParticle));
     }
   }
   //----------------------------------------------------------------------------
   
+  if (nSwarmsToDelete)
+  {
+    swarm = pso->swarms[0];
+    nParticlesMem = swarm->GetNParticles(swarm->ctx);
+    
+    for (i = nSwarmsToDelete - 1; i >= 0 ; i--)
+    {
+      _Pso_RemoveSubSwarm(pso, swarmsToDelete[i]);
+    }
+    
+    array = swarm->GetUnitArray(swarm->ctx);
+    nParticles = swarm->GetNParticles(swarm->ctx);
+    for (i = nParticlesMem; i < nParticles; i++)
+    {
+      array->SetPos(array->ctx, i, swarm->GetParticlePos(swarm->ctx, i));
+    }
+  }
   return 0;
+}
+
+
+void _Pso_RemoveSubSwarm (Pso_t *pso, UINT8 swarmId)
+{
+  PsoSwarmInterface_t *mainSwarm = pso->swarms[0];
+  void *particle = mainSwarm->GetParticle(mainSwarm->ctx, 0);
+  
+  UnitArrayInterface_t *oldArray = pso->swarms[swarmId]->GetUnitArray(pso->swarms[swarmId]->ctx);
+  UnitArrayInterface_t *mainArray = mainSwarm->GetUnitArray(mainSwarm->ctx);
+  void *unit = oldArray->GetUnitHandle(oldArray->ctx, 0);
+  oldArray->Release(oldArray->ctx);
+  
+  pso->swarms[swarmId]->Release(pso->swarms[swarmId]->ctx);
+  _Pso_ShiftSwarmsLeft(pso, swarmId);
+  pso->nSwarms--;
+  
+  mainSwarm->AddParticle(mainSwarm->ctx, particle);
+  mainArray->AddUnitToArray(mainArray->ctx, unit);
+}
+
+
+void _Pso_CreateSubSwarms (Pso_t *pso, UINT8 *particlesToRemove, UINT8 nParticlesToRemove)
+{
+  PsoSwarmInterface_t    *swarm = pso->swarms[0];
+  UnitArrayInterface_t   *initArray = swarm->GetUnitArray(swarm->ctx)
+                        ,*newArrays[N_UNITS_TOTAL] = {0}
+                        ;
+  PsoSwarmInterface_t    *newSwarms[N_UNITS_TOTAL] = {0};
+  void *units[N_UNITS_TOTAL] = {0};
+  UINT8 i;
+  PsoSwarmParam_t swarmParam;
+  
+  for (i = 0; i < nParticlesToRemove; i++)
+  {
+    newArrays[i] = (UnitArrayInterface_t *) UnitArrayInterface();
+    newSwarms[i] = (PsoSwarmInterface_t  *) PsoSwarmInterface ();
+    units    [i] = initArray->GetUnitHandle(initArray->ctx, particlesToRemove[i]);
+    newArrays[i]->Init(newArrays[i]->ctx, i+2);
+    newArrays[i]->AddUnitToArray(newArrays[i]->ctx, units[i]);
+  }
+  
+  swarm->RemoveParticles(swarm->ctx, particlesToRemove, nParticlesToRemove);
+  
+  qsort( (void *) particlesToRemove, (size_t) nParticlesToRemove, sizeof(UINT8), &_CompareFunc);
+  
+  for (i = 0; i < nParticlesToRemove; i++)
+  {
+    initArray->RemoveUnitFromArray(initArray->ctx, particlesToRemove[i]);
+  }
+  
+  swarm->GetParam(swarm->ctx, &swarmParam);
+  
+  swarmParam.currentParticle = 0;
+  swarmParam.iteration = 0;
+  swarmParam.type = PSO_SWARM_TYPE_PARALLEL_PSO_SUB_SWARM;
+  
+  for (i = 0; i < nParticlesToRemove; i++)
+  {
+    newSwarms[i]->Init(newSwarms[i]->ctx, newArrays[i], &swarmParam, pso->nSwarms);
+    pso->swarms[pso->nSwarms] = newSwarms[i];
+    pso->nSwarms++;
+    newSwarms[i]->RandomizeAllParticles(newSwarms[i]->ctx);
+  }
 }
 
 
@@ -323,7 +456,7 @@ INT8 _Pso1d_Run (Pso_t *pso)
         
         // Compute next positions
         //-----------------------------------
-        swarm->ComputeNextPos(swarm->ctx, &nextPositions[iSwarm][0]);
+        swarm->ComputeNextPos(swarm->ctx, &nextPositions[iSwarm][0], 0);
         //-----------------------------------
       }
       

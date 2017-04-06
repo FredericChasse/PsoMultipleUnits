@@ -11,6 +11,8 @@
       <itemPath>Objects/Algo/PsoParticle.h</itemPath>
       <itemPath>Objects/Algo/SteadyState.c</itemPath>
       <itemPath>Objects/Algo/SteadyState.h</itemPath>
+      <itemPath>source/ControlAlgorithm.c</itemPath>
+      <itemPath>headers/ControlAlgorithm.h</itemPath>
     </logicalFolder>
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
@@ -20,14 +22,18 @@
       <itemPath>headers/Interrupts.h</itemPath>
       <itemPath>headers/StateFunctions.h</itemPath>
       <itemPath>headers/HardwareProfile.h</itemPath>
-      <itemPath>headers/HeaderTemplate.h</itemPath>
       <itemPath>headers/SkadiFunctions.h</itemPath>
-      <itemPath>headers/LedDriver.h</itemPath>
-      <itemPath>headers/ControlAlgorithm.h</itemPath>
+      <itemPath>source/UnitMapping.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
                    projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="f3" displayName="Perturb" projectFiles="true">
+      <itemPath>Objects/Perturb/Perturb.c</itemPath>
+      <itemPath>Objects/Perturb/Perturb.h</itemPath>
+      <itemPath>source/LedDriver.c</itemPath>
+      <itemPath>headers/LedDriver.h</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
@@ -37,10 +43,7 @@
       <itemPath>source/Interrupts.c</itemPath>
       <itemPath>source/Setup.c</itemPath>
       <itemPath>source/StateFunctions.c</itemPath>
-      <itemPath>source/SourceTemplate.c</itemPath>
       <itemPath>source/SkadiFunctions.c</itemPath>
-      <itemPath>source/LedDriver.c</itemPath>
-      <itemPath>source/ControlAlgorithm.c</itemPath>
     </logicalFolder>
     <logicalFolder name="f2" displayName="Units" projectFiles="true">
       <itemPath>source/Potentiometer.c</itemPath>
@@ -62,6 +65,10 @@
       <logicalFolder name="f2" displayName="LinkedList" projectFiles="true">
         <itemPath>Utilities/ChainedList/LinkedList.c</itemPath>
         <itemPath>Utilities/ChainedList/LinkedList.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f5" displayName="MathFunctions" projectFiles="true">
+        <itemPath>Utilities/MathFunctions/MathFunctions.c</itemPath>
+        <itemPath>Utilities/MathFunctions/MathFunctions.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f3" displayName="PcgRng" projectFiles="true">
         <itemPath>Utilities/PcgRng/pcg_basic.c</itemPath>
@@ -88,6 +95,8 @@
     <Elem>Utilities/ChainedList</Elem>
     <Elem>Utilities/PcgRng</Elem>
     <Elem>Utilities/ByteBuffer</Elem>
+    <Elem>Objects/Perturb</Elem>
+    <Elem>Utilities/MathFunctions</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -149,7 +158,7 @@
         <property key="enable-unroll-loops" value="false"/>
         <property key="exclude-floating-point" value="false"/>
         <property key="extra-include-directories"
-                  value="source;headers;Objects\Algo;Objects\Units;Utilities\BipBuffer;Utilities\ChainedList;Utilities\PcgRng;Utilities\ByteBuffer"/>
+                  value="source;headers;Objects\Algo;Objects\Units;Utilities\BipBuffer;Utilities\ChainedList;Utilities\PcgRng;Utilities\ByteBuffer;Objects\Perturb;Utilities\MathFunctions"/>
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="false"/>

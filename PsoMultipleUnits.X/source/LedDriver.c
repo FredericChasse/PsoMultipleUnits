@@ -4,7 +4,7 @@
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //
-// File    : SourceTemplate.c
+// File    : LedDriver.c
 // Author  : Frederic Chasse
 // Date    : 2015-01-03
 //

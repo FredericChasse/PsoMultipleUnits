@@ -44,7 +44,7 @@ typedef struct UnitArrayInterface
 } UnitArrayInterface_t;
 
 
-const UnitArrayInterface_t * UnitArrayInterface(UINT8 idx);
+const UnitArrayInterface_t * UnitArrayInterface(void);
 
 
 #endif // __UNIT_ARRAY_H__

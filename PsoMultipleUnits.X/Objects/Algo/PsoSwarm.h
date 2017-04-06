@@ -41,6 +41,7 @@ typedef struct
 typedef enum
 {
   PSO_SWARM_TYPE_PARALLEL_PSO
+ ,PSO_SWARM_TYPE_PARALLEL_PSO_SUB_SWARM
  ,PSO_SWARM_TYPE_PSO_1D
 } PsoSwarmType_t;
 
@@ -81,10 +82,11 @@ typedef void    (*PsoSwarmIncrementCurParticle_fct)       (void *ctx);
 typedef UINT8   (*PsoSwarmGetCurParticle_fct)             (void *ctx);
 typedef void    (*PsoSwarmComputeAllParticlesPbest_fct)   (void *ctx);
 typedef BOOL    (*PsoSwarmEvalSteadyState_fct)            (void *ctx);
-typedef void    (*PsoSwarmComputeNextPos_fct)             (void *ctx, float *positions);
+typedef UINT8   (*PsoSwarmComputeNextPos_fct)             (void *ctx, float *positions, UINT8 *idxToRemove);
 typedef UINT8   (*PsoSwarmGetId_fct)                      (void *ctx);
 typedef void *  (*PsoSwarmGetUnitArray_fct)               (void *ctx);
 typedef void    (*PsoSwarmSetId_fct)                      (void *ctx, UINT8 id);
+typedef float   (*PsoSwarmGetParticlePos_fct)             (void *ctx, UINT8 idx);
   
 typedef struct
 {
@@ -113,6 +115,7 @@ typedef struct
   PsoSwarmGetId_fct                     GetId;
   PsoSwarmGetUnitArray_fct              GetUnitArray;
   PsoSwarmSetId_fct                     SetId;
+  PsoSwarmGetParticlePos_fct            GetParticlePos;
 } PsoSwarmInterface_t;
 
 

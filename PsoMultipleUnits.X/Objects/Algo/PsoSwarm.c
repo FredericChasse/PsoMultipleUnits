@@ -18,6 +18,7 @@
 #include "SteadyState.h"
 #include "PsoParticle.h"
 #include "LinkedList.h"
+#include "MathFunctions.h"
 #include "Potentiometer.h"  // To compute positions
 
 
@@ -70,9 +71,11 @@ void    _Swarm_ComputeAllParticlesPbest   (PsoSwarm_t *s);
 BOOL    _Swarm_EvalSteadyState            (PsoSwarm_t *s);
 UINT8   _Swarm_GetId                      (PsoSwarm_t *s);
 void    _Swarm_SetId                      (PsoSwarm_t *s, UINT8 id);
+float   _Swarm_GetParticlePos             (PsoSwarm_t *s, UINT8 idx);
 void *  _Swarm_GetUnitArray               (PsoSwarm_t *s);
-void    _Swarm1d_ComputeNextPositions     (PsoSwarm_t *s, float *positions);
-void    _SwarmPara_ComputeNextPositions   (PsoSwarm_t *s, float *positions);
+UINT8   _Swarm1d_ComputeNextPositions     (PsoSwarm_t *s, float *positions, UINT8 *dummy);
+UINT8   _SwarmPara_ComputeNextPositions   (PsoSwarm_t *s, float *positions, UINT8 *idxToRemove);
+UINT8   _SubSwarm_ComputeNextPositions    (PsoSwarm_t *s, float *positions, UINT8 *idxToRemove);
 
 
 // Private variables
@@ -121,6 +124,12 @@ INT8 _Swarm_Init (PsoSwarm_t *s, UnitArrayInterface_t *unitArray, PsoSwarmParam_
     s->nParticles = s->param.minParticles;
     s->nParticlesPerUnit = s->param.minParticles;
     _swarms_if[s->linkKey].ComputeNextPos = (PsoSwarmComputeNextPos_fct) &_Swarm1d_ComputeNextPositions;
+  }
+  else if (s->param.type == PSO_SWARM_TYPE_PARALLEL_PSO_SUB_SWARM)
+  {
+    s->nParticles = s->param.minParticles;
+    s->nParticlesPerUnit = s->param.minParticles;
+    _swarms_if[s->linkKey].ComputeNextPos = (PsoSwarmComputeNextPos_fct) &_SubSwarm_ComputeNextPositions;
   }
   
   for (i = 0; i < s->nParticles; i++)
@@ -349,7 +358,7 @@ UINT8 _Swarm_CheckForPerturb (PsoSwarm_t *s, UINT8 *idxPerturbed)
   
   for (i = 0; i < s->nParticles; i++)
   {
-    if (s->particles[i]->SentinelEval(s->particles[i]->ctx))
+    if (s->particles[i]->SentinelEval(s->particles[i]->ctx, s->param.sentinelMargin))
     {
       idxPerturbed[nPerturbed] = i;
       nPerturbed++;
@@ -398,24 +407,108 @@ void _Swarm_SetParticleFitness (PsoSwarm_t *s, UINT8 idx, float fitness)
 }
 
 
-void _SwarmPara_ComputeNextPositions (PsoSwarm_t *s, float *positions)
+UINT8 _SubSwarm_ComputeNextPositions (PsoSwarm_t *s, float *positions, UINT8 *idxToRemove)
 {
   UINT8 i;
+  UINT8 idxInSteadyState[PSO_SWARM_MAX_PARTICLES];
+  UINT8 nIdxInSteadyState = 0;
   UINT8 idxPerturbed[PSO_SWARM_MAX_PARTICLES];
   UINT8 nPerturbed = 0;
+  UINT8 nToRemove = 0;
+  BOOL  oFirstSwarmActive = 0;
   PsoParticleInterface_t *p;
   for (i = 0; i < s->nParticles; i++)
   {
     p = s->particles[i];
-    if ( (idxPerturbed[nPerturbed] = p->FsmStep(p->ctx, &_swarms_if[s->linkKey])) != 0)
+    p->FsmStep(p->ctx, &_swarms_if[s->linkKey]);
+    if (p->GetSteadyState(p->ctx))
     {
-      nPerturbed++;
+      idxInSteadyState[nIdxInSteadyState++] = i;
+    }
+    if (p->GetSentinelState(p->ctx))
+    {
+      idxPerturbed[nPerturbed++] = i;
     }
   }
+  
+  if (nIdxInSteadyState == s->nParticles)
+  {
+    for (i = 0; i < s->nParticles; i++)
+    {
+      s->particles[i]->SetPos(s->particles[i]->ctx, s->gbest.curPos);
+      s->particles[i]->SetFitness(s->particles[i]->ctx, s->gbest.curFitness);
+    }
+  }
+  
+  if (nPerturbed)
+  {
+    _Swarm_RandomizeAllParticles(s);
+    for (i = 0; i < s->nParticles; i++)
+    {
+      s->particles[i]->InitSpeed(s->particles[i]->ctx, &_swarms_if[s->linkKey]);
+    }
+    
+    for (i = 0; i < _swarms[0].nParticles; i++)
+    {
+      if (_swarms[0].particles[i]->IsSearching(_swarms[0].particles[i]->ctx))
+      {
+        oFirstSwarmActive = 1;
+        break;
+      }
+    }
+    
+    if (oFirstSwarmActive)
+    {
+      nToRemove = 1;
+      for (i = 0; i < s->nParticles; i++)
+      {
+        s->particles[i]->ResetSteadyState(s->particles[i]->ctx);
+      }
+    }
+  }
+  
+  for (i = 0; i < s->nParticles; i++)
+  {
+    positions[i] = s->particles[i]->GetPos(s->particles[i]->ctx);
+  }
+  
+  return nToRemove;
 }
 
 
-void _Swarm1d_ComputeNextPositions (PsoSwarm_t *s, float *positions)
+UINT8 _SwarmPara_ComputeNextPositions (PsoSwarm_t *s, float *positions, UINT8 *idxToRemove)
+{
+  UINT8 i;
+  UINT8 idxPerturbed[PSO_SWARM_MAX_PARTICLES];
+  UINT8 nPerturbed = 0;
+  UINT8 nToRemove = 0;
+  PsoParticleInterface_t *p;
+  for (i = 0; i < s->nParticles; i++)
+  {
+    p = s->particles[i];
+    if ( p->FsmStep(p->ctx, &_swarms_if[s->linkKey]))
+    {
+      idxToRemove[nToRemove] = i;
+      nToRemove++;
+    }
+    
+    if ( p->GetSentinelState(p->ctx))
+    {
+      idxPerturbed[nPerturbed] = i;
+      nPerturbed++;
+    }
+  }
+  
+  for (i = 0; i < s->nParticles; i++)
+  {
+    positions[i] = s->particles[i]->GetPos(s->particles[i]->ctx);
+  }
+  
+  return nToRemove;
+}
+
+
+UINT8 _Swarm1d_ComputeNextPositions (PsoSwarm_t *s, float *positions, UINT8 *dummy)
 {
   UINT8 i;
   
@@ -451,6 +544,8 @@ void _Swarm1d_ComputeNextPositions (PsoSwarm_t *s, float *positions)
   {
     positions[i] = s->particles[i]->GetPos(s->particles[i]->ctx);
   }
+  
+  return 0;
 }
 
 
@@ -463,6 +558,12 @@ UINT8 _Swarm_GetId (PsoSwarm_t *s)
 void _Swarm_SetId (PsoSwarm_t *s, UINT8 id)
 {
   s->id = id;
+}
+
+
+float _Swarm_GetParticlePos (PsoSwarm_t *s, UINT8 idx)
+{
+  return s->particles[idx]->GetPos(s->particles[idx]->ctx);
 }
 
 
@@ -569,6 +670,7 @@ const PsoSwarmInterface_t * PsoSwarmInterface (void)
       _swarms_if[i].GetId                       = (PsoSwarmGetId_fct)                     &_Swarm_GetId;
       _swarms_if[i].GetUnitArray                = (PsoSwarmGetUnitArray_fct)              &_Swarm_GetUnitArray;
       _swarms_if[i].SetId                       = (PsoSwarmSetId_fct)                     &_Swarm_SetId;
+      _swarms_if[i].GetParticlePos              = (PsoSwarmGetParticlePos_fct)            &_Swarm_GetParticlePos;
       
       // Init the linked list
       _swarmsNodes[i].ctx = (void *) &_swarms_if[i];

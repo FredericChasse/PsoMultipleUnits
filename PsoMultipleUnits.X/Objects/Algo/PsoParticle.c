@@ -18,6 +18,7 @@
 #include "SteadyState.h"
 #include "LinkedList.h"
 #include "Rng.h"
+#include "MathFunctions.h"
 #include "Potentiometer.h"  // To compute positions
 
 
@@ -66,29 +67,34 @@ typedef struct
 // Private prototypes
 //==============================================================================
 
-void  _Particle_ResetOptPos     (ParticleOptPos_t *optPos);
+void  _Particle_ResetOptPos       (ParticleOptPos_t *optPos);
 
-void  _Particle_Init            (PsoParticle_t *p, UINT8 id);
-UINT8 _Particle_GetId           (PsoParticle_t *p);
-void  _Particle_SetId           (PsoParticle_t *p, UINT8 id);
-void  _Particle_Release         (PsoParticle_t *p);
-void  _Particle_SetPbest        (PsoParticle_t *p, Position_t *pbest);
-void  _Particle_SetPbestAbs     (PsoParticle_t *p, Position_t *pbestAbs);
-void  _Particle_ComputePbest    (PsoParticle_t *p);
-float _Particle_GetPos          (PsoParticle_t *p);
-float _Particle_GetFitness      (PsoParticle_t *p);
-float _Particle_GetSpeed        (PsoParticle_t *p);
-void  _Particle_SetPos          (PsoParticle_t *p, float pos);
-void  _Particle_SetSpeed        (PsoParticle_t *p, float speed);
-void  _Particle_SetFitness      (PsoParticle_t *p, float fitness);
-BOOL  _Particle_FsmStep         (PsoParticle_t *p, PsoSwarmInterface_t *swarm);
-BOOL  _Particle_SentinelEval    (PsoParticle_t *p);
-void  _Particle_ComputeSpeed    (PsoParticle_t *p, PsoSwarmInterface_t *swarm);
-void  _Particle_ComputePos      (PsoParticle_t *p, PsoSwarmInterface_t *swarm);
-void  _Particle_InitSpeed       (PsoParticle_t *p, PsoSwarmInterface_t *swarm);
-void  _Particle_InitPos         (PsoParticle_t *p, PsoSwarmInterface_t *swarm);
-void  _Particle_SetSteadyState  (PsoParticle_t *p, size_t bufSize, float oscAmp);
-BOOL  _Particle_EvalSteadyState (PsoParticle_t *p);
+void  _Particle_Init              (PsoParticle_t *p, UINT8 id);
+UINT8 _Particle_GetId             (PsoParticle_t *p);
+void  _Particle_SetId             (PsoParticle_t *p, UINT8 id);
+void  _Particle_Release           (PsoParticle_t *p);
+void  _Particle_SetPbest          (PsoParticle_t *p, Position_t *pbest);
+void  _Particle_SetPbestAbs       (PsoParticle_t *p, Position_t *pbestAbs);
+void  _Particle_ComputePbest      (PsoParticle_t *p);
+float _Particle_GetPos            (PsoParticle_t *p);
+float _Particle_GetFitness        (PsoParticle_t *p);
+float _Particle_GetSpeed          (PsoParticle_t *p);
+void  _Particle_SetPos            (PsoParticle_t *p, float pos);
+void  _Particle_SetSpeed          (PsoParticle_t *p, float speed);
+void  _Particle_SetFitness        (PsoParticle_t *p, float fitness);
+void  _Particle_SetJSteady        (PsoParticle_t *p, float jSteady);
+BOOL  _Particle_FsmStep           (PsoParticle_t *p, PsoSwarmInterface_t *swarm);
+BOOL  _Particle_SentinelEval      (PsoParticle_t *p, float margin);
+void  _Particle_ComputeSpeed      (PsoParticle_t *p, PsoSwarmInterface_t *swarm);
+void  _Particle_ComputePos        (PsoParticle_t *p, PsoSwarmInterface_t *swarm);
+void  _Particle_InitSpeed         (PsoParticle_t *p, PsoSwarmInterface_t *swarm);
+void  _Particle_InitPos           (PsoParticle_t *p, PsoSwarmInterface_t *swarm);
+void  _Particle_SetSteadyState    (PsoParticle_t *p, size_t bufSize, float oscAmp);
+BOOL  _Particle_EvalSteadyState   (PsoParticle_t *p);
+BOOL  _Particle_GetSteadyState    (PsoParticle_t *p);
+BOOL  _Particle_GetSentinelState  (PsoParticle_t *p);
+BOOL  _Particle_IsSearching       (PsoParticle_t *p);
+void  _Particle_ResetSteadyState  (PsoParticle_t *p);
 
 
 
@@ -214,6 +220,18 @@ void _Particle_SetSpeed (PsoParticle_t *p, float speed)
 }
 
 
+BOOL _Particle_IsSearching (PsoParticle_t *p)
+{
+  return p->state == PARTICLE_STATE_SEARCHING;
+}
+
+
+void _Particle_SetJSteady (PsoParticle_t *p, float jSteady)
+{
+  p->jSteady = jSteady;
+}
+
+
 void _Particle_SetFitness (PsoParticle_t *p, float fitness)
 {
   p->pos.prevFitness = p->pos.curFitness;
@@ -230,7 +248,7 @@ BOOL _Particle_FsmStep (PsoParticle_t *p, PsoSwarmInterface_t *swarm)
   
   if (p->steadyState.oInSteadyState && (p->state == PARTICLE_STATE_SEARCHING))
   {
-    if (param.type == PSO_SWARM_TYPE_PSO_1D)
+    if (param.type == PSO_SWARM_TYPE_PARALLEL_PSO_SUB_SWARM)
     {
       p->jSteady = p->pos.curFitness;
       p->state = PARTICLE_STATE_STEADY_STATE;
@@ -358,10 +376,39 @@ BOOL _Particle_FsmStep (PsoParticle_t *p, PsoSwarmInterface_t *swarm)
 }
 
 
-BOOL _Particle_SentinelEval (PsoParticle_t *p)
+BOOL _Particle_SentinelEval (PsoParticle_t *p, float margin)
 {
-  BOOL oPerturbedOccurred = 0;
-  return oPerturbedOccurred;
+  float jCompare;
+  if (p->state == PARTICLE_STATE_STEADY_STATE)
+  {
+    jCompare = p->jSteady;
+  }
+  else
+  {
+    jCompare = p->pos.prevFitness;
+  }
+  if (p->pos.curPos == p->pos.prevPos)
+  {
+    if ( (ABS(p->pos.curFitness - jCompare) / p->pos.curFitness) >= margin)
+    {
+      p->oSentinelWarning = 1;
+    }
+    else
+    {
+      p->oSentinelWarning = 0;
+    }
+  }
+  else
+  {
+    p->oSentinelWarning = 0;
+  }
+  return p->oSentinelWarning;
+}
+
+
+BOOL _Particle_GetSentinelState (PsoParticle_t *p)
+{
+  return p->oSentinelWarning;
 }
 
 
@@ -380,7 +427,6 @@ void _Particle_ComputeSpeed (PsoParticle_t *p, PsoSwarmInterface_t *swarm)
   {
     swarm->GetParam(swarm->ctx, &param);
     swarm->GetGbest(swarm->ctx, &gbest);
-    // If s->ìteration == 0 -> p->InitSpeed
 
     p->prevSpeed = p->curSpeed;
     p->curSpeed =   param.omega * p->prevSpeed
@@ -445,6 +491,18 @@ void _Particle_ComputePbest (PsoParticle_t *p)
       p->pbestAbs.curFitness = p->pbest.curFitness;
     }
   }
+}
+
+
+BOOL _Particle_GetSteadyState (PsoParticle_t *p)
+{
+  return p->steadyState.oInSteadyState;
+}
+
+
+void _Particle_ResetSteadyState (PsoParticle_t *p)
+{
+  SteadyState_Reset(&p->steadyState);
 }
 
 
@@ -515,6 +573,11 @@ const PsoParticleInterface_t * PsoParticleInterface (void)
       _particles_if[i].SetPbestAbs      = (PsoParticleSetPbestAbs_fct)      &_Particle_SetPbestAbs;
       _particles_if[i].ComputePbest     = (PsoParticleComputePbest_fct)     &_Particle_ComputePbest;
       _particles_if[i].EvalSteadyState  = (PsoParticleEvalSteadyState_fct)  &_Particle_EvalSteadyState;
+      _particles_if[i].GetSteadyState   = (PsoParticleGetSteadyState_fct)   &_Particle_GetSteadyState;
+      _particles_if[i].GetSentinelState = (PsoParticleGetSentinelState_fct) &_Particle_GetSentinelState;
+      _particles_if[i].SetJSteady       = (PsoParticleSetJSteady_fct)       &_Particle_SetJSteady;
+      _particles_if[i].IsSearching      = (PsoParticleIsSearching_fct)      &_Particle_IsSearching;
+      _particles_if[i].ResetSteadyState = (PsoParticleResetSteadyState_fct) &_Particle_ResetSteadyState;
       
       // Init the linked list
       _particlesNodes[i].ctx = (void *) &_particles_if[i];

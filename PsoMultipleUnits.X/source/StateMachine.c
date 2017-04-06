@@ -20,6 +20,10 @@
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 #include "..\headers\StateMachine.h"
+#include "Perturb.h"
+#include "UnitArray.h"
+#include "AlgoInterface.h"
+#include "Pso.h"
 
 
 extern volatile BOOL   oAdcReady
@@ -76,12 +80,13 @@ extern sMultiUnitValues_t multiUnitValues;
 
 extern float sinus[2][15];
 
-float testFloat = 0;
-UINT32 testUint32 = 0;
-INT32 testInt32 = 0;
-UINT8 testUint8 = 0;
-
 BOOL oFirstTimeCallFromMatlab = 1;
+
+AlgoInterface_t *pso;
+UnitArrayInterface_t   *algoArray
+                      ,*mainArray
+                      ;
+PerturbInterface_t *perturb;
 
 //==============================================================================
 //	STATES OF STATE MACHINE
@@ -281,36 +286,26 @@ void StateInit(void)
   SetPotAllUnits(2, potIndexValue[0]);
   SetPotAllUnits(3, potIndexValue[0]);
   
-  // Init LED driver PCA9685
-  InitLedDriver();
-  
+#warning "Change to new rng."
   InitRandomValue();
   
-//  UINT16 dutyCycle = 400;
+  mainArray = (UnitArrayInterface_t *) UnitArrayInterface();
+  algoArray = (UnitArrayInterface_t *) UnitArrayInterface();
   
-  SetLedDutyCycle( 1, 150);
-  SetLedDutyCycle(13, 200);
-  SetLedDutyCycle(14, 300);
+  PsoType_t psoType = PSO_TYPE_PSO_1D;
+  pso = (AlgoInterface_t *) PsoInterface(psoType);
   
-//  SetLedDutyCycle( 0, dutyCycle);
-//  SetLedDutyCycle( 1, dutyCycle);
-//  SetLedDutyCycle( 2, dutyCycle);
-//  SetLedDutyCycle( 3, dutyCycle);
-//  
-////  SetLedDutyCycle( 4, dutyCycle);
-////  SetLedDutyCycle( 5, dutyCycle);
-////  SetLedDutyCycle( 6, dutyCycle);
-////  SetLedDutyCycle( 7, dutyCycle);
-//  
-////  SetLedDutyCycle( 8, dutyCycle);
-////  SetLedDutyCycle( 9, dutyCycle);
-////  SetLedDutyCycle(10, dutyCycle);
-////  SetLedDutyCycle(11, dutyCycle);
-//  
-//  SetLedDutyCycle(12, dutyCycle);
-//  SetLedDutyCycle(13, dutyCycle);
-//  SetLedDutyCycle(14, dutyCycle);
-//  SetLedDutyCycle(15, dutyCycle);
+  perturb = (PerturbInterface_t *) PerturbInterface();
+  
+  mainArray->Init(mainArray->ctx, 0);
+  algoArray->Init(algoArray->ctx, 1);
+  
+  for (i = 0; i < N_UNITS_TOTAL; i++)
+  {
+    algoArray->AddUnitToArray(algoArray->ctx, mainArray->GetUnitHandle(mainArray->ctx, i));
+  }
+  pso->Init(pso->ctx, algoArray);
+  perturb->Init(perturb->ctx, 500);
 
 }
 

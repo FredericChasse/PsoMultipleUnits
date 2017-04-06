@@ -16,6 +16,7 @@
 
 #include "Unit.h"
 #include "StateMachine.h"
+#include "UnitMapping.h"
 
 
 // Private definitions
@@ -47,14 +48,14 @@ extern struct sAllCells sCellValues;
 
 Unit_t _units[N_UNITS_TOTAL] = 
 {
-  {.id = 0, .adcNum =  8, .potNum =  8, .pos = 50, .posIdx = 0, .power = 0, .adcRaw = 0}
- ,{.id = 1, .adcNum =  9, .potNum =  9, .pos = 50, .posIdx = 0, .power = 0, .adcRaw = 0}
- ,{.id = 2, .adcNum = 10, .potNum = 10, .pos = 50, .posIdx = 0, .power = 0, .adcRaw = 0}
- ,{.id = 3, .adcNum = 11, .potNum = 11, .pos = 50, .posIdx = 0, .power = 0, .adcRaw = 0}
- ,{.id = 4, .adcNum = 12, .potNum = 12, .pos = 50, .posIdx = 0, .power = 0, .adcRaw = 0}
- ,{.id = 5, .adcNum = 13, .potNum = 13, .pos = 50, .posIdx = 0, .power = 0, .adcRaw = 0}
- ,{.id = 6, .adcNum = 14, .potNum = 14, .pos = 50, .posIdx = 0, .power = 0, .adcRaw = 0}
- ,{.id = 7, .adcNum = 15, .potNum = 15, .pos = 50, .posIdx = 0, .power = 0, .adcRaw = 0}
+  {.id = 0, .adcNum = UNIT_0_ADC, .potNum = UNIT_0_POT, .pos = 50, .posIdx = 0, .power = 0, .adcRaw = 0}
+ ,{.id = 1, .adcNum = UNIT_1_ADC, .potNum = UNIT_1_POT, .pos = 50, .posIdx = 0, .power = 0, .adcRaw = 0}
+ ,{.id = 2, .adcNum = UNIT_2_ADC, .potNum = UNIT_2_POT, .pos = 50, .posIdx = 0, .power = 0, .adcRaw = 0}
+ ,{.id = 3, .adcNum = UNIT_3_ADC, .potNum = UNIT_3_POT, .pos = 50, .posIdx = 0, .power = 0, .adcRaw = 0}
+ ,{.id = 4, .adcNum = UNIT_4_ADC, .potNum = UNIT_4_POT, .pos = 50, .posIdx = 0, .power = 0, .adcRaw = 0}
+ ,{.id = 5, .adcNum = UNIT_5_ADC, .potNum = UNIT_5_POT, .pos = 50, .posIdx = 0, .power = 0, .adcRaw = 0}
+ ,{.id = 6, .adcNum = UNIT_6_ADC, .potNum = UNIT_6_POT, .pos = 50, .posIdx = 0, .power = 0, .adcRaw = 0}
+ ,{.id = 7, .adcNum = UNIT_7_ADC, .potNum = UNIT_7_POT, .pos = 50, .posIdx = 0, .power = 0, .adcRaw = 0}
 };
 
 const UnitInterface_t _unit0_if = 
