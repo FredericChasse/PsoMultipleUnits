@@ -22,8 +22,11 @@
 #include "..\headers\StateMachine.h"
 #include "Perturb.h"
 #include "UnitArray.h"
+#include "UnitMapping.h"
 #include "AlgoInterface.h"
 #include "Pso.h"
+#include "Characterization.h"
+#include "Codec.h"
 
 
 extern volatile BOOL   oAdcReady
@@ -37,19 +40,7 @@ extern const float potRealValuesInverse[256];
 BOOL  oSendData       = 0
      ,oNewSample      = 0
      ,oErrorFlag      = 0
-     ,oMatlabReady    = 0
-     ,oCaracMode      = 1   // Caracterization by default
-     ,oCaracDone      = 1
-     ,oPsoMode        = 1
-     ,oPsoSeqMode     = 0
-     ,oPsoDone        = 1
-     ,oMultiUnitMode  = 0
-     ,oMultiUnitDone  = 0
      ;
-
-UINT8 psoSeqCounter = 0;
-
-UINT16 dutyCycle = 500;
 
 UINT32 cellVoltageRaw [16] = {0};
 
@@ -65,28 +56,23 @@ sUartFifoBuffer_t matlabData =
   ,.maxBufSize = UART_LINE_BUFFER_LENGTH
 };
 
-UINT8 potIndexValue[16] = {0};
-
 BOOL oSmoothData = 1;
 
 UINT16 nSamples = 0;
 
-extern sUartLineBuffer_t buffer;
-
 extern UINT32 iteration;
-
-extern sPsoValues_t psoValues;
-extern sMultiUnitValues_t multiUnitValues;
 
 extern float sinus[2][15];
 
 BOOL oFirstTimeCallFromMatlab = 1;
 
-AlgoInterface_t *pso;
+AlgoInterface_t *algo;
 UnitArrayInterface_t   *algoArray
                       ,*mainArray
                       ;
 PerturbInterface_t *perturb;
+
+CodecInterface_t *codec;
 
 //==============================================================================
 //	STATES OF STATE MACHINE
@@ -271,40 +257,30 @@ void StateInit(void)
   
   START_INTERRUPTS;
   
-//  InitRandomValue();
-  
 //  // Init digital potentiometers AD8403
 //  InitPot(0);
 //  InitPot(1);
   InitPot(2);
   InitPot(3);
-  for (i = 0; i < 16; i++)
-  {
-    potIndexValue[i] = 0;
-  }
   
-  SetPotAllUnits(2, potIndexValue[0]);
-  SetPotAllUnits(3, potIndexValue[0]);
+  mainArray = (UnitArrayInterface_t *)  UnitArrayInterface();
+  algoArray = (UnitArrayInterface_t *)  UnitArrayInterface();
+  perturb   = (PerturbInterface_t   *)  PerturbInterface  ();
+  codec     = (CodecInterface_t     *)  CodecInterface    ();
   
-#warning "Change to new rng."
-  InitRandomValue();
-  
-  mainArray = (UnitArrayInterface_t *) UnitArrayInterface();
-  algoArray = (UnitArrayInterface_t *) UnitArrayInterface();
-  
-  PsoType_t psoType = PSO_TYPE_PSO_1D;
-  pso = (AlgoInterface_t *) PsoInterface(psoType);
-  
-  perturb = (PerturbInterface_t *) PerturbInterface();
+  codec->Init(codec->ctx, U_MATLAB);
   
   mainArray->Init(mainArray->ctx, 0);
+  for (i = 0; i < N_UNITS_TOTAL; i++)
+  {
+    mainArray->SetPos(mainArray->ctx, i, potRealValues[0]);
+  }
   algoArray->Init(algoArray->ctx, 1);
   
   for (i = 0; i < N_UNITS_TOTAL; i++)
   {
     algoArray->AddUnitToArray(algoArray->ctx, mainArray->GetUnitHandle(mainArray->ctx, i));
   }
-  pso->Init(pso->ctx, algoArray);
   perturb->Init(perturb->ctx, 500);
 
 }
@@ -316,27 +292,27 @@ void StateInit(void)
 //===============================================================
 void StateAcq(void)
 {
-  
-  //==================================================================
-  // VARIABLE DECLARATIONS
-  //==================================================================
   INT32 err = 0;
-  UINT32 i = 0, j = 0;
   
   //==================================================================
   // ADC READ
   // Check cells voltage
   //==================================================================
-  if (oMatlabReady)
+  if (oAdcReady)
   {
-    if (oAdcReady)
+    oAdcReady = 0;
+
+    GetAdcValues();
+
+    nSamples++;
+    if (nSamples >= N_SAMPLES_PER_ADC_READ)
     {
-      oAdcReady = 0;
+      nSamples = 0;
       
-      GetAdcValues();
-      
-      nSamples++;
-      oNewSample = 1;   // Go to stateCompute
+      if (codec->IsLinkActive(codec->ctx))
+      {
+        oNewSample = 1;   // Go to stateCompute
+      }
     }
   }
   
@@ -346,167 +322,8 @@ void StateAcq(void)
   Skadi.GetCmdMsgFifo();
   
   AssessButtons();
-
-  if (Uart.Var.oIsRxDataAvailable[UART6])                 // Check if RX interrupt occured
-  {
-    err = Uart.GetRxFifoBuffer(UART6, &buffer, FALSE);    // put received data in uart6Data
-    if (err >= 0)                                         // If no error occured
-    {
-      if (oFirstTimeCallFromMatlab)
-      {
-        oFirstTimeCallFromMatlab = 0;
-        InitRandomValue();
-      }
-      if      (buffer.buffer[0] == 'c')       // Caracterization mode
-      {
-        oMatlabReady    = 1;
-        
-        oSmoothData     = 1;
-        
-        oMultiUnitMode  = 0;
-        oPsoMode        = 0;
-        oCaracMode      = 1;
-        
-        oCaracDone      = 0;
-        oMultiUnitDone  = 1;
-        oPsoDone        = 1;
-        
-        nSamples        = 0;
-        
-        SetPotInitialCondition();
-        
-        oAdcReady       = 0;
-      }
-      else if ( (buffer.buffer[0] == 'p') || (buffer.buffer[0] == 'P') || (buffer.buffer[0] == 'S') )      // PSO mode
-      {
-        oMatlabReady    = 1;
-        
-        oSmoothData     = 0;
-        
-        oMultiUnitMode  = 0;
-        oCaracMode      = 0;
-        oPsoMode        = 1;
-        
-        oCaracDone      = 1;
-        oMultiUnitDone  = 1;
-        oPsoDone        = 0;
-        
-        nSamples        = 0;
-        
-//        InitRandomValue();
-        
-        SetPotInitialCondition();
-        
-        oAdcReady       = 0;
-        
-        if (buffer.buffer[0] == 'P')
-        {
-          psoValues.oDoPerturb = 1;
-        }
-        else
-        {
-          psoValues.oDoPerturb = 0;
-        }
-        
-        if (buffer.buffer[0] == 'S')
-        {
-          psoValues.seqParticleIndex = 7 + 2;
-          oPsoSeqMode = 1;
-        }
-        else
-        {
-          oPsoSeqMode = 0;
-          psoValues.seqParticleIndex = 0;
-        }
-      }
-      else if ( (buffer.buffer[0] == 'm') || (buffer.buffer[0] == 'M') )       // Multi-Unit mode
-      {
-        LED1_OFF;
-        LED2_OFF;
-        
-        oMatlabReady    = 1;
-        
-        oSmoothData     = 0;
-        
-        oPsoMode        = 0;
-        oMultiUnitMode  = 1;
-        oCaracMode      = 0;
-        
-        oCaracDone      = 1;
-        oMultiUnitDone  = 0;
-        oPsoDone        = 1;
-        
-        nSamples        = 0;
-        
-        SetPotInitialCondition();
-        
-        oAdcReady       = 0;
-        
-        if (buffer.buffer[0] == 'M')
-        {
-          multiUnitValues.oDoPerturb = 1;
-        }
-        else
-        {
-          multiUnitValues.oDoPerturb = 0;
-        }
-      }
-      else if (buffer.buffer[0] == 's')       // Stop current mode. Reset and wait for new command
-      {
-        oMatlabReady    = 0;
-        oNewSample      = 0;
-        oSendData       = 0;
-        oAdcReady       = 0;
-        
-        nSamples        = 0;
-        iteration       = 0;
-        
-        oCaracDone      = 1;
-        oMultiUnitDone  = 1;
-        oPsoDone        = 1;
-        
-        matlabData.bufEmpty           = 1;
-        matlabData.bufFull            = 0;
-        matlabData.lineBuffer.length  = 0;
-        matlabData.inIdx              = 0;
-        matlabData.outIdx             = 0;
-        
-        for (i = 0; i < 16; i++)
-        {
-          sCellValues.cells[i].cellPowerFloat = 0;
-          sCellValues.cells[i].cellVoltFloat  = 0;
-          sCellValues.cells[i].nSamples       = 0;
-          
-          for (j = 0; j < N_SAMPLES_PER_ADC_READ; j++)
-          {
-            sCellValues.cells[i].cellVoltRaw[j] = 0;
-          }
-        }
-        
-        SetPotInitialCondition();
-        
-        oPsoMode        = 0;
-        oMultiUnitMode  = 0;
-        oCaracMode      = 1;
-        
-//        UINT16 dutyCycle = 150;
-        
-//        SetLedDutyCycle( 0, dutyCycle);
-//        SetLedDutyCycle( 1, dutyCycle);
-//        SetLedDutyCycle( 2, dutyCycle);
-//        SetLedDutyCycle( 3, dutyCycle);
-//        SetLedDutyCycle(12, dutyCycle);
-//        SetLedDutyCycle(13, dutyCycle);
-//        SetLedDutyCycle(14, dutyCycle);
-//        SetLedDutyCycle(15, dutyCycle);
-        
-        
-//        SetLedDutyCycle( 1, 150);
-//        SetLedDutyCycle(13, 200);
-//        SetLedDutyCycle(14, 300);
-      }
-    }
-  }
+  
+  codec->FsmStep(codec->ctx);
 }
 
 
@@ -517,6 +334,7 @@ void StateAcq(void)
 void StateSendData(void)
 {
   oSendData = 0;
+  
   sUartLineBuffer_t localBuffer = 
   { 
      .buffer = {0} 
@@ -542,78 +360,20 @@ void StateSendData(void)
 void StateCompute(void)
 {  
   oNewSample = 0;
-  UINT8 i;
   
-  if (nSamples >= N_SAMPLES_PER_ADC_READ)
+  UINT8 i;
+  float pos, power;
+  UINT8 nUnits = algoArray->GetNUnits(algoArray->ctx);
+  
+  ComputeMeanAdcValues();
+  for (i = 0; i < nUnits; i++)
   {
-    nSamples -= N_SAMPLES_PER_ADC_READ;
-
-    ComputeMeanAdcValues();
-            
-    if (oCaracMode)
-    {
-//      ComputeCellPower( 0, potIndexValue[0]);
-//      ComputeCellPower( 1, potIndexValue[0]);
-//      ComputeCellPower( 2, potIndexValue[0]);
-//      ComputeCellPower( 3, potIndexValue[0]);
-
-//      ComputeCellPower( 4, potIndexValue[0]);
-//      ComputeCellPower( 5, potIndexValue[0]);
-//      ComputeCellPower( 6, potIndexValue[0]);
-//      ComputeCellPower( 7, potIndexValue[0]);
-
-      ComputeCellPower( 8, potIndexValue[0]);
-      ComputeCellPower( 9, potIndexValue[0]);
-      ComputeCellPower(10, potIndexValue[0]);
-      ComputeCellPower(11, potIndexValue[0]);
-
-      ComputeCellPower(12, potIndexValue[0]);
-      ComputeCellPower(13, potIndexValue[0]);
-      ComputeCellPower(14, potIndexValue[0]);
-      ComputeCellPower(15, potIndexValue[0]);
-      
-      Caracterization();
-    }
-    else if (oPsoMode)
-    {
-      if (!oPsoSeqMode)
-      {
-        for (i = 0; i < psoValues.nParticles; i++)
-        {
-          ComputeCellPower(psoValues.particleIndex[i], potIndexValue[psoValues.particleIndex[i]]);
-        }
-        ParticleSwarmOptimization();
-      }
-      else
-      {
-//        ComputeCellPower(psoValues.seqParticleIndex, potIndexValue[psoValues.particleIndex[psoSeqCounter]]);
-        sCellValues.cells[psoValues.particleIndex[psoSeqCounter]].cellPowerFloat  = sCellValues.cells[psoValues.seqParticleIndex].cellVoltFloat 
-                                                                                  * sCellValues.cells[psoValues.seqParticleIndex].cellVoltFloat 
-                                                                                  * potRealValuesInverse[potIndexValue[psoValues.particleIndex[psoSeqCounter]]];
-        
-        if (psoSeqCounter < (psoValues.nParticles - 1))
-        {
-          SetPot(psoValues.seqParticleIndex, potIndexValue[psoValues.particleIndex[psoSeqCounter + 1]]);
-          psoSeqCounter++;
-        }
-        else
-        {
-          psoSeqCounter = 0;
-          ParticleSwarmOptimization();
-        }
-      }
-    }
-    else if (oMultiUnitMode)
-    {
-      ComputeCellPower(multiUnitValues.unitIndex[0], potIndexValue[multiUnitValues.unitIndex[0]]);
-      ComputeCellPower(multiUnitValues.unitIndex[1], potIndexValue[multiUnitValues.unitIndex[1]]);
-      MultiUnit();
-    }
-    else
-    {
-      oErrorFlag = 1;
-    }
+    pos = algoArray->GetPos(algoArray->ctx, i);
+    power = ComputeCellPower(unitAdcs[i], pos);
+    algoArray->SetPower(algoArray->ctx, i, power);
   }
+  
+  algo->Run(algo->ctx);
 }
 
 

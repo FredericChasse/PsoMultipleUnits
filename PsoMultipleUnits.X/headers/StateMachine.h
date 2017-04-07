@@ -27,7 +27,6 @@
 #include "StateFunctions.h"
 #include "Potentiometer.h"
 #include "LedDriver.h"
-#include "ControlAlgorithm.h"
 #include "AlgoInterface.h"
 #include "Pso.h"
 #include "UnitArray.h"

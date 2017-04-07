@@ -1,16 +1,16 @@
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //
-// Utilities
+// Parallel PSO
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //
-// File    : LinkedList.h
+// File    : Characterization.h
 // Author  : Frederic Chasse
 // Date    : 2017-03-19
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //
-// Purpose : This file implements different math functions.
+// Purpose : This file implements the methods for characterizing the units.
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //
@@ -18,32 +18,22 @@
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-#ifndef __MATH_FUNCTIONS_H__
-#define __MATH_FUNCTIONS_H__
+#ifndef __CHARACTERIZATION_H__
+#define __CHARACTERIZATION_H__
 
 #include "Setup.h"
+#include "UnitArray.h"
+#include "AlgoInterface.h"
 
 // Public definitions
 //==============================================================================
 
-/*
- * Structure used for the Tustin discrete integrators
- */
-typedef struct
-{
-  float  previousValue
-        ,currentValue
-        ;
-} TustinValue_t;
 
 // Public functions
 //==============================================================================
 
-#define MAX(_x, _y)   ( (_x > _y) ? _x :  _y )
-#define MIN(_x, _y)   ( (_x < _y) ? _x :  _y )
-#define ABS(_x)       ( (_x >= 0) ? _x : -_x )
-
-void TustinZ (TustinValue_t *input, TustinValue_t *output, float acqTime);
+const AlgoInterface_t * CharacterizationInterface (void);
 
 
-#endif // __MATH_FUNCTIONS_H__
+
+#endif // __CHARACTERIZATION_H__

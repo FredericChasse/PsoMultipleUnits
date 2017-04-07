@@ -30,7 +30,6 @@
 extern struct sAllCells sCellValues;
 extern const float potRealValues[256];
 extern const float potRealValuesInverse[256];
-extern UINT8 potIndexValue[16];
 extern UINT32 cellVoltageRaw[16];
 extern UINT16 nSamples;
 extern BOOL oSmoothData, oPsoSeqMode;
@@ -55,12 +54,7 @@ sButtonStates_t buttons =
 //float sinus[2][15] = { {0 , .4189 , .8378 , 1.2566 , 1.6755 , 2.0944 , 2.5133 , 2.9322 , 3.3510 , 3.7699 , 4.1888 , 4.6077 , 5.0265 , 5.4454 , 5.8643} ,
 float sinus[2][15] = { {1 , 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ,12 ,13, 14, 15} ,
                        {0 , .4067 , .7431 , .9511  , .9945  , .8660  , .5878  , .2079  , -.2079 , -.5878 , -.8660 , -.9945 , -.9511 , -.7431 , -.4067} };
-  
-sUartLineBuffer_t buffer = 
-{ 
-   .buffer = {0} 
-  ,.length =  0 
-};
+ 
 
 //==============================================================================
 // State Machine private functions prototypes
@@ -71,10 +65,11 @@ sUartLineBuffer_t buffer =
 // Solar cells functions
 //==============================================================================
 
-inline void ComputeCellPower (UINT8 cellIndex, UINT8 potIndex)
+inline float ComputeCellPower (UINT8 cellIndex, UINT8 potIndex)
 {
 //  sCellValues.cells[cellIndex].cellPowerFloat = sCellValues.cells[cellIndex].cellVoltFloat * sCellValues.cells[cellIndex].cellVoltFloat / potRealValues[potIndexValue];
   sCellValues.cells[cellIndex].cellPowerFloat = sCellValues.cells[cellIndex].cellVoltFloat * sCellValues.cells[cellIndex].cellVoltFloat * potRealValuesInverse[potIndex];
+  return sCellValues.cells[cellIndex].cellPowerFloat;
 }
 
 inline void AddDataToMatlabFifo (UINT8 *buffer, UINT8 size)
@@ -224,7 +219,13 @@ inline void ComputeMeanAdcValues (void)
 // Buttons functions
 //==============================================================================
 void AssessButtons (void)
-{
+{ 
+  sUartLineBuffer_t buffer = 
+  { 
+     .buffer = {0} 
+    ,.length =  0 
+  };
+  
   UINT16 i = 0;
   
   // <editor-fold defaultstate="collapsed" desc="Check changes on board">

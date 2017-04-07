@@ -1,16 +1,17 @@
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //
-// Utilities
+// Source files
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //
-// File    : LinkedList.h
+// File    : Codec.h
 // Author  : Frederic Chasse
 // Date    : 2017-03-19
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //
-// Purpose : This file implements different math functions.
+// Purpose : This file implements the methods needed for the serial interface 
+//           with MATLAB.
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //
@@ -18,32 +19,30 @@
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-#ifndef __MATH_FUNCTIONS_H__
-#define __MATH_FUNCTIONS_H__
+#ifndef __CODEC_H__
+#define __CODEC_H__
 
 #include "Setup.h"
+#include "Protocol.h"
 
 // Public definitions
 //==============================================================================
 
-/*
- * Structure used for the Tustin discrete integrators
- */
+typedef UINT8 (*CodecInit_fct)          (void *ctx, UartModule_t uartChannel);
+typedef UINT8 (*CodecFsmStep_fct)       (void *ctx);
+typedef BOOL  (*CodecIsLinkActive_fct)  (void *ctx);
+
 typedef struct
 {
-  float  previousValue
-        ,currentValue
-        ;
-} TustinValue_t;
+  void                 *ctx;
+  CodecInit_fct         Init;
+  CodecFsmStep_fct      FsmStep;
+  CodecIsLinkActive_fct IsLinkActive;
+} CodecInterface_t;
 
 // Public functions
 //==============================================================================
 
-#define MAX(_x, _y)   ( (_x > _y) ? _x :  _y )
-#define MIN(_x, _y)   ( (_x < _y) ? _x :  _y )
-#define ABS(_x)       ( (_x >= 0) ? _x : -_x )
+const CodecInterface_t * CodecInterface(void);
 
-void TustinZ (TustinValue_t *input, TustinValue_t *output, float acqTime);
-
-
-#endif // __MATH_FUNCTIONS_H__
+#endif // __CODEC_H__

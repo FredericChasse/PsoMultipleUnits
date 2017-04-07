@@ -16,7 +16,6 @@
 
 #include "Pso.h"
 #include "PsoSwarm.h"
-#include "Potentiometer.h"
 
 // Private definitions
 //==============================================================================
@@ -98,6 +97,7 @@ INT8 _ParallelPso_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
 {
   UnitArrayInterface_t *swarmArray;
   UINT8 nUnits, i;
+  float minPos, maxPos;
   
   pso->unitArray    = unitArray;
   pso->nSwarms      = 1;
@@ -112,13 +112,14 @@ INT8 _ParallelPso_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
     swarmArray->AddUnitToArray(swarmArray->ctx, unitArray->GetUnitHandle(unitArray->ctx, i));
   }
   
+  pso->unitArray->GetPosLimits(pso->unitArray->ctx, &minPos, &maxPos);
   const PsoSwarmParam_t swarmParam = 
   {
     .c1                     = 1
    ,.c2                     = 2
    ,.omega                  = 0.4
-   ,.posMin                 = MIN_POT_VALUE
-   ,.posMax                 = MAX_POT_VALUE
+   ,.posMin                 = minPos
+   ,.posMax                 = maxPos
    ,.minParticles           = 3
    ,.perturbAmp             = 15.7
    ,.sentinelMargin         = 0.05
@@ -139,18 +140,20 @@ INT8 _ParallelPso_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
 INT8 _Pso1d_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
 {
   UINT8 i;
+  float minPos, maxPos;
   pso->unitArray    = unitArray;
   pso->nSwarms      = pso->unitArray->GetNUnits(pso->unitArray->ctx);
   pso->timeElapsed  = 0;
   pso->sampleTime   = SAMPLING_TIME_FLOAT;
   
+  pso->unitArray->GetPosLimits(pso->unitArray->ctx, &minPos, &maxPos);
   const PsoSwarmParam_t swarmParam = 
   {
     .c1                     = 1
    ,.c2                     = 2
    ,.omega                  = 0.4
-   ,.posMin                 = MIN_POT_VALUE
-   ,.posMax                 = MAX_POT_VALUE
+   ,.posMin                 = minPos
+   ,.posMax                 = maxPos
    ,.minParticles           = 3
    ,.perturbAmp             = 15.7
    ,.sentinelMargin         = 0.05
@@ -480,6 +483,7 @@ INT8 _Pso_Close (Pso_t *pso)
   pso->nSwarms      = 0;
   pso->timeElapsed  = 0;
   pso->iteration    = 0;
+  pso->unitArray->Release(pso->unitArray->ctx);
   pso->unitArray    = NULL;
   return 0;
 }

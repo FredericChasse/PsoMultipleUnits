@@ -138,6 +138,9 @@ inline INT8 SetPotAllUnits (UINT8 numPot, UINT8 value);
 
 //float potRealValues[256];
 
+extern const float potRealValuesInverse[256];
+extern const float potRealValues[256];
+
 
 //==============================================================================
 // Variable declarations

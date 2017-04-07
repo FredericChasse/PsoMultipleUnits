@@ -11,8 +11,8 @@
       <itemPath>Objects/Algo/PsoParticle.h</itemPath>
       <itemPath>Objects/Algo/SteadyState.c</itemPath>
       <itemPath>Objects/Algo/SteadyState.h</itemPath>
-      <itemPath>source/ControlAlgorithm.c</itemPath>
-      <itemPath>headers/ControlAlgorithm.h</itemPath>
+      <itemPath>Objects/Algo/Characterization.c</itemPath>
+      <itemPath>Objects/Algo/Characterization.h</itemPath>
     </logicalFolder>
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
@@ -23,7 +23,6 @@
       <itemPath>headers/StateFunctions.h</itemPath>
       <itemPath>headers/HardwareProfile.h</itemPath>
       <itemPath>headers/SkadiFunctions.h</itemPath>
-      <itemPath>source/UnitMapping.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -38,6 +37,11 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <logicalFolder name="f1" displayName="Codec" projectFiles="true">
+        <itemPath>source/Codec/Codec.c</itemPath>
+        <itemPath>source/Codec/Codec.h</itemPath>
+        <itemPath>source/Codec/Protocol.h</itemPath>
+      </logicalFolder>
       <itemPath>source/main.c</itemPath>
       <itemPath>source/StateMachine.c</itemPath>
       <itemPath>source/Interrupts.c</itemPath>
@@ -52,6 +56,8 @@
       <itemPath>headers/Potentiometer.h</itemPath>
       <itemPath>Objects/Units/Unit.h</itemPath>
       <itemPath>Objects/Units/UnitArray.h</itemPath>
+      <itemPath>Objects/Units/UnitMapping.c</itemPath>
+      <itemPath>Objects/Units/UnitMapping.h</itemPath>
     </logicalFolder>
     <logicalFolder name="f4" displayName="Utilities" projectFiles="true">
       <logicalFolder name="f1" displayName="BipBuffer" projectFiles="true">
@@ -158,7 +164,7 @@
         <property key="enable-unroll-loops" value="false"/>
         <property key="exclude-floating-point" value="false"/>
         <property key="extra-include-directories"
-                  value="source;headers;Objects\Algo;Objects\Units;Utilities\BipBuffer;Utilities\ChainedList;Utilities\PcgRng;Utilities\ByteBuffer;Objects\Perturb;Utilities\MathFunctions"/>
+                  value="source;headers;Objects\Algo;Objects\Units;Utilities\BipBuffer;Utilities\ChainedList;Utilities\PcgRng;Utilities\ByteBuffer;Objects\Perturb;Utilities\MathFunctions;source\Codec"/>
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="false"/>

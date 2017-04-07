@@ -4,19 +4,23 @@
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //
-// File    : Unit.h
+// File    : UnitMapping.h
 // Author  : Frederic Chasse
 // Date    : 2017-03-19
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //
-// Purpose : This file implements the methods for the abstract Unit object.
+// Purpose : This file describes the link between ADC, LED driver and units.
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 #ifndef __UNIT_MAPPING_H__
 #define __UNIT_MAPPING_H__
 
+#include "Setup.h"
+
+
+extern const UINT8 unitAdcs[N_UNITS_TOTAL];
 
 #define UNIT_0_ADC    (8)
 #define UNIT_1_ADC    (9)

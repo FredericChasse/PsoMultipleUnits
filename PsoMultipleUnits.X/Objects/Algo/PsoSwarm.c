@@ -184,6 +184,8 @@ void _Swarm_Release (PsoSwarm_t *s)
     s->particles[i]->Release(s->particles[i]->ctx);
   }
   
+  s->unitArray->Release(s->unitArray->ctx);
+  
   LinkedList_RemoveNode(node->list, node);
   LinkedList_AddToEnd(&_unusedSwarms, node);
 }
