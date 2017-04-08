@@ -105,11 +105,14 @@ UINT8 _Codec_CodeNewMsg (Codec_t *c, ProtocolUnitsDataPayload_t *newMsg)
   memcpy(&buf.buffer[buf.length], &newMsg->nData, sizeOfUnitsNData);
   buf.length += sizeOfUnitsNData;
   
-  memcpy(&buf.buffer[buf.length], newMsg->positions, sizeOfUnitsOnePosition * newMsg->nUnits);
-  buf.length += sizeOfUnitsOnePosition * newMsg->nUnits;
+  size_t length = newMsg->nUnits * newMsg->nData;
+  size_t sizeOfPos = sizeOfUnitsOnePosition * length;
+  memcpy(&buf.buffer[buf.length], newMsg->positions, sizeOfPos);
+  buf.length += sizeOfUnitsOnePosition * newMsg->nUnits * newMsg->nData;
   
-  memcpy(&buf.buffer[buf.length], newMsg->powers, sizeOfUnitsOnePower * newMsg->nUnits);
-  buf.length += sizeOfUnitsOnePower * newMsg->nUnits;
+  size_t sizeOfPower = sizeOfUnitsOnePower * length;
+  memcpy(&buf.buffer[buf.length], newMsg->powers, sizeOfPower);
+  buf.length += sizeOfUnitsOnePower * newMsg->nUnits * newMsg->nData;
   
   while(Uart.PutTxFifoBuffer(c->uartChannel, &buf) < 0);
   

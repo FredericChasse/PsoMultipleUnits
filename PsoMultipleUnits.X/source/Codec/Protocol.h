@@ -29,8 +29,6 @@
 //==============================================================================
 #define PROTOCOL_DELIMITER      (0x7E)
 
-extern const size_t sizeOfProtocolHeader;
-
 typedef enum
 {
   NEW_RNG_SEED  = 0x00
@@ -46,6 +44,7 @@ typedef struct
   UINT8   type;
   UINT16  lengthOfPayload;
 } ProtocolHeader_t;
+extern const size_t sizeOfProtocolHeader;
 //==============================================================================
 
 
