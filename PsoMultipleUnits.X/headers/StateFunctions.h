@@ -39,10 +39,6 @@
 void AssessButtons (void);
 // =======================================
 
-inline INT8   FifoWriteBuffer (sUartFifoBuffer_t *fifo, UINT8 *data, UINT8 length);
-inline INT8   FifoWrite       (sUartFifoBuffer_t *fifo, UINT8 *data);
-inline INT8   FifoRead        (sUartFifoBuffer_t *fifo, UINT8 *data);
-
 inline float  ComputeCellPower (UINT8 cellIndex, UINT8 potIndex);
 inline void   GetAdcValues (void);
 inline void   ComputeMeanAdcValues (void);

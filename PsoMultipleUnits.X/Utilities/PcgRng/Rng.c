@@ -39,6 +39,8 @@ typedef pcg32_random_t Rng_t;
 // Private variables
 //==============================================================================
 
+BOOL oRngIsInitialized = 0;
+
 static Rng_t rng = 
 {
   .inc   = 1  // Must always be odd.
@@ -66,8 +68,12 @@ double _RandUint32ToDouble (UINT32 rand)
 
 void Rng_InitSeed (UINT64 seed1, UINT64 seed2)
 {
-  seed2 |= 1;   // Must always be odd.
-  pcg32_srandom_r(&rng, seed1, seed2);
+  if (!oRngIsInitialized)
+  {
+    seed2 |= 1;   // Must always be odd.
+    pcg32_srandom_r(&rng, seed1, seed2);
+    oRngIsInitialized = 1;
+  }
 }
 
 

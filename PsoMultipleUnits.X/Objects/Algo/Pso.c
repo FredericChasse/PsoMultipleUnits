@@ -41,6 +41,7 @@ INT8  _ParallelPso_Run    (Pso_t *pso);
 INT8  _Pso1d_Run          (Pso_t *pso);
 INT8  _Pso_Close          (Pso_t *pso);
 float _Pso_GetTimeElapsed (Pso_t *pso);
+void  _Pso_Release        (Pso_t *pso);
 
 void _Pso_RemoveSubSwarm  (Pso_t *pso, UINT8 swarmId);
 void _Pso_CreateSubSwarms (Pso_t *pso, UINT8 *particlesToRemove, UINT8 nParticlesToRemove);
@@ -52,7 +53,7 @@ static int _CompareFunc   (const void *p1, const void *p2);
 
 Pso_t _parallelPso = 
 {
-  .type         = PSO_TYPE_PARALLEL_PSO
+  .type         = PSO_TYPE_PARALLEL_PSO_MULTI_SWARM
  ,.nSwarms      = 0
  ,.swarms       = {0}
  ,.unitArray    = 0
@@ -79,6 +80,7 @@ const AlgoInterface_t _parallelPso_if =
  ,.Run            = (AlgoRun_fct)             &_ParallelPso_Run
  ,.Close          = (AlgoClose_fct)           &_Pso_Close
  ,.GetTimeElapsed = (AlgoGetTimeElapsed_fct)  &_Pso_GetTimeElapsed
+ ,.Release        = (AlgoRelease_fct)         &_Pso_Release
 };
 
 const AlgoInterface_t _pso1d_if =
@@ -88,6 +90,7 @@ const AlgoInterface_t _pso1d_if =
  ,.Run            = (AlgoRun_fct)             &_Pso1d_Run
  ,.Close          = (AlgoClose_fct)           &_Pso_Close
  ,.GetTimeElapsed = (AlgoGetTimeElapsed_fct)  &_Pso_GetTimeElapsed
+ ,.Release        = (AlgoRelease_fct)         &_Pso_Release
 };
 
 // Private functions
@@ -133,7 +136,28 @@ INT8 _ParallelPso_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
   pso->swarms[0] = (PsoSwarmInterface_t *) PsoSwarmInterface();
   pso->swarms[0]->Init(pso->swarms[0]->ctx, swarmArray, (PsoSwarmParam_t *) &swarmParam, 0);
   
+  for (i = 0; i < nUnits; i++)
+  {
+    unitArray->SetPos(unitArray->ctx, i, pso->swarms[0]->GetParticlePos(pso->swarms[0]->ctx, i));
+  }
+  
   return 0;
+}
+
+
+void _Pso_Release (Pso_t *pso)
+{
+  UINT8 i;
+  for (i = 0; i < pso->nSwarms; i++)
+  {
+    pso->swarms[i]->Release(pso->swarms[i]->ctx);
+    pso->swarms[i] = NULL;
+  }
+  
+  pso->iteration    = 0;
+  pso->nSwarms      = 0;
+  pso->timeElapsed  = 0;
+  pso->unitArray    = NULL;
 }
 
 
@@ -168,6 +192,8 @@ INT8 _Pso1d_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
   {
     pso->swarms[i] = (PsoSwarmInterface_t *) PsoSwarmInterface();
     pso->swarms[i]->Init(pso->swarms[i]->ctx, unitArray, (PsoSwarmParam_t *) &swarmParam, i);
+    
+    unitArray->SetPos(unitArray->ctx, i, pso->swarms[i]->GetParticlePos(pso->swarms[i]->ctx, 0));
   }
   return 0;
 }
@@ -523,7 +549,7 @@ const AlgoInterface_t * PsoInterface(PsoType_t psoType)
   {
     case PSO_TYPE_PSO_1D:
       return &_pso1d_if;
-    case PSO_TYPE_PARALLEL_PSO:
+    case PSO_TYPE_PARALLEL_PSO_MULTI_SWARM:
       return &_parallelPso_if;
     default:
       return NULL;

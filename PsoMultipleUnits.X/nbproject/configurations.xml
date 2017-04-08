@@ -41,6 +41,7 @@
         <itemPath>source/Codec/Codec.c</itemPath>
         <itemPath>source/Codec/Codec.h</itemPath>
         <itemPath>source/Codec/Protocol.h</itemPath>
+        <itemPath>source/Codec/Protocol.c</itemPath>
       </logicalFolder>
       <itemPath>source/main.c</itemPath>
       <itemPath>source/StateMachine.c</itemPath>

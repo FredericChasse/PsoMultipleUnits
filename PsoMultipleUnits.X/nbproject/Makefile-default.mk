@@ -45,17 +45,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=Objects/Algo/Pso.c Objects/Algo/PsoSwarm.c Objects/Algo/PsoParticle.c Objects/Algo/SteadyState.c Objects/Perturb/Perturb.c source/LedDriver.c source/main.c source/StateMachine.c source/Interrupts.c source/Setup.c source/StateFunctions.c source/SkadiFunctions.c source/Potentiometer.c Objects/Units/Unit.c Objects/Units/UnitArray.c Utilities/BipBuffer/BipBuffer.c Utilities/ByteBuffer/ByteBuffer.c Utilities/ChainedList/LinkedList.c Utilities/PcgRng/pcg_basic.c Utilities/PcgRng/Rng.c Utilities/MathFunctions/MathFunctions.c source/Codec/Codec.c Objects/Algo/Characterization.c Objects/Units/UnitMapping.c
+SOURCEFILES_QUOTED_IF_SPACED=Objects/Algo/Pso.c Objects/Algo/PsoSwarm.c Objects/Algo/PsoParticle.c Objects/Algo/SteadyState.c Objects/Algo/Characterization.c Objects/Perturb/Perturb.c source/LedDriver.c source/Codec/Codec.c source/Codec/Protocol.c source/main.c source/StateMachine.c source/Interrupts.c source/Setup.c source/StateFunctions.c source/SkadiFunctions.c source/Potentiometer.c Objects/Units/Unit.c Objects/Units/UnitArray.c Objects/Units/UnitMapping.c Utilities/BipBuffer/BipBuffer.c Utilities/ByteBuffer/ByteBuffer.c Utilities/ChainedList/LinkedList.c Utilities/MathFunctions/MathFunctions.c Utilities/PcgRng/pcg_basic.c Utilities/PcgRng/Rng.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/Objects/Algo/Pso.o ${OBJECTDIR}/Objects/Algo/PsoSwarm.o ${OBJECTDIR}/Objects/Algo/PsoParticle.o ${OBJECTDIR}/Objects/Algo/SteadyState.o ${OBJECTDIR}/Objects/Perturb/Perturb.o ${OBJECTDIR}/source/LedDriver.o ${OBJECTDIR}/source/main.o ${OBJECTDIR}/source/StateMachine.o ${OBJECTDIR}/source/Interrupts.o ${OBJECTDIR}/source/Setup.o ${OBJECTDIR}/source/StateFunctions.o ${OBJECTDIR}/source/SkadiFunctions.o ${OBJECTDIR}/source/Potentiometer.o ${OBJECTDIR}/Objects/Units/Unit.o ${OBJECTDIR}/Objects/Units/UnitArray.o ${OBJECTDIR}/Utilities/BipBuffer/BipBuffer.o ${OBJECTDIR}/Utilities/ByteBuffer/ByteBuffer.o ${OBJECTDIR}/Utilities/ChainedList/LinkedList.o ${OBJECTDIR}/Utilities/PcgRng/pcg_basic.o ${OBJECTDIR}/Utilities/PcgRng/Rng.o ${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o ${OBJECTDIR}/source/Codec/Codec.o ${OBJECTDIR}/Objects/Algo/Characterization.o ${OBJECTDIR}/Objects/Units/UnitMapping.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/Objects/Algo/Pso.o.d ${OBJECTDIR}/Objects/Algo/PsoSwarm.o.d ${OBJECTDIR}/Objects/Algo/PsoParticle.o.d ${OBJECTDIR}/Objects/Algo/SteadyState.o.d ${OBJECTDIR}/Objects/Perturb/Perturb.o.d ${OBJECTDIR}/source/LedDriver.o.d ${OBJECTDIR}/source/main.o.d ${OBJECTDIR}/source/StateMachine.o.d ${OBJECTDIR}/source/Interrupts.o.d ${OBJECTDIR}/source/Setup.o.d ${OBJECTDIR}/source/StateFunctions.o.d ${OBJECTDIR}/source/SkadiFunctions.o.d ${OBJECTDIR}/source/Potentiometer.o.d ${OBJECTDIR}/Objects/Units/Unit.o.d ${OBJECTDIR}/Objects/Units/UnitArray.o.d ${OBJECTDIR}/Utilities/BipBuffer/BipBuffer.o.d ${OBJECTDIR}/Utilities/ByteBuffer/ByteBuffer.o.d ${OBJECTDIR}/Utilities/ChainedList/LinkedList.o.d ${OBJECTDIR}/Utilities/PcgRng/pcg_basic.o.d ${OBJECTDIR}/Utilities/PcgRng/Rng.o.d ${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o.d ${OBJECTDIR}/source/Codec/Codec.o.d ${OBJECTDIR}/Objects/Algo/Characterization.o.d ${OBJECTDIR}/Objects/Units/UnitMapping.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/Objects/Algo/Pso.o ${OBJECTDIR}/Objects/Algo/PsoSwarm.o ${OBJECTDIR}/Objects/Algo/PsoParticle.o ${OBJECTDIR}/Objects/Algo/SteadyState.o ${OBJECTDIR}/Objects/Algo/Characterization.o ${OBJECTDIR}/Objects/Perturb/Perturb.o ${OBJECTDIR}/source/LedDriver.o ${OBJECTDIR}/source/Codec/Codec.o ${OBJECTDIR}/source/Codec/Protocol.o ${OBJECTDIR}/source/main.o ${OBJECTDIR}/source/StateMachine.o ${OBJECTDIR}/source/Interrupts.o ${OBJECTDIR}/source/Setup.o ${OBJECTDIR}/source/StateFunctions.o ${OBJECTDIR}/source/SkadiFunctions.o ${OBJECTDIR}/source/Potentiometer.o ${OBJECTDIR}/Objects/Units/Unit.o ${OBJECTDIR}/Objects/Units/UnitArray.o ${OBJECTDIR}/Objects/Units/UnitMapping.o ${OBJECTDIR}/Utilities/BipBuffer/BipBuffer.o ${OBJECTDIR}/Utilities/ByteBuffer/ByteBuffer.o ${OBJECTDIR}/Utilities/ChainedList/LinkedList.o ${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o ${OBJECTDIR}/Utilities/PcgRng/pcg_basic.o ${OBJECTDIR}/Utilities/PcgRng/Rng.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/Objects/Algo/Pso.o.d ${OBJECTDIR}/Objects/Algo/PsoSwarm.o.d ${OBJECTDIR}/Objects/Algo/PsoParticle.o.d ${OBJECTDIR}/Objects/Algo/SteadyState.o.d ${OBJECTDIR}/Objects/Algo/Characterization.o.d ${OBJECTDIR}/Objects/Perturb/Perturb.o.d ${OBJECTDIR}/source/LedDriver.o.d ${OBJECTDIR}/source/Codec/Codec.o.d ${OBJECTDIR}/source/Codec/Protocol.o.d ${OBJECTDIR}/source/main.o.d ${OBJECTDIR}/source/StateMachine.o.d ${OBJECTDIR}/source/Interrupts.o.d ${OBJECTDIR}/source/Setup.o.d ${OBJECTDIR}/source/StateFunctions.o.d ${OBJECTDIR}/source/SkadiFunctions.o.d ${OBJECTDIR}/source/Potentiometer.o.d ${OBJECTDIR}/Objects/Units/Unit.o.d ${OBJECTDIR}/Objects/Units/UnitArray.o.d ${OBJECTDIR}/Objects/Units/UnitMapping.o.d ${OBJECTDIR}/Utilities/BipBuffer/BipBuffer.o.d ${OBJECTDIR}/Utilities/ByteBuffer/ByteBuffer.o.d ${OBJECTDIR}/Utilities/ChainedList/LinkedList.o.d ${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o.d ${OBJECTDIR}/Utilities/PcgRng/pcg_basic.o.d ${OBJECTDIR}/Utilities/PcgRng/Rng.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/Objects/Algo/Pso.o ${OBJECTDIR}/Objects/Algo/PsoSwarm.o ${OBJECTDIR}/Objects/Algo/PsoParticle.o ${OBJECTDIR}/Objects/Algo/SteadyState.o ${OBJECTDIR}/Objects/Perturb/Perturb.o ${OBJECTDIR}/source/LedDriver.o ${OBJECTDIR}/source/main.o ${OBJECTDIR}/source/StateMachine.o ${OBJECTDIR}/source/Interrupts.o ${OBJECTDIR}/source/Setup.o ${OBJECTDIR}/source/StateFunctions.o ${OBJECTDIR}/source/SkadiFunctions.o ${OBJECTDIR}/source/Potentiometer.o ${OBJECTDIR}/Objects/Units/Unit.o ${OBJECTDIR}/Objects/Units/UnitArray.o ${OBJECTDIR}/Utilities/BipBuffer/BipBuffer.o ${OBJECTDIR}/Utilities/ByteBuffer/ByteBuffer.o ${OBJECTDIR}/Utilities/ChainedList/LinkedList.o ${OBJECTDIR}/Utilities/PcgRng/pcg_basic.o ${OBJECTDIR}/Utilities/PcgRng/Rng.o ${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o ${OBJECTDIR}/source/Codec/Codec.o ${OBJECTDIR}/Objects/Algo/Characterization.o ${OBJECTDIR}/Objects/Units/UnitMapping.o
+OBJECTFILES=${OBJECTDIR}/Objects/Algo/Pso.o ${OBJECTDIR}/Objects/Algo/PsoSwarm.o ${OBJECTDIR}/Objects/Algo/PsoParticle.o ${OBJECTDIR}/Objects/Algo/SteadyState.o ${OBJECTDIR}/Objects/Algo/Characterization.o ${OBJECTDIR}/Objects/Perturb/Perturb.o ${OBJECTDIR}/source/LedDriver.o ${OBJECTDIR}/source/Codec/Codec.o ${OBJECTDIR}/source/Codec/Protocol.o ${OBJECTDIR}/source/main.o ${OBJECTDIR}/source/StateMachine.o ${OBJECTDIR}/source/Interrupts.o ${OBJECTDIR}/source/Setup.o ${OBJECTDIR}/source/StateFunctions.o ${OBJECTDIR}/source/SkadiFunctions.o ${OBJECTDIR}/source/Potentiometer.o ${OBJECTDIR}/Objects/Units/Unit.o ${OBJECTDIR}/Objects/Units/UnitArray.o ${OBJECTDIR}/Objects/Units/UnitMapping.o ${OBJECTDIR}/Utilities/BipBuffer/BipBuffer.o ${OBJECTDIR}/Utilities/ByteBuffer/ByteBuffer.o ${OBJECTDIR}/Utilities/ChainedList/LinkedList.o ${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o ${OBJECTDIR}/Utilities/PcgRng/pcg_basic.o ${OBJECTDIR}/Utilities/PcgRng/Rng.o
 
 # Source Files
-SOURCEFILES=Objects/Algo/Pso.c Objects/Algo/PsoSwarm.c Objects/Algo/PsoParticle.c Objects/Algo/SteadyState.c Objects/Perturb/Perturb.c source/LedDriver.c source/main.c source/StateMachine.c source/Interrupts.c source/Setup.c source/StateFunctions.c source/SkadiFunctions.c source/Potentiometer.c Objects/Units/Unit.c Objects/Units/UnitArray.c Utilities/BipBuffer/BipBuffer.c Utilities/ByteBuffer/ByteBuffer.c Utilities/ChainedList/LinkedList.c Utilities/PcgRng/pcg_basic.c Utilities/PcgRng/Rng.c Utilities/MathFunctions/MathFunctions.c source/Codec/Codec.c Objects/Algo/Characterization.c Objects/Units/UnitMapping.c
+SOURCEFILES=Objects/Algo/Pso.c Objects/Algo/PsoSwarm.c Objects/Algo/PsoParticle.c Objects/Algo/SteadyState.c Objects/Algo/Characterization.c Objects/Perturb/Perturb.c source/LedDriver.c source/Codec/Codec.c source/Codec/Protocol.c source/main.c source/StateMachine.c source/Interrupts.c source/Setup.c source/StateFunctions.c source/SkadiFunctions.c source/Potentiometer.c Objects/Units/Unit.c Objects/Units/UnitArray.c Objects/Units/UnitMapping.c Utilities/BipBuffer/BipBuffer.c Utilities/ByteBuffer/ByteBuffer.c Utilities/ChainedList/LinkedList.c Utilities/MathFunctions/MathFunctions.c Utilities/PcgRng/pcg_basic.c Utilities/PcgRng/Rng.c
 
 
 CFLAGS=
@@ -118,6 +118,12 @@ ${OBJECTDIR}/Objects/Algo/SteadyState.o: Objects/Algo/SteadyState.c  nbproject/M
 	@${RM} ${OBJECTDIR}/Objects/Algo/SteadyState.o 
 	@${FIXDEPS} "${OBJECTDIR}/Objects/Algo/SteadyState.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -I"Utilities/ByteBuffer" -I"Objects/Perturb" -I"Utilities/MathFunctions" -I"source/Codec" -MMD -MF "${OBJECTDIR}/Objects/Algo/SteadyState.o.d" -o ${OBJECTDIR}/Objects/Algo/SteadyState.o Objects/Algo/SteadyState.c   
 	
+${OBJECTDIR}/Objects/Algo/Characterization.o: Objects/Algo/Characterization.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/Objects/Algo" 
+	@${RM} ${OBJECTDIR}/Objects/Algo/Characterization.o.d 
+	@${RM} ${OBJECTDIR}/Objects/Algo/Characterization.o 
+	@${FIXDEPS} "${OBJECTDIR}/Objects/Algo/Characterization.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -I"Utilities/ByteBuffer" -I"Objects/Perturb" -I"Utilities/MathFunctions" -I"source/Codec" -MMD -MF "${OBJECTDIR}/Objects/Algo/Characterization.o.d" -o ${OBJECTDIR}/Objects/Algo/Characterization.o Objects/Algo/Characterization.c   
+	
 ${OBJECTDIR}/Objects/Perturb/Perturb.o: Objects/Perturb/Perturb.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/Objects/Perturb" 
 	@${RM} ${OBJECTDIR}/Objects/Perturb/Perturb.o.d 
@@ -129,6 +135,18 @@ ${OBJECTDIR}/source/LedDriver.o: source/LedDriver.c  nbproject/Makefile-${CND_CO
 	@${RM} ${OBJECTDIR}/source/LedDriver.o.d 
 	@${RM} ${OBJECTDIR}/source/LedDriver.o 
 	@${FIXDEPS} "${OBJECTDIR}/source/LedDriver.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -I"Utilities/ByteBuffer" -I"Objects/Perturb" -I"Utilities/MathFunctions" -I"source/Codec" -MMD -MF "${OBJECTDIR}/source/LedDriver.o.d" -o ${OBJECTDIR}/source/LedDriver.o source/LedDriver.c   
+	
+${OBJECTDIR}/source/Codec/Codec.o: source/Codec/Codec.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/source/Codec" 
+	@${RM} ${OBJECTDIR}/source/Codec/Codec.o.d 
+	@${RM} ${OBJECTDIR}/source/Codec/Codec.o 
+	@${FIXDEPS} "${OBJECTDIR}/source/Codec/Codec.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -I"Utilities/ByteBuffer" -I"Objects/Perturb" -I"Utilities/MathFunctions" -I"source/Codec" -MMD -MF "${OBJECTDIR}/source/Codec/Codec.o.d" -o ${OBJECTDIR}/source/Codec/Codec.o source/Codec/Codec.c   
+	
+${OBJECTDIR}/source/Codec/Protocol.o: source/Codec/Protocol.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/source/Codec" 
+	@${RM} ${OBJECTDIR}/source/Codec/Protocol.o.d 
+	@${RM} ${OBJECTDIR}/source/Codec/Protocol.o 
+	@${FIXDEPS} "${OBJECTDIR}/source/Codec/Protocol.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -I"Utilities/ByteBuffer" -I"Objects/Perturb" -I"Utilities/MathFunctions" -I"source/Codec" -MMD -MF "${OBJECTDIR}/source/Codec/Protocol.o.d" -o ${OBJECTDIR}/source/Codec/Protocol.o source/Codec/Protocol.c   
 	
 ${OBJECTDIR}/source/main.o: source/main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/source" 
@@ -184,6 +202,12 @@ ${OBJECTDIR}/Objects/Units/UnitArray.o: Objects/Units/UnitArray.c  nbproject/Mak
 	@${RM} ${OBJECTDIR}/Objects/Units/UnitArray.o 
 	@${FIXDEPS} "${OBJECTDIR}/Objects/Units/UnitArray.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -I"Utilities/ByteBuffer" -I"Objects/Perturb" -I"Utilities/MathFunctions" -I"source/Codec" -MMD -MF "${OBJECTDIR}/Objects/Units/UnitArray.o.d" -o ${OBJECTDIR}/Objects/Units/UnitArray.o Objects/Units/UnitArray.c   
 	
+${OBJECTDIR}/Objects/Units/UnitMapping.o: Objects/Units/UnitMapping.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/Objects/Units" 
+	@${RM} ${OBJECTDIR}/Objects/Units/UnitMapping.o.d 
+	@${RM} ${OBJECTDIR}/Objects/Units/UnitMapping.o 
+	@${FIXDEPS} "${OBJECTDIR}/Objects/Units/UnitMapping.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -I"Utilities/ByteBuffer" -I"Objects/Perturb" -I"Utilities/MathFunctions" -I"source/Codec" -MMD -MF "${OBJECTDIR}/Objects/Units/UnitMapping.o.d" -o ${OBJECTDIR}/Objects/Units/UnitMapping.o Objects/Units/UnitMapping.c   
+	
 ${OBJECTDIR}/Utilities/BipBuffer/BipBuffer.o: Utilities/BipBuffer/BipBuffer.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/Utilities/BipBuffer" 
 	@${RM} ${OBJECTDIR}/Utilities/BipBuffer/BipBuffer.o.d 
@@ -202,6 +226,12 @@ ${OBJECTDIR}/Utilities/ChainedList/LinkedList.o: Utilities/ChainedList/LinkedLis
 	@${RM} ${OBJECTDIR}/Utilities/ChainedList/LinkedList.o 
 	@${FIXDEPS} "${OBJECTDIR}/Utilities/ChainedList/LinkedList.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -I"Utilities/ByteBuffer" -I"Objects/Perturb" -I"Utilities/MathFunctions" -I"source/Codec" -MMD -MF "${OBJECTDIR}/Utilities/ChainedList/LinkedList.o.d" -o ${OBJECTDIR}/Utilities/ChainedList/LinkedList.o Utilities/ChainedList/LinkedList.c   
 	
+${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o: Utilities/MathFunctions/MathFunctions.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/Utilities/MathFunctions" 
+	@${RM} ${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o.d 
+	@${RM} ${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o 
+	@${FIXDEPS} "${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -I"Utilities/ByteBuffer" -I"Objects/Perturb" -I"Utilities/MathFunctions" -I"source/Codec" -MMD -MF "${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o.d" -o ${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o Utilities/MathFunctions/MathFunctions.c   
+	
 ${OBJECTDIR}/Utilities/PcgRng/pcg_basic.o: Utilities/PcgRng/pcg_basic.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/Utilities/PcgRng" 
 	@${RM} ${OBJECTDIR}/Utilities/PcgRng/pcg_basic.o.d 
@@ -213,30 +243,6 @@ ${OBJECTDIR}/Utilities/PcgRng/Rng.o: Utilities/PcgRng/Rng.c  nbproject/Makefile-
 	@${RM} ${OBJECTDIR}/Utilities/PcgRng/Rng.o.d 
 	@${RM} ${OBJECTDIR}/Utilities/PcgRng/Rng.o 
 	@${FIXDEPS} "${OBJECTDIR}/Utilities/PcgRng/Rng.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -I"Utilities/ByteBuffer" -I"Objects/Perturb" -I"Utilities/MathFunctions" -I"source/Codec" -MMD -MF "${OBJECTDIR}/Utilities/PcgRng/Rng.o.d" -o ${OBJECTDIR}/Utilities/PcgRng/Rng.o Utilities/PcgRng/Rng.c   
-	
-${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o: Utilities/MathFunctions/MathFunctions.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/Utilities/MathFunctions" 
-	@${RM} ${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o.d 
-	@${RM} ${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o 
-	@${FIXDEPS} "${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -I"Utilities/ByteBuffer" -I"Objects/Perturb" -I"Utilities/MathFunctions" -I"source/Codec" -MMD -MF "${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o.d" -o ${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o Utilities/MathFunctions/MathFunctions.c   
-	
-${OBJECTDIR}/source/Codec/Codec.o: source/Codec/Codec.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/source/Codec" 
-	@${RM} ${OBJECTDIR}/source/Codec/Codec.o.d 
-	@${RM} ${OBJECTDIR}/source/Codec/Codec.o 
-	@${FIXDEPS} "${OBJECTDIR}/source/Codec/Codec.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -I"Utilities/ByteBuffer" -I"Objects/Perturb" -I"Utilities/MathFunctions" -I"source/Codec" -MMD -MF "${OBJECTDIR}/source/Codec/Codec.o.d" -o ${OBJECTDIR}/source/Codec/Codec.o source/Codec/Codec.c   
-	
-${OBJECTDIR}/Objects/Algo/Characterization.o: Objects/Algo/Characterization.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/Objects/Algo" 
-	@${RM} ${OBJECTDIR}/Objects/Algo/Characterization.o.d 
-	@${RM} ${OBJECTDIR}/Objects/Algo/Characterization.o 
-	@${FIXDEPS} "${OBJECTDIR}/Objects/Algo/Characterization.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -I"Utilities/ByteBuffer" -I"Objects/Perturb" -I"Utilities/MathFunctions" -I"source/Codec" -MMD -MF "${OBJECTDIR}/Objects/Algo/Characterization.o.d" -o ${OBJECTDIR}/Objects/Algo/Characterization.o Objects/Algo/Characterization.c   
-	
-${OBJECTDIR}/Objects/Units/UnitMapping.o: Objects/Units/UnitMapping.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/Objects/Units" 
-	@${RM} ${OBJECTDIR}/Objects/Units/UnitMapping.o.d 
-	@${RM} ${OBJECTDIR}/Objects/Units/UnitMapping.o 
-	@${FIXDEPS} "${OBJECTDIR}/Objects/Units/UnitMapping.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -I"Utilities/ByteBuffer" -I"Objects/Perturb" -I"Utilities/MathFunctions" -I"source/Codec" -MMD -MF "${OBJECTDIR}/Objects/Units/UnitMapping.o.d" -o ${OBJECTDIR}/Objects/Units/UnitMapping.o Objects/Units/UnitMapping.c   
 	
 else
 ${OBJECTDIR}/Objects/Algo/Pso.o: Objects/Algo/Pso.c  nbproject/Makefile-${CND_CONF}.mk
@@ -263,6 +269,12 @@ ${OBJECTDIR}/Objects/Algo/SteadyState.o: Objects/Algo/SteadyState.c  nbproject/M
 	@${RM} ${OBJECTDIR}/Objects/Algo/SteadyState.o 
 	@${FIXDEPS} "${OBJECTDIR}/Objects/Algo/SteadyState.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -I"Utilities/ByteBuffer" -I"Objects/Perturb" -I"Utilities/MathFunctions" -I"source/Codec" -MMD -MF "${OBJECTDIR}/Objects/Algo/SteadyState.o.d" -o ${OBJECTDIR}/Objects/Algo/SteadyState.o Objects/Algo/SteadyState.c   
 	
+${OBJECTDIR}/Objects/Algo/Characterization.o: Objects/Algo/Characterization.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/Objects/Algo" 
+	@${RM} ${OBJECTDIR}/Objects/Algo/Characterization.o.d 
+	@${RM} ${OBJECTDIR}/Objects/Algo/Characterization.o 
+	@${FIXDEPS} "${OBJECTDIR}/Objects/Algo/Characterization.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -I"Utilities/ByteBuffer" -I"Objects/Perturb" -I"Utilities/MathFunctions" -I"source/Codec" -MMD -MF "${OBJECTDIR}/Objects/Algo/Characterization.o.d" -o ${OBJECTDIR}/Objects/Algo/Characterization.o Objects/Algo/Characterization.c   
+	
 ${OBJECTDIR}/Objects/Perturb/Perturb.o: Objects/Perturb/Perturb.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/Objects/Perturb" 
 	@${RM} ${OBJECTDIR}/Objects/Perturb/Perturb.o.d 
@@ -274,6 +286,18 @@ ${OBJECTDIR}/source/LedDriver.o: source/LedDriver.c  nbproject/Makefile-${CND_CO
 	@${RM} ${OBJECTDIR}/source/LedDriver.o.d 
 	@${RM} ${OBJECTDIR}/source/LedDriver.o 
 	@${FIXDEPS} "${OBJECTDIR}/source/LedDriver.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -I"Utilities/ByteBuffer" -I"Objects/Perturb" -I"Utilities/MathFunctions" -I"source/Codec" -MMD -MF "${OBJECTDIR}/source/LedDriver.o.d" -o ${OBJECTDIR}/source/LedDriver.o source/LedDriver.c   
+	
+${OBJECTDIR}/source/Codec/Codec.o: source/Codec/Codec.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/source/Codec" 
+	@${RM} ${OBJECTDIR}/source/Codec/Codec.o.d 
+	@${RM} ${OBJECTDIR}/source/Codec/Codec.o 
+	@${FIXDEPS} "${OBJECTDIR}/source/Codec/Codec.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -I"Utilities/ByteBuffer" -I"Objects/Perturb" -I"Utilities/MathFunctions" -I"source/Codec" -MMD -MF "${OBJECTDIR}/source/Codec/Codec.o.d" -o ${OBJECTDIR}/source/Codec/Codec.o source/Codec/Codec.c   
+	
+${OBJECTDIR}/source/Codec/Protocol.o: source/Codec/Protocol.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/source/Codec" 
+	@${RM} ${OBJECTDIR}/source/Codec/Protocol.o.d 
+	@${RM} ${OBJECTDIR}/source/Codec/Protocol.o 
+	@${FIXDEPS} "${OBJECTDIR}/source/Codec/Protocol.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -I"Utilities/ByteBuffer" -I"Objects/Perturb" -I"Utilities/MathFunctions" -I"source/Codec" -MMD -MF "${OBJECTDIR}/source/Codec/Protocol.o.d" -o ${OBJECTDIR}/source/Codec/Protocol.o source/Codec/Protocol.c   
 	
 ${OBJECTDIR}/source/main.o: source/main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/source" 
@@ -329,6 +353,12 @@ ${OBJECTDIR}/Objects/Units/UnitArray.o: Objects/Units/UnitArray.c  nbproject/Mak
 	@${RM} ${OBJECTDIR}/Objects/Units/UnitArray.o 
 	@${FIXDEPS} "${OBJECTDIR}/Objects/Units/UnitArray.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -I"Utilities/ByteBuffer" -I"Objects/Perturb" -I"Utilities/MathFunctions" -I"source/Codec" -MMD -MF "${OBJECTDIR}/Objects/Units/UnitArray.o.d" -o ${OBJECTDIR}/Objects/Units/UnitArray.o Objects/Units/UnitArray.c   
 	
+${OBJECTDIR}/Objects/Units/UnitMapping.o: Objects/Units/UnitMapping.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/Objects/Units" 
+	@${RM} ${OBJECTDIR}/Objects/Units/UnitMapping.o.d 
+	@${RM} ${OBJECTDIR}/Objects/Units/UnitMapping.o 
+	@${FIXDEPS} "${OBJECTDIR}/Objects/Units/UnitMapping.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -I"Utilities/ByteBuffer" -I"Objects/Perturb" -I"Utilities/MathFunctions" -I"source/Codec" -MMD -MF "${OBJECTDIR}/Objects/Units/UnitMapping.o.d" -o ${OBJECTDIR}/Objects/Units/UnitMapping.o Objects/Units/UnitMapping.c   
+	
 ${OBJECTDIR}/Utilities/BipBuffer/BipBuffer.o: Utilities/BipBuffer/BipBuffer.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/Utilities/BipBuffer" 
 	@${RM} ${OBJECTDIR}/Utilities/BipBuffer/BipBuffer.o.d 
@@ -347,6 +377,12 @@ ${OBJECTDIR}/Utilities/ChainedList/LinkedList.o: Utilities/ChainedList/LinkedLis
 	@${RM} ${OBJECTDIR}/Utilities/ChainedList/LinkedList.o 
 	@${FIXDEPS} "${OBJECTDIR}/Utilities/ChainedList/LinkedList.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -I"Utilities/ByteBuffer" -I"Objects/Perturb" -I"Utilities/MathFunctions" -I"source/Codec" -MMD -MF "${OBJECTDIR}/Utilities/ChainedList/LinkedList.o.d" -o ${OBJECTDIR}/Utilities/ChainedList/LinkedList.o Utilities/ChainedList/LinkedList.c   
 	
+${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o: Utilities/MathFunctions/MathFunctions.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/Utilities/MathFunctions" 
+	@${RM} ${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o.d 
+	@${RM} ${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o 
+	@${FIXDEPS} "${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -I"Utilities/ByteBuffer" -I"Objects/Perturb" -I"Utilities/MathFunctions" -I"source/Codec" -MMD -MF "${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o.d" -o ${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o Utilities/MathFunctions/MathFunctions.c   
+	
 ${OBJECTDIR}/Utilities/PcgRng/pcg_basic.o: Utilities/PcgRng/pcg_basic.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/Utilities/PcgRng" 
 	@${RM} ${OBJECTDIR}/Utilities/PcgRng/pcg_basic.o.d 
@@ -358,30 +394,6 @@ ${OBJECTDIR}/Utilities/PcgRng/Rng.o: Utilities/PcgRng/Rng.c  nbproject/Makefile-
 	@${RM} ${OBJECTDIR}/Utilities/PcgRng/Rng.o.d 
 	@${RM} ${OBJECTDIR}/Utilities/PcgRng/Rng.o 
 	@${FIXDEPS} "${OBJECTDIR}/Utilities/PcgRng/Rng.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -I"Utilities/ByteBuffer" -I"Objects/Perturb" -I"Utilities/MathFunctions" -I"source/Codec" -MMD -MF "${OBJECTDIR}/Utilities/PcgRng/Rng.o.d" -o ${OBJECTDIR}/Utilities/PcgRng/Rng.o Utilities/PcgRng/Rng.c   
-	
-${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o: Utilities/MathFunctions/MathFunctions.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/Utilities/MathFunctions" 
-	@${RM} ${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o.d 
-	@${RM} ${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o 
-	@${FIXDEPS} "${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -I"Utilities/ByteBuffer" -I"Objects/Perturb" -I"Utilities/MathFunctions" -I"source/Codec" -MMD -MF "${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o.d" -o ${OBJECTDIR}/Utilities/MathFunctions/MathFunctions.o Utilities/MathFunctions/MathFunctions.c   
-	
-${OBJECTDIR}/source/Codec/Codec.o: source/Codec/Codec.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/source/Codec" 
-	@${RM} ${OBJECTDIR}/source/Codec/Codec.o.d 
-	@${RM} ${OBJECTDIR}/source/Codec/Codec.o 
-	@${FIXDEPS} "${OBJECTDIR}/source/Codec/Codec.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -I"Utilities/ByteBuffer" -I"Objects/Perturb" -I"Utilities/MathFunctions" -I"source/Codec" -MMD -MF "${OBJECTDIR}/source/Codec/Codec.o.d" -o ${OBJECTDIR}/source/Codec/Codec.o source/Codec/Codec.c   
-	
-${OBJECTDIR}/Objects/Algo/Characterization.o: Objects/Algo/Characterization.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/Objects/Algo" 
-	@${RM} ${OBJECTDIR}/Objects/Algo/Characterization.o.d 
-	@${RM} ${OBJECTDIR}/Objects/Algo/Characterization.o 
-	@${FIXDEPS} "${OBJECTDIR}/Objects/Algo/Characterization.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -I"Utilities/ByteBuffer" -I"Objects/Perturb" -I"Utilities/MathFunctions" -I"source/Codec" -MMD -MF "${OBJECTDIR}/Objects/Algo/Characterization.o.d" -o ${OBJECTDIR}/Objects/Algo/Characterization.o Objects/Algo/Characterization.c   
-	
-${OBJECTDIR}/Objects/Units/UnitMapping.o: Objects/Units/UnitMapping.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/Objects/Units" 
-	@${RM} ${OBJECTDIR}/Objects/Units/UnitMapping.o.d 
-	@${RM} ${OBJECTDIR}/Objects/Units/UnitMapping.o 
-	@${FIXDEPS} "${OBJECTDIR}/Objects/Units/UnitMapping.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -O1 -I"source" -I"headers" -I"Objects/Algo" -I"Objects/Units" -I"Utilities/BipBuffer" -I"Utilities/ChainedList" -I"Utilities/PcgRng" -I"Utilities/ByteBuffer" -I"Objects/Perturb" -I"Utilities/MathFunctions" -I"source/Codec" -MMD -MF "${OBJECTDIR}/Objects/Units/UnitMapping.o.d" -o ${OBJECTDIR}/Objects/Units/UnitMapping.o Objects/Units/UnitMapping.c   
 	
 endif
 

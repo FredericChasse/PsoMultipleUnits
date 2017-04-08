@@ -32,11 +32,8 @@ extern const float potRealValues[256];
 extern const float potRealValuesInverse[256];
 extern UINT32 cellVoltageRaw[16];
 extern UINT16 nSamples;
-extern BOOL oSmoothData, oPsoSeqMode;
+extern BOOL oSmoothData;
 const float kFilter = 0.1;
-extern sUartFifoBuffer_t matlabData;
-extern BOOL oSendData;
-UINT8 matlabPacketSize = MATLAB_PACKET_SIZE_CARAC;
 
 // All the buttons used. 3 on the steering wheel, 3 on the board
 sButtonStates_t buttons =
@@ -70,27 +67,6 @@ inline float ComputeCellPower (UINT8 cellIndex, UINT8 potIndex)
 //  sCellValues.cells[cellIndex].cellPowerFloat = sCellValues.cells[cellIndex].cellVoltFloat * sCellValues.cells[cellIndex].cellVoltFloat / potRealValues[potIndexValue];
   sCellValues.cells[cellIndex].cellPowerFloat = sCellValues.cells[cellIndex].cellVoltFloat * sCellValues.cells[cellIndex].cellVoltFloat * potRealValuesInverse[potIndex];
   return sCellValues.cells[cellIndex].cellPowerFloat;
-}
-
-inline void AddDataToMatlabFifo (UINT8 *buffer, UINT8 size)
-{
-  INT8 err = FifoWriteBuffer(&matlabData, buffer, size);
-  if (err < 0)
-  {
-    LED1_ON;
-    LED2_OFF;
-    while(1)
-    {
-      Timer.DelayMs(500);
-      LED1_TOGGLE;
-      LED2_TOGGLE;
-    }
-  }
-  
-  if (matlabData.lineBuffer.length >= matlabPacketSize)
-  {
-    oSendData = 1;
-  }
 }
 
 
@@ -314,74 +290,4 @@ void AssessButtons (void)
     // </editor-fold>
   }
   // </editor-fold>
-}
-
-
-//==============================================================================
-// MATLAB FIFOs functions
-//==============================================================================
-
-inline INT8 FifoWrite(sUartFifoBuffer_t *fifo, UINT8 *data)
-{
-  if (fifo->bufFull)
-  {
-    return -1;
-  }
-  fifo->bufEmpty = 0;
-  fifo->lineBuffer.buffer[fifo->inIdx] = *data;
-  fifo->inIdx = (fifo->inIdx + 1) % fifo->maxBufSize;
-  if (fifo->inIdx == fifo->outIdx)
-  {
-    fifo->bufFull = 1;
-  }
-  fifo->lineBuffer.length++;
-  return 0;
-}
-
-inline INT8 FifoWriteBuffer(sUartFifoBuffer_t *fifo, UINT8 *data, UINT8 length)
-{
-  UINT8 i;
-  
-  if (fifo->bufFull)
-  {
-    return -1;
-  }
-  
-  if ((fifo->maxBufSize - fifo->lineBuffer.length) < length)
-  {
-    return -1;
-  }
-  
-  fifo->bufEmpty = 0;
-  for (i = 0; i < length; i++)
-  {
-    fifo->lineBuffer.buffer[fifo->inIdx] = *data;
-    fifo->inIdx = (fifo->inIdx + 1) % fifo->maxBufSize;
-    fifo->lineBuffer.length++;
-    data++;
-  }
-  
-  if (fifo->inIdx == fifo->outIdx)
-  {
-    fifo->bufFull = 1;
-  }
-  return 0;
-}
-
-
-inline INT8 FifoRead (sUartFifoBuffer_t *fifo, UINT8 *data)
-{
-  if (fifo->bufEmpty)
-  {
-    return -1;
-  }
-  fifo->bufFull = 0;
-  *data = fifo->lineBuffer.buffer[fifo->outIdx];
-  fifo->outIdx = (fifo->outIdx + 1) % fifo->maxBufSize;
-  if (fifo->outIdx == fifo->inIdx)
-  {
-    fifo->bufEmpty = 1;
-  }
-  fifo->lineBuffer.length--;
-  return 0;
 }

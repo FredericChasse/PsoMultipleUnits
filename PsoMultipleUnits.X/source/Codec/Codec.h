@@ -28,21 +28,32 @@
 // Public definitions
 //==============================================================================
 
-typedef UINT8 (*CodecInit_fct)          (void *ctx, UartModule_t uartChannel);
-typedef UINT8 (*CodecFsmStep_fct)       (void *ctx);
-typedef BOOL  (*CodecIsLinkActive_fct)  (void *ctx);
+#define MAX_DECODER_LENGTH    (100)
+
+typedef enum
+{
+  DECODER_RET_MSG_NO_MSG
+ ,DECODER_RET_MSG_RNG_SEED
+ ,DECODER_RET_MSG_START_ALGO
+ ,DECODER_RET_MSG_STOP_ALGO
+} DecoderReturnMsg_t;
+
+typedef UINT8               (*CodecInit_fct)            (void *ctx, UartModule_t uartChannel);
+typedef DecoderReturnMsg_t  (*CodecDecoderFsmStep_fct)  (void *ctx, UINT8 *rxMsg);
+typedef UINT8               (*CodecCodeNewMsg_fct)      (void *ctx, ProtocolUnitsDataPayload_t *newMsg);
 
 typedef struct
 {
-  void                 *ctx;
-  CodecInit_fct         Init;
-  CodecFsmStep_fct      FsmStep;
-  CodecIsLinkActive_fct IsLinkActive;
+  void                     *ctx;
+  CodecInit_fct             Init;
+  CodecDecoderFsmStep_fct   DecoderFsmStep;
+  CodecCodeNewMsg_fct       CodeNewMsg;
 } CodecInterface_t;
 
 // Public functions
 //==============================================================================
 
 const CodecInterface_t * CodecInterface(void);
+
 
 #endif // __CODEC_H__

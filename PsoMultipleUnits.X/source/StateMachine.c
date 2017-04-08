@@ -27,6 +27,7 @@
 #include "Pso.h"
 #include "Characterization.h"
 #include "Codec.h"
+#include "Protocol.h"
 
 
 extern volatile BOOL   oAdcReady
@@ -64,7 +65,7 @@ extern UINT32 iteration;
 
 extern float sinus[2][15];
 
-BOOL oFirstTimeCallFromMatlab = 1;
+BOOL oSessionActive = 0;
 
 AlgoInterface_t *algo;
 UnitArrayInterface_t   *algoArray
@@ -99,10 +100,6 @@ void StateScheduler(void)
     {
       pState = &StateAcq;
     }
-    else if (INIT_2_SEND_DATA)
-    {
-      pState = &StateSendData;
-    }
     else if (INIT_2_ERROR)
     {
       pState = &StateError;
@@ -126,10 +123,6 @@ void StateScheduler(void)
     {
       pState = &StateCompute;
     }
-    else if (ACQ_2_SEND_DATA)
-    {
-      pState = &StateSendData;
-    }
     else if (ACQ_2_ACQ)
     {
       pState = &StateAcq;
@@ -145,33 +138,6 @@ void StateScheduler(void)
   }
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  // Current state == StateSendData
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  else if (pState == &StateSendData)
-  {
-    if (SEND_DATA_2_ACQ)
-    {
-      pState = &StateAcq;
-    }
-    else if (SEND_DATA_2_SEND_DATA)
-    {
-      pState = &StateSendData;
-    }
-    else if (SEND_DATA_2_ERROR)
-    {
-      pState = &StateError;
-    }
-    else if (SEND_DATA_2_COMP)
-    {
-      pState = &StateCompute;
-    }
-    else
-    {
-      pState = &StateError;   // Go to Error state by default
-    }
-  }
-
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   // Current state == StateError
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   else if (pState == &StateError)
@@ -179,10 +145,6 @@ void StateScheduler(void)
     if (ERROR_2_ACQ)
     {
       pState = &StateAcq;
-    }
-    else if (ERROR_2_SEND_DATA)
-    {
-      pState = &StateSendData;
     }
     else if (ERROR_2_COMP)
     {
@@ -203,11 +165,7 @@ void StateScheduler(void)
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   else if (pState == &StateCompute)
   {
-    if (COMP_2_SEND_DATA)
-    {
-      pState = &StateSendData;
-    }
-    else if (COMP_2_ACQ)
+    if (COMP_2_ACQ)
     {
       pState = &StateAcq;
     }
@@ -267,6 +225,7 @@ void StateInit(void)
   algoArray = (UnitArrayInterface_t *)  UnitArrayInterface();
   perturb   = (PerturbInterface_t   *)  PerturbInterface  ();
   codec     = (CodecInterface_t     *)  CodecInterface    ();
+  algo      = NULL;
   
   codec->Init(codec->ctx, U_MATLAB);
   
@@ -292,7 +251,6 @@ void StateInit(void)
 //===============================================================
 void StateAcq(void)
 {
-  INT32 err = 0;
   
   //==================================================================
   // ADC READ
@@ -309,7 +267,7 @@ void StateAcq(void)
     {
       nSamples = 0;
       
-      if (codec->IsLinkActive(codec->ctx))
+      if (oSessionActive)
       {
         oNewSample = 1;   // Go to stateCompute
       }
@@ -323,33 +281,61 @@ void StateAcq(void)
   
   AssessButtons();
   
-  codec->FsmStep(codec->ctx);
-}
-
-
-//===============================================================
-// Name     : StateSendData
-// Purpose  : Send data on UART.
-//===============================================================
-void StateSendData(void)
-{
-  oSendData = 0;
-  
-  sUartLineBuffer_t localBuffer = 
-  { 
-     .buffer = {0} 
-    ,.length =  0 
-  };
-  
-  UINT32 i = 0;
-  
-  for (i = 0; i < matlabPacketSize; i++)
+  UINT64 seed1, seed2;
+  UINT8 retBuf[MAX_DECODER_LENGTH];
+  DecoderReturnMsg_t ret;
+  ret = codec->DecoderFsmStep(codec->ctx, retBuf);
+  switch (ret)
   {
-    FifoRead(&matlabData, &localBuffer.buffer[i]);
-    localBuffer.length++;
+    case DECODER_RET_MSG_RNG_SEED:
+      memcpy(&seed1, &retBuf[0], 8);
+      memcpy(&seed2, &retBuf[8], 8);
+      Rng_InitSeed(seed1, seed2);
+      break;
+      
+    case DECODER_RET_MSG_START_ALGO:
+      if (!oSessionActive) // We are not already started
+      {
+        switch (retBuf[0])
+        {
+          case CLASSIC_PSO:
+            oSessionActive  = 1;
+            nSamples        = 0;  // Reset the samples
+            algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PSO_1D);
+            algo->Init(algo->ctx, algoArray);
+            break;
+            
+          case PARALLEL_PSO_MULTI_SWARM:
+            oSessionActive  = 1;
+            nSamples        = 0;  // Reset the samples
+            algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PARALLEL_PSO_MULTI_SWARM);
+            algo->Init(algo->ctx, algoArray);
+            break;
+            
+          case CHARACTERIZATION:
+            oSessionActive  = 1;
+            nSamples        = 0;  // Reset the samples
+            algo = (AlgoInterface_t *) CharacterizationInterface();
+            algo->Init(algo->ctx, algoArray);
+            break;
+            
+          default:
+            break;
+        }
+      }
+      
+    case DECODER_RET_MSG_STOP_ALGO:
+      if (oSessionActive)   // To ensure that we are currently running
+      {
+        oSessionActive = 0;
+        algo->Release(algo->ctx);
+      }
+      break;
+      
+    case DECODER_RET_MSG_NO_MSG:
+    default:
+      break;
   }
-  
-  Uart.PutTxFifoBuffer(U_MATLAB, &localBuffer);
 }
 
 
@@ -362,16 +348,28 @@ void StateCompute(void)
   oNewSample = 0;
   
   UINT8 i;
-  float pos, power;
+  float  positions[N_UNITS_TOTAL]
+        ,powers   [N_UNITS_TOTAL]
+        ;
   UINT8 nUnits = algoArray->GetNUnits(algoArray->ctx);
+  
+  ProtocolUnitsDataPayload_t newPayload = {0};
   
   ComputeMeanAdcValues();
   for (i = 0; i < nUnits; i++)
   {
-    pos = algoArray->GetPos(algoArray->ctx, i);
-    power = ComputeCellPower(unitAdcs[i], pos);
-    algoArray->SetPower(algoArray->ctx, i, power);
+    positions[i]  = algoArray->GetPos(algoArray->ctx, i);
+    powers[i]     = ComputeCellPower(unitAdcs[i], positions[i]);
+    algoArray->SetPower(algoArray->ctx, i, powers[i]);
   }
+  
+  newPayload.timestamp_ms = algo->GetTimeElapsed(algo->ctx);
+  newPayload.nData        = 1;
+  newPayload.nUnits       = nUnits;
+  newPayload.positions    = positions;
+  newPayload.powers       = powers;
+  
+  codec->CodeNewMsg(codec->ctx, &newPayload);
   
   algo->Run(algo->ctx);
 }

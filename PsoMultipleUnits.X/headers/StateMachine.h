@@ -37,7 +37,6 @@
 //==============================================================================
 void StateInit      (void);   // Initialization state of the system
 void StateAcq       (void);   // Acquisition state
-void StateSendData  (void);   // Send data on UART
 void StateCompute   (void);   // Compute algorithm
 void StateError     (void);   // Error state. User should assess and correct errors in this state
 void StateScheduler (void);   // State Scheduler. Decides which state is next
@@ -68,8 +67,7 @@ inline INT8 FifoRead (sUartFifoBuffer_t *fifo, UINT8 *data);
 #define INIT_2_COMP               ( 0                         )       // StateInit to StateCompute
 #define INIT_2_SEND_DATA          ( 0                         )       // StateInit to StateSendData
 
-#define ACQ_2_SEND_DATA           ( oSendData  && !oErrorFlag )       // StateAcq to StateSendData
-#define ACQ_2_ACQ                 (!oSendData  && !oErrorFlag )       // StateAcq to StateAcq
+#define ACQ_2_ACQ                 (!oErrorFlag                )       // StateAcq to StateAcq
 #define ACQ_2_COMP                ( oNewSample && !oErrorFlag )       // StateAcq to StateCompute
 #define ACQ_2_ERROR               ( oErrorFlag                )       // StateAcq to StateError
 
@@ -83,21 +81,10 @@ inline INT8 FifoRead (sUartFifoBuffer_t *fifo, UINT8 *data);
 #define ERROR_2_ERROR             ( 1                         )       // StateError to StateError
 #define ERROR_2_COMP              ( 0                         )       // StateError to StateCompute
 
-#define COMP_2_ACQ                (!oSendData && !oErrorFlag  )       // StateCompute to StateAcq
-#define COMP_2_SEND_DATA          ( oSendData && !oErrorFlag  )       // StateCompute to StateSendData
+#define COMP_2_ACQ                (!oErrorFlag                )       // StateCompute to StateAcq
 #define COMP_2_COMP               ( 0                         )       // StateCompute to StateCompute
 #define COMP_2_ERROR              ( oErrorFlag                )       // StateCompute to StateError
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-//=========================================
-// UART packet size in bytes for MATLAB
-//=========================================
-#define MATLAB_PACKET_SIZE_MULTI_UNIT   140   // 35 floats = 140 bytes
-#define MATLAB_PACKET_SIZE_CARAC        144   // 36 floats = 144 bytes
-//#define MATLAB_PACKET_SIZE_PSO          224   // 56 floats = 224 bytes
-#define MATLAB_PACKET_SIZE_PSO          112   // 56 floats = 224 bytes
-//#define MATLAB_PACKET_SIZE_PSO          144   // 56 floats = 224 bytes
-//=========================================
 
 
 //==============================================================================
