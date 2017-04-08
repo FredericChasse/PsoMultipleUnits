@@ -87,11 +87,13 @@ UINT8 _Codec_Init (Codec_t *c, UartModule_t uartChannel)
 UINT8 _Codec_CodeNewMsg (Codec_t *c, ProtocolUnitsDataPayload_t *newMsg)
 {
   sUartLineBuffer_t buf = {0};
-  const ProtocolHeader_t header = 
+  size_t length = newMsg->nUnits * newMsg->nData * 4;
+  
+  ProtocolHeader_t header = 
   {
     .delimiter        = PROTOCOL_DELIMITER
    ,.type             = UNITS_DATA
-   ,.lengthOfPayload  = sizeOfUnitsDataPayload
+   ,.lengthOfPayload  = sizeOfUnitsDataPayloadBase + length * 2
   };
   memcpy(&buf.buffer[0], &header, sizeOfProtocolHeader);
   buf.length += sizeOfProtocolHeader;
@@ -105,14 +107,11 @@ UINT8 _Codec_CodeNewMsg (Codec_t *c, ProtocolUnitsDataPayload_t *newMsg)
   memcpy(&buf.buffer[buf.length], &newMsg->nData, sizeOfUnitsNData);
   buf.length += sizeOfUnitsNData;
   
-  size_t length = newMsg->nUnits * newMsg->nData;
-  size_t sizeOfPos = sizeOfUnitsOnePosition * length;
-  memcpy(&buf.buffer[buf.length], newMsg->positions, sizeOfPos);
-  buf.length += sizeOfUnitsOnePosition * newMsg->nUnits * newMsg->nData;
+  memcpy(&buf.buffer[buf.length], newMsg->positions, length);
+  buf.length += length;
   
-  size_t sizeOfPower = sizeOfUnitsOnePower * length;
-  memcpy(&buf.buffer[buf.length], newMsg->powers, sizeOfPower);
-  buf.length += sizeOfUnitsOnePower * newMsg->nUnits * newMsg->nData;
+  memcpy(&buf.buffer[buf.length], newMsg->powers, length);
+  buf.length += length;
   
   while(Uart.PutTxFifoBuffer(c->uartChannel, &buf) < 0);
   
@@ -125,6 +124,7 @@ DecoderReturnMsg_t _Codec_DecoderFsmStep (Codec_t *c, UINT8 *rxMsg)
   sUartLineBuffer_t buffer;
   UINT8 i;
   INT32 err;
+  UINT8 nUnits;
   // Get new characters pending
   //-------------------------------------------------------------
   if (Uart.Var.oIsRxDataAvailable[c->uartChannel])
@@ -221,10 +221,18 @@ DecoderReturnMsg_t _Codec_DecoderFsmStep (Codec_t *c, UINT8 *rxMsg)
           
         case START_ACQ:
           c->decoder->state = S_DECODER_STANDBY;
-          if ( (PROTOCOL_START_ALGO == rxBuf[0]) && (sizeOfStartAcqPayload == sizeOfPayload) )
+          nUnits = rxBuf[2];
+          if (nUnits)
           {
-            memcpy(rxMsg, &rxBuf[1], 1);
-            return DECODER_RET_MSG_START_ALGO;
+            if ( (PROTOCOL_START_ALGO == rxBuf[0]) && ((sizeOfStartAcqPayloadBase + nUnits) == sizeOfPayload) )
+            {
+              memcpy(rxMsg, &rxBuf[1], sizeOfStartAcqPayloadBase + nUnits);
+              return DECODER_RET_MSG_START_ALGO;
+            }
+            else
+            {
+              return DECODER_RET_MSG_NO_MSG;
+            }
           }
           else
           {

@@ -236,10 +236,10 @@ void StateInit(void)
   }
   algoArray->Init(algoArray->ctx, 1);
   
-  for (i = 0; i < N_UNITS_TOTAL; i++)
-  {
-    algoArray->AddUnitToArray(algoArray->ctx, mainArray->GetUnitHandle(mainArray->ctx, i));
-  }
+//  for (i = 0; i < N_UNITS_TOTAL; i++)
+//  {
+//    algoArray->AddUnitToArray(algoArray->ctx, mainArray->GetUnitHandle(mainArray->ctx, i));
+//  }
   perturb->Init(perturb->ctx, 500);
 
 }
@@ -284,6 +284,9 @@ void StateAcq(void)
   UINT64 seed1, seed2;
   UINT8 retBuf[MAX_DECODER_LENGTH];
   DecoderReturnMsg_t ret;
+  UINT8 nUnits;
+  UINT8 i;
+  UINT8 units[N_UNITS_TOTAL];
   ret = codec->DecoderFsmStep(codec->ctx, retBuf);
   switch (ret)
   {
@@ -296,6 +299,12 @@ void StateAcq(void)
     case DECODER_RET_MSG_START_ALGO:
       if (!oSessionActive) // We are not already started
       {
+        nUnits = retBuf[1];
+        memcpy(units, &retBuf[2], nUnits);
+        for (i = 0; i < nUnits; i++)
+        {
+          algoArray->AddUnitToArray(algoArray->ctx, mainArray->GetUnitHandle(mainArray->ctx, units[i]));
+        }
         switch (retBuf[0])
         {
           case CLASSIC_PSO:
@@ -329,6 +338,11 @@ void StateAcq(void)
       {
         oSessionActive = 0;
         algo->Release(algo->ctx);
+        nUnits = algoArray->GetNUnits(algoArray->ctx);
+        for (i = 0; i < nUnits; i++)
+        {
+          algoArray->RemoveUnitFromArray(algoArray->ctx, 0);
+        }
       }
       break;
       

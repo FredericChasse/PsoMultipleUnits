@@ -73,8 +73,10 @@ typedef struct
 {
   UINT8 startAlgoChar;
   UINT8 typeOfAlgo;
+  UINT8 nUnits;
+  UINT8 *units;
 } ProtocolStartAcqPayload_t;
-extern const size_t sizeOfStartAcqPayload;
+extern const size_t sizeOfStartAcqPayloadBase;
 
 #define PROTOCOL_STOP_ALGO    ('x')
 typedef struct
@@ -96,7 +98,7 @@ extern const size_t sizeOfUnitsNUnits;
 extern const size_t sizeOfUnitsNData;
 extern const size_t sizeOfUnitsOnePosition;
 extern const size_t sizeOfUnitsOnePower;
-extern const size_t sizeOfUnitsDataPayload;
+extern const size_t sizeOfUnitsDataPayloadBase;
 //==============================================================================
 
 // Protocol message definition
