@@ -58,6 +58,7 @@ sUartFifoBuffer_t matlabData =
 };
 
 BOOL oSmoothData = 1;
+//BOOL oSmoothData = 0;
 
 UINT16 nSamples = 0;
 
@@ -220,6 +221,11 @@ void StateInit(void)
 //  InitPot(1);
   InitPot(2);
   InitPot(3);
+//  TurnOnPot(2);
+//  TurnOnPot(3);
+  
+//  Timer.DelayMs(10000);
+//  LED1_ON;
   
   mainArray = (UnitArrayInterface_t *)  UnitArrayInterface();
   algoArray = (UnitArrayInterface_t *)  UnitArrayInterface();
@@ -332,6 +338,7 @@ void StateAcq(void)
             break;
         }
       }
+      break;
       
     case DECODER_RET_MSG_STOP_ALGO:
       if (oSessionActive)   // To ensure that we are currently running
@@ -373,7 +380,8 @@ void StateCompute(void)
   for (i = 0; i < nUnits; i++)
   {
     positions[i]  = algoArray->GetPos(algoArray->ctx, i);
-    powers[i]     = ComputeCellPower(unitAdcs[i], positions[i]);
+    powers[i]     = ComputeCellPower(unitAdcs[i], algoArray->GetUnitPosIdx(algoArray->ctx, i));
+//    powers[i] = sCellValues.cells[i + 8].cellVoltFloat;
     algoArray->SetPower(algoArray->ctx, i, powers[i]);
   }
   

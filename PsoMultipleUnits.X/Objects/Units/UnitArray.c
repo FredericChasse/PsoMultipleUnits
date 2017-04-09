@@ -46,6 +46,7 @@ void* _UnitArray_GetUnitHandle        (UnitArray_t *array, UINT8 idx);
 void  _UnitArray_Release              (UnitArray_t *array);
 void  _UnitArray_GetPosLimits         (UnitArray_t *array, float *minPos, float *maxPos);
 void  _UnitArray_SetPower             (UnitArray_t *array, UINT8 idx, float power);
+UINT8 _UnitArray_GetUnitPosIdx        (UnitArray_t *array, UINT8 idx);
 
 
 // Private variables
@@ -70,11 +71,12 @@ void _UnitArray_Init (UnitArray_t *array, UINT8 id)
 {
   UINT8 i;
   array->id = id;
-  if (array->linkKey == 0)
+  if (array->linkKey == (N_ARRAYS_TOTAL - 1))
   {
     for (i = 0; i < N_UNITS_TOTAL; i++)
     {
       array->units[i] = (UnitInterface_t *) UnitInterface(i);
+      array->units[i]->Init(array->units[i]->ctx);
     }
     array->nUnits = N_UNITS_TOTAL;
   }
@@ -148,6 +150,12 @@ float _UnitArray_GetUnitPower (UnitArray_t *array, UINT8 idx)
 }
 
 
+UINT8 _UnitArray_GetUnitPosIdx (UnitArray_t *array, UINT8 idx)
+{
+  return array->units[idx]->GetPosIdx(array->units[idx]->ctx);
+}
+
+
 INT8 _UnitArray_AddUnitToArray (UnitArray_t *array, UnitInterface_t *unit)
 {
   if (array->nUnits == N_UNITS_TOTAL)
@@ -208,8 +216,9 @@ const UnitArrayInterface_t * UnitArrayInterface(void)
     for (i = 0; i < N_ARRAYS_TOTAL; i++)
     {
       // Init the array itself and its interface
-      _arrays[i].linkKey = i;
-      _UnitArray_Init(&_arrays[i], 0);
+      _arrays[i].linkKey  = i;
+      _arrays[i].nUnits   = 0;
+      _arrays[i].id       = 0;
       
       _arrays_if[i].ctx                 = (void *)                            &_arrays[i];
       _arrays_if[i].Init                = (UnitArrayInit_fct)                 &_UnitArray_Init;
@@ -223,6 +232,7 @@ const UnitArrayInterface_t * UnitArrayInterface(void)
       _arrays_if[i].Release             = (UnitArrayRelease_fct)              &_UnitArray_Release;
       _arrays_if[i].GetPosLimits        = (UnitArrayGetPosLimits_fct)         &_UnitArray_GetPosLimits;
       _arrays_if[i].SetPower            = (UnitArraySetPower_fct)             &_UnitArray_SetPower;
+      _arrays_if[i].GetUnitPosIdx       = (UnitArrayGetUnitPosIdx_fct)        &_UnitArray_GetUnitPosIdx;
       
       // Init the linked list
       _arraysNodes[i].ctx = (void *) &_arrays_if[i];

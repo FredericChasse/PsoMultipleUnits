@@ -27,7 +27,7 @@ typedef struct
   float sampleTime;
   float timeElapsed;
   UINT8 nUnits;
-  UINT8 currentPosIdx;
+  UINT16 currentPosIdx;
   float currentPos;
 } Charac_t;
 
@@ -36,7 +36,6 @@ typedef struct
 
 INT8  _Charac_Init            (Charac_t *c, UnitArrayInterface_t *unitArray);
 INT8  _Charac_Run             (Charac_t *c);
-INT8  _Charac_Close           (Charac_t *c);
 float _Charac_GetTimeElapsed  (Charac_t *c);
 void  _Charac_Release         (Charac_t *c);
 
@@ -59,7 +58,6 @@ const AlgoInterface_t _charac_if =
  ,.Init           = (AlgoInit_fct)            &_Charac_Init
  ,.Run            = (AlgoRun_fct)             &_Charac_Run
  ,.GetTimeElapsed = (AlgoGetTimeElapsed_fct)  &_Charac_GetTimeElapsed
- ,.Close          = (AlgoClose_fct)           &_Charac_Close
  ,.Release        = (AlgoRelease_fct)         &_Charac_Release
 };
 
@@ -79,6 +77,7 @@ INT8 _Charac_Init (Charac_t *c, UnitArrayInterface_t *unitArray)
   for (i = 0; i < c->nUnits; i++)
   {
     unitArray->SetPos(unitArray->ctx, i, potRealValues[c->currentPosIdx]);
+//    unitArray->SetPos(unitArray->ctx, i, potRealValues[1]);
   }
 }
 
@@ -96,29 +95,19 @@ void _Charac_Release (Charac_t *c)
 INT8 _Charac_Run (Charac_t *c)
 {
   UINT8 i;
-  float powers[N_UNITS_TOTAL];
   
-  if (c->currentPosIdx++ <= 254)
+  c->timeElapsed += c->sampleTime;
+  
+  if (c->currentPosIdx <= 255)
   {
+    c->currentPosIdx++;
     for (i = 0; i < c->nUnits; i++)
     {
-      powers[i] = c->unitArray->GetPower(c->unitArray->ctx, i);
       c->unitArray->SetPos(c->unitArray->ctx, i, potRealValues[c->currentPosIdx]);
+//      c->unitArray->SetPos(c->unitArray->ctx, i, potRealValues[1]);
     }
   }
   
-  return 0;
-}
-
-
-INT8 _Charac_Close (Charac_t *c)
-{
-  c->currentPos     = MIN_POT_VALUE;
-  c->currentPosIdx  = 0;
-  c->nUnits         = 0;
-  c->timeElapsed    = 0;
-  c->unitArray->Release(c->unitArray->ctx);
-  c->unitArray      = NULL;
   return 0;
 }
 

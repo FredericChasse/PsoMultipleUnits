@@ -32,6 +32,7 @@ typedef float (*UnitGetPower_fct)       (void *ctx);
 typedef UINT8 (*UnitGetId_fct)          (void *ctx);
 typedef void  (*UnitGetPosLimits_fct)   (void *ctx, float *minPos, float *maxPos);
 typedef void  (*UnitSetPower_fct)       (void *ctx, float power);
+typedef UINT8 (*UnitGetPosIdx_fct)      (void *ctx);
 
 typedef struct
 {
@@ -43,6 +44,7 @@ typedef struct
   UnitGetId_fct         GetId;
   UnitGetPosLimits_fct  GetPosLimits;
   UnitSetPower_fct      SetPower;
+  UnitGetPosIdx_fct     GetPosIdx;
 } UnitInterface_t;
 
 

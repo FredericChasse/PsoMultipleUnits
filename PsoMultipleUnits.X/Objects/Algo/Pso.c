@@ -39,7 +39,6 @@ INT8  _ParallelPso_Init   (Pso_t *pso, UnitArrayInterface_t *unitArray);
 INT8  _Pso1d_Init         (Pso_t *pso, UnitArrayInterface_t *unitArray);
 INT8  _ParallelPso_Run    (Pso_t *pso);
 INT8  _Pso1d_Run          (Pso_t *pso);
-INT8  _Pso_Close          (Pso_t *pso);
 float _Pso_GetTimeElapsed (Pso_t *pso);
 void  _Pso_Release        (Pso_t *pso);
 
@@ -78,7 +77,6 @@ const AlgoInterface_t _parallelPso_if =
   .ctx            = (void *)                  &_parallelPso
  ,.Init           = (AlgoInit_fct)            &_ParallelPso_Init
  ,.Run            = (AlgoRun_fct)             &_ParallelPso_Run
- ,.Close          = (AlgoClose_fct)           &_Pso_Close
  ,.GetTimeElapsed = (AlgoGetTimeElapsed_fct)  &_Pso_GetTimeElapsed
  ,.Release        = (AlgoRelease_fct)         &_Pso_Release
 };
@@ -88,7 +86,6 @@ const AlgoInterface_t _pso1d_if =
   .ctx            = (void *)                  &_pso1d
  ,.Init           = (AlgoInit_fct)            &_Pso1d_Init
  ,.Run            = (AlgoRun_fct)             &_Pso1d_Run
- ,.Close          = (AlgoClose_fct)           &_Pso_Close
  ,.GetTimeElapsed = (AlgoGetTimeElapsed_fct)  &_Pso_GetTimeElapsed
  ,.Release        = (AlgoRelease_fct)         &_Pso_Release
 };
@@ -495,22 +492,6 @@ INT8 _Pso1d_Run (Pso_t *pso)
       pso->unitArray->SetPos(pso->unitArray->ctx, iSwarm, nextPositions[iSwarm][curParticle]);
     }
   }
-  return 0;
-}
-
-
-INT8 _Pso_Close (Pso_t *pso)
-{
-  UINT8 i;
-  for (i = 0; i < pso->nSwarms; i++)
-  {
-    pso->swarms[i]->Release(pso->swarms[i]->ctx);
-  }
-  pso->nSwarms      = 0;
-  pso->timeElapsed  = 0;
-  pso->iteration    = 0;
-  pso->unitArray->Release(pso->unitArray->ctx);
-  pso->unitArray    = NULL;
   return 0;
 }
 

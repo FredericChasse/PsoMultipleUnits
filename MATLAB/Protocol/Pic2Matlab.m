@@ -1,9 +1,10 @@
-clear all
+clear
 close all
 
 %% Constants
 
-PROTOCOL_DELIMITER = uint8(hex2num('7E'));
+% PROTOCOL_DELIMITER = uint8(hex2num('7E'));
+PROTOCOL_DELIMITER = uint8(126);
 
 NEW_RNG_SEED = uint8(0);
 START_ACQ = uint8(1);
@@ -41,6 +42,10 @@ if isempty(port)
 %     port = serial('COM5');
     port = serial('COM3');
 else
+    % Remove contents of input buffer
+    flushinput(port);
+    % Remove contents of output buffer
+    flushoutput(port);
     fclose(port);
     port = port(1);
 end
@@ -62,10 +67,11 @@ fopen(port);
 % RNG Seed
 delimiter = PROTOCOL_DELIMITER;
 typeOfMsg = NEW_RNG_SEED;
-lengthOfPayload = fliplr(typecast(uint16(16), 'uint8'));
+% lengthOfPayload = fliplr(typecast(uint16(16), 'uint8'));
+lengthOfPayload = typecast(uint16(16), 'uint8');
 [seed1, seed2] = GenerateNewSeeds;
 seeds = typecast([seed1, seed2], 'uint8');
-seeds = fliplr(seeds);
+% seeds = fliplr(seeds);
 
 buf = [delimiter, typeOfMsg, lengthOfPayload, seeds];
 fwrite(port, buf);
@@ -79,16 +85,18 @@ algo = CHARACTERIZATION;
 % algo = PARALLEL_PSO_MULTI_SWARM;
 % algo = MULTI_UNIT;
 % algo = EXTREMUM_SEEKING;
-units = uint8(0:1:7);
+% units = uint8(0:1:7);
+units = uint8(0:1:3);
 nUnits = uint8(length(units));
-lengthOfPayload = fliplr(typecast(uint16(3 + nUnits), 'uint8'));
+% lengthOfPayload = fliplr(typecast(uint16(3 + nUnits), 'uint8'));
+lengthOfPayload = typecast(uint16(3 + nUnits), 'uint8');
 
 buf = [delimiter, typeOfMsg, lengthOfPayload, startAlgoChar, algo, nUnits, units];
 fwrite(port, buf);
 
 %% Figures init
 
-nSolarCells = nUnits;
+nSolarCells = double(nUnits);
 % Create figure for data
 for i = 1 : nSolarCells*2
   fig(i) = figure(i);
@@ -121,45 +129,59 @@ end
 % end
 
 % Wait for the user to stop the program
-stopBtn = 0;
-f = figure(i+1);
-b = uicontrol('style','push','string','Stop','callback','stopBtn=stopBtn+1');
+% stopBtn = 0;
+% f = figure(i+1);
+% b = uicontrol('style','push','string','Stop','callback','stopBtn=stopBtn+1');
 
-% now the loop
-while stopBtn == 0
+tsMem = [];
+posMem = [];
+powMem = [];
+
+nIterations = 256;
+tic
+for iIteration = 1 : nIterations
   % header
-  buf = fread(port, SIZE_OF_PROTOCOL_HEADER, 'uint8');
+%   buf = fread(port, SIZE_OF_PROTOCOL_HEADER, 'uint8');
+  buf = fread(port, SIZE_OF_PROTOCOL_HEADER);
   delimiter = buf(1);
   typeOfMsg = buf(2);
-  lengthOfPayload = typecast(buf(3:4), 'uint16');
+%   lengthOfPayload = typecast(buf(3:4), 'uint16');
+  lengthOfPayload = double(typecast(uint8(buf(3:4)'), 'uint16'));
   
   %payload
   buf = fread(port, lengthOfPayload, 'uint8');
-  timestamp = typecast(buf(1:4), 'uint32');
-  ts_ms = double(timestamp) * 0.001;
+%   timestamp = typecast(uint8(buf(1:4)'), 'uint32');
+  timestamp = typecast(typecast(uint8(buf(1:4)'), 'uint32'), 'single');
+%   ts_ms = double(timestamp) * 0.001;
   nUnits = buf(5);
   nData = buf(6);
-  data = typecast(typecast(buf(7:end), 'uint32'), 'single');
+  data = typecast(typecast(uint8(buf(7:end)'), 'uint32'), 'single');
   positions = data(1:end/2);
   powers = data(end/2+1:end);
   
-  for i = 1 : nUnits
-    fig(i);
-    plot(ts_ms, positions(i));
-  end
+  tsMem  = [tsMem timestamp];
+  posMem = [posMem positions];
+  powMem = [powMem powers];
   
-  for i = nUnits+1 : nUnits*2
-    fig(i);
-    plot(ts_ms, powers(i));
-  end
+%   for i = 1 : nUnits
+%     fig(i);
+%     plot(timestamp, positions(i), 'o');
+%   end
+%   
+%   for i = nUnits+1 : nUnits*2
+%     fig(i);
+%     plot(timestamp, powers(i - nUnits), 'o');
+%   end
   
   %update button
-  drawnow
+%   drawnow
 end
+toc
 
 % Stop algo
 typeOfMsg = STOP_ACQ;
-lengthOfPayload = fliplr(typecast(uint16(1), 'uint8'));
+% lengthOfPayload = fliplr(typecast(uint16(1), 'uint8'));
+lengthOfPayload = typecast(uint16(1), 'uint8');
 stopAlgoChar = PROTOCOL_STOP_ALGO;
 buf = [delimiter, typeOfMsg, lengthOfPayload, stopAlgoChar];
 fwrite(port, buf);
@@ -174,6 +196,18 @@ fclose(port);
 delete(port);
 
 %% Figures
+
+close all
+
+lengthOfData = length(posMem) / nData;
+for i = 1 : nUnits
+  fig(i) = figure(i);
+  plot(tsMem, posMem(i:nUnits:end));
+end
+for i = nUnits + 1 : 2*nUnits
+  fig(i) = figure(i);
+  plot(tsMem, powMem(i-nUnits:nUnits:end));
+end
 
 % if matlabMode == 'c'
 %   % Extract data from figure

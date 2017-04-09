@@ -125,6 +125,7 @@ DecoderReturnMsg_t _Codec_DecoderFsmStep (Codec_t *c, UINT8 *rxMsg)
   UINT8 i;
   INT32 err;
   UINT8 nUnits;
+  static UINT32 dbgCount = 0;
   // Get new characters pending
   //-------------------------------------------------------------
   if (Uart.Var.oIsRxDataAvailable[c->uartChannel])
@@ -135,6 +136,7 @@ DecoderReturnMsg_t _Codec_DecoderFsmStep (Codec_t *c, UINT8 *rxMsg)
       for (i = 0; i < buffer.length; i++)
       {
         BUFFER_ADD_FAST(c->decoder->buffer, &buffer.buffer[i]);
+        dbgCount++;
       }
     }
   }
@@ -144,7 +146,7 @@ DecoderReturnMsg_t _Codec_DecoderFsmStep (Codec_t *c, UINT8 *rxMsg)
   //-------------------------------------------------------------
   static ProtocolHeader_t header = {0};
   UINT8 byte;
-  UINT8 sizeOfPayload;
+  static UINT8 sizeOfPayload;
   static UINT8 rxBuf[MAX_DECODER_LENGTH] = {0};
   static UINT8 nData;
   

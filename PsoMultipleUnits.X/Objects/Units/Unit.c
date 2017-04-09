@@ -32,6 +32,7 @@ typedef struct
   float power;
   float minPos;
   float maxPos;
+  BOOL  oFirstSetupDone;
 } Unit_t;
 
 
@@ -42,6 +43,7 @@ INT8  _Unit_SetPos        (Unit_t *unit, float pos);
 float _Unit_GetPos        (Unit_t *unit);
 float _Unit_GetPower      (Unit_t *unit);
 UINT8 _Unit_GetId         (Unit_t *unit);
+UINT8 _Unit_GetPosIdx     (Unit_t *unit);
 void  _Unit_GetPosLimits  (Unit_t *unit, float *minPos, float *maxPos);
 void  _Unit_SetPower      (Unit_t *unit, float power);
 
@@ -52,14 +54,14 @@ extern struct sAllCells sCellValues;
 
 Unit_t _units[N_UNITS_TOTAL] = 
 {
-  {.id = 0, .adcNum = UNIT_0_ADC, .potNum = UNIT_0_POT, .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE}
- ,{.id = 1, .adcNum = UNIT_1_ADC, .potNum = UNIT_1_POT, .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE}
- ,{.id = 2, .adcNum = UNIT_2_ADC, .potNum = UNIT_2_POT, .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE}
- ,{.id = 3, .adcNum = UNIT_3_ADC, .potNum = UNIT_3_POT, .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE}
- ,{.id = 4, .adcNum = UNIT_4_ADC, .potNum = UNIT_4_POT, .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE}
- ,{.id = 5, .adcNum = UNIT_5_ADC, .potNum = UNIT_5_POT, .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE}
- ,{.id = 6, .adcNum = UNIT_6_ADC, .potNum = UNIT_6_POT, .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE}
- ,{.id = 7, .adcNum = UNIT_7_ADC, .potNum = UNIT_7_POT, .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE}
+  {.id = 0, .adcNum = UNIT_0_ADC, .potNum = UNIT_0_POT, .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE, .oFirstSetupDone = 0}
+ ,{.id = 1, .adcNum = UNIT_1_ADC, .potNum = UNIT_1_POT, .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE, .oFirstSetupDone = 0}
+ ,{.id = 2, .adcNum = UNIT_2_ADC, .potNum = UNIT_2_POT, .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE, .oFirstSetupDone = 0}
+ ,{.id = 3, .adcNum = UNIT_3_ADC, .potNum = UNIT_3_POT, .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE, .oFirstSetupDone = 0}
+ ,{.id = 4, .adcNum = UNIT_4_ADC, .potNum = UNIT_4_POT, .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE, .oFirstSetupDone = 0}
+ ,{.id = 5, .adcNum = UNIT_5_ADC, .potNum = UNIT_5_POT, .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE, .oFirstSetupDone = 0}
+ ,{.id = 6, .adcNum = UNIT_6_ADC, .potNum = UNIT_6_POT, .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE, .oFirstSetupDone = 0}
+ ,{.id = 7, .adcNum = UNIT_7_ADC, .potNum = UNIT_7_POT, .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE, .oFirstSetupDone = 0}
 };
 
 const UnitInterface_t _unit0_if = 
@@ -72,6 +74,7 @@ const UnitInterface_t _unit0_if =
  ,.SetPos       = (UnitSetPos_fct)        &_Unit_SetPos
  ,.GetPosLimits = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
  ,.SetPower     = (UnitSetPower_fct)      &_Unit_SetPower
+ ,.GetPosIdx    = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
 };
 const UnitInterface_t _unit1_if = 
 {
@@ -83,6 +86,7 @@ const UnitInterface_t _unit1_if =
  ,.SetPos       = (UnitSetPos_fct)        &_Unit_SetPos
  ,.GetPosLimits = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
  ,.SetPower     = (UnitSetPower_fct)      &_Unit_SetPower
+ ,.GetPosIdx    = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
 };
 const UnitInterface_t _unit2_if = 
 {
@@ -94,6 +98,7 @@ const UnitInterface_t _unit2_if =
  ,.SetPos       = (UnitSetPos_fct)        &_Unit_SetPos
  ,.GetPosLimits = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
  ,.SetPower     = (UnitSetPower_fct)      &_Unit_SetPower
+ ,.GetPosIdx    = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
 };
 const UnitInterface_t _unit3_if = 
 {
@@ -105,6 +110,7 @@ const UnitInterface_t _unit3_if =
  ,.SetPos       = (UnitSetPos_fct)        &_Unit_SetPos
  ,.GetPosLimits = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
  ,.SetPower     = (UnitSetPower_fct)      &_Unit_SetPower
+ ,.GetPosIdx    = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
 };
 const UnitInterface_t _unit4_if = 
 {
@@ -116,6 +122,7 @@ const UnitInterface_t _unit4_if =
  ,.SetPos       = (UnitSetPos_fct)        &_Unit_SetPos
  ,.GetPosLimits = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
  ,.SetPower     = (UnitSetPower_fct)      &_Unit_SetPower
+ ,.GetPosIdx    = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
 };
 const UnitInterface_t _unit5_if = 
 {
@@ -127,6 +134,7 @@ const UnitInterface_t _unit5_if =
  ,.SetPos       = (UnitSetPos_fct)        &_Unit_SetPos
  ,.GetPosLimits = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
  ,.SetPower     = (UnitSetPower_fct)      &_Unit_SetPower
+ ,.GetPosIdx    = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
 };
 const UnitInterface_t _unit6_if = 
 {
@@ -138,6 +146,7 @@ const UnitInterface_t _unit6_if =
  ,.SetPos       = (UnitSetPos_fct)        &_Unit_SetPos
  ,.GetPosLimits = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
  ,.SetPower     = (UnitSetPower_fct)      &_Unit_SetPower
+ ,.GetPosIdx    = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
 };
 const UnitInterface_t _unit7_if = 
 {
@@ -149,6 +158,7 @@ const UnitInterface_t _unit7_if =
  ,.SetPos       = (UnitSetPos_fct)        &_Unit_SetPos
  ,.GetPosLimits = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
  ,.SetPower     = (UnitSetPower_fct)      &_Unit_SetPower
+ ,.GetPosIdx    = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
 };
 
 const UnitInterface_t *_units_if[N_UNITS_TOTAL] = 
@@ -168,7 +178,13 @@ const UnitInterface_t *_units_if[N_UNITS_TOTAL] =
 
 void _Unit_Init (Unit_t *unit)
 {
-  return;
+  if (!unit->oFirstSetupDone)
+  {
+    unit->oFirstSetupDone = 1;
+    SetPot(unit->potNum, 0);
+    unit->pos = MIN_POT_VALUE;
+    unit->posIdx = 0;
+  }
 }
 
 
@@ -180,7 +196,7 @@ void _Unit_SetPower (Unit_t *unit, float power)
 
 INT8 _Unit_SetPos (Unit_t *unit, float pos)
 {
-  INT8 ret;
+  INT16 ret;
   if (pos != unit->pos)
   {
     ret = ComputePotValueFloat2Dec(pos);
@@ -197,6 +213,12 @@ INT8 _Unit_SetPos (Unit_t *unit, float pos)
     }
   }
   return 0;
+}
+
+
+UINT8 _Unit_GetPosIdx (Unit_t *unit)
+{
+  return unit->posIdx;
 }
 
 
