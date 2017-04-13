@@ -140,6 +140,8 @@ INT8 _Swarm_Init (PsoSwarm_t *s, UnitArrayInterface_t *unitArray, PsoSwarmParam_
   
   _Swarm_SetSteadyState(s);
   
+  _Swarm_RandomizeAllParticles(s);
+  
   return 0;
 }
 
@@ -256,7 +258,7 @@ void _Swarm_RandomizeAllParticles (PsoSwarm_t *s)
   
   for (i = 1; i < s->nParticles; i++)
   {
-    sections[i] = sectionLength * (i - 1);
+    sections[i] = sectionLength * i;
   }
   
   for (i = 0; i < s->nParticles; i++)
@@ -418,6 +420,7 @@ UINT8 _SubSwarm_ComputeNextPositions (PsoSwarm_t *s, float *positions, UINT8 *id
   UINT8 nPerturbed = 0;
   UINT8 nToRemove = 0;
   BOOL  oFirstSwarmActive = 0;
+  UINT8 mainSwarmIdx = N_SWARMS_TOTAL - 1;
   PsoParticleInterface_t *p;
   for (i = 0; i < s->nParticles; i++)
   {
@@ -450,9 +453,9 @@ UINT8 _SubSwarm_ComputeNextPositions (PsoSwarm_t *s, float *positions, UINT8 *id
       s->particles[i]->InitSpeed(s->particles[i]->ctx, &_swarms_if[s->linkKey]);
     }
     
-    for (i = 0; i < _swarms[0].nParticles; i++)
+    for (i = 0; i < _swarms[mainSwarmIdx].nParticles; i++)
     {
-      if (_swarms[0].particles[i]->IsSearching(_swarms[0].particles[i]->ctx))
+      if (_swarms[mainSwarmIdx].particles[i]->IsSearching(_swarms[mainSwarmIdx].particles[i]->ctx))
       {
         oFirstSwarmActive = 1;
         break;
@@ -537,8 +540,11 @@ UINT8 _Swarm1d_ComputeNextPositions (PsoSwarm_t *s, float *positions, UINT8 *dum
     }
     else
     {
-      s->particles[i]->ComputeSpeed (s->particles[i]->ctx, &_swarms_if[s->linkKey]);
-      s->particles[i]->ComputePos   (s->particles[i]->ctx, &_swarms_if[s->linkKey]);
+      for (i = 0; i < s->nParticles; i++)
+      {
+        s->particles[i]->ComputeSpeed (s->particles[i]->ctx, &_swarms_if[s->linkKey]);
+        s->particles[i]->ComputePos   (s->particles[i]->ctx, &_swarms_if[s->linkKey]);
+      }
     }
   }
   

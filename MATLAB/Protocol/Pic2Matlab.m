@@ -79,20 +79,28 @@ fwrite(port, buf);
 % Start algo
 typeOfMsg = START_ACQ;
 startAlgoChar = PROTOCOL_START_ALGO;
-algo = CHARACTERIZATION;
-% algo = CLASSIC_PSO
+% algo = CHARACTERIZATION;
+algo = CLASSIC_PSO
 % algo = PARALLEL_PSO;
 % algo = PARALLEL_PSO_MULTI_SWARM;
 % algo = MULTI_UNIT;
 % algo = EXTREMUM_SEEKING;
 % units = uint8(0:1:7);
-units = uint8(0:1:3);
+units = uint8(0);
 nUnits = uint8(length(units));
 % lengthOfPayload = fliplr(typecast(uint16(3 + nUnits), 'uint8'));
 lengthOfPayload = typecast(uint16(3 + nUnits), 'uint8');
 
 buf = [delimiter, typeOfMsg, lengthOfPayload, startAlgoChar, algo, nUnits, units];
 fwrite(port, buf);
+
+if algo == CHARACTERIZATION
+  nIterations = 256;
+elseif algo == CLASSIC_PSO
+  nIterations = 140;
+else
+  nIterations = 20;
+end
 
 %% Figures init
 
@@ -137,7 +145,6 @@ tsMem = [];
 posMem = [];
 powMem = [];
 
-nIterations = 256;
 tic
 for iIteration = 1 : nIterations
   % header

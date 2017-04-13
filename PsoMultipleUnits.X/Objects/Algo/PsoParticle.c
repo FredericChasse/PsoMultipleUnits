@@ -418,6 +418,7 @@ void _Particle_ComputeSpeed (PsoParticle_t *p, PsoSwarmInterface_t *swarm)
   
   PsoSwarmParam_t param;
   Position_t gbest;
+  float r1,r2;
   
   if (swarm->GetIteration(swarm->ctx) == 1)
   {
@@ -427,11 +428,14 @@ void _Particle_ComputeSpeed (PsoParticle_t *p, PsoSwarmInterface_t *swarm)
   {
     swarm->GetParam(swarm->ctx, &param);
     swarm->GetGbest(swarm->ctx, &gbest);
+    
+    r1 = Rng_GetRandFloat();
+    r2 = Rng_GetRandFloat();
 
     p->prevSpeed = p->curSpeed;
     p->curSpeed =   param.omega * p->prevSpeed
-                  + param.c1 * Rng_GetRandFloat() * (p->pbest.curPos - p->pos.curPos)
-                  + param.c2 * Rng_GetRandFloat() * (gbest.curPos - p->pos.curPos)
+                  + param.c1 * r1 * (p->pbest.curPos - p->pos.curPos)
+                  + param.c2 * r2 * (gbest.curPos - p->pos.curPos)
                   ;
   }
 }
@@ -443,13 +447,17 @@ void _Particle_InitSpeed (PsoParticle_t *p, PsoSwarmInterface_t *swarm)
   
   PsoSwarmParam_t param;
   Position_t gbest;
+  float  rInit = Rng_GetRandFloat()
+        ,r1    = Rng_GetRandFloat()
+        ,r2    = Rng_GetRandFloat()
+        ;
   swarm->GetParam(swarm->ctx, &param);
   swarm->GetGbest(swarm->ctx, &gbest);
   p->prevSpeed = p->curSpeed;
-  p->curSpeed =   (20*Rng_GetRandFloat() - 10)
+  p->curSpeed =   (20*rInit - 10)
                 + param.omega * p->prevSpeed
-                + param.c1 * Rng_GetRandFloat() * (p->pbest.curPos - p->pos.curPos)
-                + param.c2 * Rng_GetRandFloat() * (gbest.curPos - p->pos.curPos)
+                + param.c1 * r1 * (p->pbest.curPos - p->pos.curPos)
+                + param.c2 * r2 * (gbest.curPos - p->pos.curPos)
                 ;
 }
 

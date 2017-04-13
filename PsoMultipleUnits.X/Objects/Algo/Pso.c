@@ -303,7 +303,7 @@ INT8 _ParallelPso_Run (Pso_t *pso)
       array = swarm->GetUnitArray(swarm->ctx);
       fitness[0] = array->GetPower(array->ctx, 0);
       curParticle = swarm->GetCurParticle(swarm->ctx);
-      swarm->SetParticleFitness(swarm->ctx, i, fitness[0]);
+      swarm->SetParticleFitness(swarm->ctx, curParticle, fitness[0]);
       
       if (curParticle == (nParticles - 1))  // Ready for a real iteration
       {
@@ -440,7 +440,7 @@ INT8 _Pso1d_Run (Pso_t *pso)
         ;
   UINT8 idxPerturbed[PSO_SWARM_MAX_PARTICLES];
   float fitness[N_UNITS_TOTAL];
-  static float nextPositions[N_UNITS_TOTAL+1][PSO_SWARM_MAX_PARTICLES];
+  float nextPositions[N_UNITS_TOTAL+1];
   
   pso->iteration++;
   pso->timeElapsed += pso->sampleTime;
@@ -458,7 +458,7 @@ INT8 _Pso1d_Run (Pso_t *pso)
     if (nParticles != 0)
     {
       curParticle = swarm->GetCurParticle(swarm->ctx);
-      swarm->SetParticleFitness(swarm->ctx, i, fitness[i]);
+      swarm->SetParticleFitness(swarm->ctx, curParticle, fitness[iSwarm]);
       
       if (curParticle == (nParticles - 1))  // Ready for a real iteration
       {
@@ -482,14 +482,14 @@ INT8 _Pso1d_Run (Pso_t *pso)
         
         // Compute next positions
         //-----------------------------------
-        swarm->ComputeNextPos(swarm->ctx, &nextPositions[iSwarm][0], 0);
+        swarm->ComputeNextPos(swarm->ctx, nextPositions, 0);
         //-----------------------------------
       }
       
       swarm->IncCurrentParticle(swarm->ctx);
       curParticle = swarm->GetCurParticle(swarm->ctx);
       
-      pso->unitArray->SetPos(pso->unitArray->ctx, iSwarm, nextPositions[iSwarm][curParticle]);
+      pso->unitArray->SetPos(pso->unitArray->ctx, iSwarm, swarm->GetParticlePos(swarm->ctx, curParticle));
     }
   }
   return 0;

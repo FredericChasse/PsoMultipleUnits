@@ -96,6 +96,6 @@ void StartInterrupts  (void);
 #define ADC_TIMER_SCALE         (SCALE_US)
 #define N_SAMPLES_PER_ADC_READ  (100)    // Number of samples / ADC value
 
-#define SAMPLING_TIME_FLOAT     (TIMER_SCALE_US * ADC_TIMER_PERIOD * N_SAMPLES_PER_ADC_READ)
+#define SAMPLING_TIME_FLOAT     (TIMER_SCALE_US * ADC_TIMER_PERIOD * N_SAMPLES_PER_ADC_READ * N_UNITS_TOTAL)
 
 #endif	/* __SETUP_H__ */
