@@ -80,9 +80,9 @@ fwrite(port, buf);
 typeOfMsg = START_ACQ;
 startAlgoChar = PROTOCOL_START_ALGO;
 % algo = CHARACTERIZATION;
-algo = CLASSIC_PSO
+% algo = CLASSIC_PSO
 % algo = PARALLEL_PSO;
-% algo = PARALLEL_PSO_MULTI_SWARM;
+algo = PARALLEL_PSO_MULTI_SWARM;
 % algo = MULTI_UNIT;
 % algo = EXTREMUM_SEEKING;
 % units = uint8(0:1:7);

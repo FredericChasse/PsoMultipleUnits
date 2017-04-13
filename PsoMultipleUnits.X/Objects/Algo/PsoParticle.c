@@ -253,7 +253,7 @@ BOOL _Particle_FsmStep (PsoParticle_t *p, PsoSwarmInterface_t *swarm)
       p->jSteady = p->pos.curFitness;
       p->state = PARTICLE_STATE_STEADY_STATE;
     }
-    else if (param.type == PSO_SWARM_TYPE_PARALLEL_PSO)
+    else if (param.type == PSO_SWARM_TYPE_PARALLEL_PSO_MULTI_SWARM)
     {
       p->state = PARTICLE_STATE_VALIDATE_OPTIMUM;
     }

@@ -113,7 +113,7 @@ INT8 _Swarm_Init (PsoSwarm_t *s, UnitArrayInterface_t *unitArray, PsoSwarmParam_
   
   memcpy(&s->param, param, sizeof(PsoSwarmParam_t));
   
-  if (s->param.type == PSO_SWARM_TYPE_PARALLEL_PSO)
+  if (s->param.type == PSO_SWARM_TYPE_PARALLEL_PSO_MULTI_SWARM)
   {
     s->nParticles = s->unitArray->GetNUnits(s->unitArray->ctx);
     s->nParticlesPerUnit = 1;
@@ -130,6 +130,12 @@ INT8 _Swarm_Init (PsoSwarm_t *s, UnitArrayInterface_t *unitArray, PsoSwarmParam_
     s->nParticles = s->param.minParticles;
     s->nParticlesPerUnit = s->param.minParticles;
     _swarms_if[s->linkKey].ComputeNextPos = (PsoSwarmComputeNextPos_fct) &_SubSwarm_ComputeNextPositions;
+  }
+  else if (s->param.type == PSO_SWARM_TYPE_PARALLEL_PSO)
+  {
+    s->nParticles = unitArray->GetNUnits(unitArray->ctx);
+    s->nParticlesPerUnit = 1;
+    _swarms_if[s->linkKey].ComputeNextPos = (PsoSwarmComputeNextPos_fct) &_Swarm1d_ComputeNextPositions;
   }
   
   for (i = 0; i < s->nParticles; i++)

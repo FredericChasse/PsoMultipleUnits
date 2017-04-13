@@ -303,7 +303,7 @@ void StateAcq(void)
       break;
       
     case DECODER_RET_MSG_START_ALGO:
-      if (!oSessionActive) // We are not already started
+      if (!oSessionActive) // Ensure we are not already started
       {
         nUnits = retBuf[1];
         memcpy(units, &retBuf[2], nUnits);
@@ -334,7 +334,18 @@ void StateAcq(void)
             algo->Init(algo->ctx, algoArray);
             break;
             
+          case PARALLEL_PSO:
+            oSessionActive  = 1;
+            nSamples        = 0;  // Reset the samples
+            algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PARALLEL_PSO);
+            algo->Init(algo->ctx, algoArray);
+            break;
+            
           default:
+            for (i = 0; i < nUnits; i++)
+            {
+              algoArray->RemoveUnitFromArray(algoArray->ctx, 0);
+            }
             break;
         }
       }
@@ -355,6 +366,7 @@ void StateAcq(void)
       
     case DECODER_RET_MSG_NO_MSG:
     default:
+      LED2_ON;
       break;
   }
 }

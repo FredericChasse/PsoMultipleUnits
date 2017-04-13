@@ -31,6 +31,7 @@
 typedef enum
 {
   PSO_TYPE_PARALLEL_PSO_MULTI_SWARM
+ ,PSO_TYPE_PARALLEL_PSO
  ,PSO_TYPE_PSO_1D
 } PsoType_t;
 
