@@ -109,6 +109,12 @@ INT8 LinkedList_RemoveNode (LinkedList_t *list, Node_t *node)
       return -1;
     }
   }
+  else if (list->head == node)  // Node is head of list and list has multiple elements
+  {
+    list->head = node->next;
+    list->count--;
+    node->list = node->next = NULL;
+  }
   else  // List has multiple elements
   {
     temp = list->head;

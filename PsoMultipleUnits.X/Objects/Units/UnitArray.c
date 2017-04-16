@@ -97,9 +97,15 @@ void _UnitArray_GetPosLimits (UnitArray_t *array, float *minPos, float *maxPos)
 
 void _UnitArray_Release (UnitArray_t *array)
 {
+  INT16 i;
   Node_t *node = &_arraysNodes[array->linkKey];
   LinkedList_RemoveNode(node->list, node);
   LinkedList_AddToEnd(&_unusedArrays, node);
+  
+  for (i = array->nUnits-1; i >= 0; i--)
+  {
+    _UnitArray_RemoveUnitFromArray(array, i);
+  }
 }
 
 

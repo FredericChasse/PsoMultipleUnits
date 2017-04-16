@@ -38,6 +38,7 @@ INT8  _Charac_Init            (Charac_t *c, UnitArrayInterface_t *unitArray);
 INT8  _Charac_Run             (Charac_t *c);
 float _Charac_GetTimeElapsed  (Charac_t *c);
 void  _Charac_Release         (Charac_t *c);
+void  _Charac_GetDebugData    (Charac_t *c, void *ret);
 
 // Private variables
 //==============================================================================
@@ -59,6 +60,7 @@ const AlgoInterface_t _charac_if =
  ,.Run            = (AlgoRun_fct)             &_Charac_Run
  ,.GetTimeElapsed = (AlgoGetTimeElapsed_fct)  &_Charac_GetTimeElapsed
  ,.Release        = (AlgoRelease_fct)         &_Charac_Release
+ ,.GetDebugData   = (AlgoGetDebugData_fct)    &_Charac_GetDebugData
 };
 
 // Private functions
@@ -79,6 +81,12 @@ INT8 _Charac_Init (Charac_t *c, UnitArrayInterface_t *unitArray)
     unitArray->SetPos(unitArray->ctx, i, potRealValues[c->currentPosIdx]);
 //    unitArray->SetPos(unitArray->ctx, i, potRealValues[1]);
   }
+}
+
+
+void _Charac_GetDebugData (Charac_t *c, void *ret)
+{
+  return;
 }
 
 

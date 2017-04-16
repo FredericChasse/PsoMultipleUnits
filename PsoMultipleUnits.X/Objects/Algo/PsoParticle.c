@@ -472,6 +472,7 @@ void _Particle_ComputePos (PsoParticle_t *p, PsoSwarmInterface_t *swarm)
   p->pos.curPos = MIN(MAX(param.posMin, p->pos.curPos), param.posMax);
   potIdx = ComputePotValueFloat2Dec(p->pos.curPos);
   p->pos.curPos = potRealValues[potIdx];
+  p->curSpeed = p->pos.curPos - p->pos.prevPos;
 }
 
 
@@ -489,6 +490,8 @@ void _Particle_ComputePbest (PsoParticle_t *p)
   {
     p->pbest.curPos     = p->pos.prevPos;
     p->pbest.curFitness = p->pos.prevFitness;
+//    p->pbest.curPos     = p->pbest.prevPos;
+//    p->pbest.curFitness = p->pbest.prevFitness;
   }
   
   if (p->state != PARTICLE_STATE_VALIDATE_OPTIMUM)

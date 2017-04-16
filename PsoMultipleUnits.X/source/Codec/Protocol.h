@@ -36,6 +36,7 @@ typedef enum
  ,END_ACQ       = 0x02
   
  ,UNITS_DATA    = 0x03
+ ,PSO_DATA      = 0x04
 } ProtocolMsgType_t;
 
 typedef struct
@@ -99,6 +100,23 @@ extern const size_t sizeOfUnitsNData;
 extern const size_t sizeOfUnitsOnePosition;
 extern const size_t sizeOfUnitsOnePower;
 extern const size_t sizeOfUnitsDataPayloadBase;
+
+typedef struct
+{
+  UINT16  iteration;
+  UINT8   nParticles;
+  UINT8   nData;
+  float   *speed;
+  float   *pos;
+  float   *fitness;
+} ProtocolPsoDataPayload_t;
+extern const size_t sizeOfPsoIteration;
+extern const size_t sizeOfPsoNParticles;
+extern const size_t sizeOfPsoNData;
+extern const size_t sizeOfPsoOneParticleSpeed;
+extern const size_t sizeOfPsoOneParticlePos;
+extern const size_t sizeOfPsoOneParticlefitness;
+extern const size_t sizeOfPsoDataPayloadBase;
 //==============================================================================
 
 // Protocol message definition

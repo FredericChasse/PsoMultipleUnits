@@ -201,12 +201,12 @@ fig(1).Position = [1 figHeigth figWidth figHeigth];
 for i = 2 : nUnits
   fig(i) = figure(i);
   figPos = fig(i-1).Position;
-  fig(i).Position = [figPos(1)+figWidth, figPos(2), figWidth, figHeigth];
+  fig(i).Position = [figPos(1)+figWidth, figPos(2)+figHeigth, figWidth, figHeigth];
 end
-for i = nUnits+1 : nUnits*2
+for i = 2 : nUnits
   fig(i) = figure(i);
-  figPos = fig(i-nUnits).Position;
-  fig(i).Position = [figPos(1), 1, figWidth, figHeigth];
+  figPos = fig(i-1).Position;
+  fig(i).Position = [figPos(1)+figWidth, figPos(2)+figHeigth, figWidth, figHeigth];
 end
 
 lengthOfData = length(posMem) / nData;

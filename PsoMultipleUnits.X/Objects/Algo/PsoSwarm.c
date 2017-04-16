@@ -72,6 +72,8 @@ BOOL    _Swarm_EvalSteadyState            (PsoSwarm_t *s);
 UINT8   _Swarm_GetId                      (PsoSwarm_t *s);
 void    _Swarm_SetId                      (PsoSwarm_t *s, UINT8 id);
 float   _Swarm_GetParticlePos             (PsoSwarm_t *s, UINT8 idx);
+float   _Swarm_GetParticleSpeed           (PsoSwarm_t *s, UINT8 idx);
+float   _Swarm_GetParticleFitness         (PsoSwarm_t *s, UINT8 idx);
 void *  _Swarm_GetUnitArray               (PsoSwarm_t *s);
 UINT8   _Swarm1d_ComputeNextPositions     (PsoSwarm_t *s, float *positions, UINT8 *dummy);
 UINT8   _SwarmPara_ComputeNextPositions   (PsoSwarm_t *s, float *positions, UINT8 *idxToRemove);
@@ -224,12 +226,13 @@ void _Swarm_SetSteadyState (PsoSwarm_t *s)
 
 void _Swarm_ComputeGbest (PsoSwarm_t *s)
 {
-  float max, temp;
+  float max, temp, fitness;
   UINT8 i, iBest;
   for (i = 0; i < s->nParticles; i++)
   {
     temp = max;
-    max  = MAX(max, s->particles[i]->GetFitness(s->particles[i]->ctx));
+    fitness = s->particles[i]->GetFitness(s->particles[i]->ctx);
+    max  = MAX(max, fitness);
     if (max != temp)
     {
       iBest = i;
@@ -581,6 +584,18 @@ float _Swarm_GetParticlePos (PsoSwarm_t *s, UINT8 idx)
 }
 
 
+float _Swarm_GetParticleSpeed (PsoSwarm_t *s, UINT8 idx)
+{
+  return s->particles[idx]->GetSpeed(s->particles[idx]->ctx);
+}
+
+
+float _Swarm_GetParticleFitness (PsoSwarm_t *s, UINT8 idx)
+{
+  return s->particles[idx]->GetFitness(s->particles[idx]->ctx);
+}
+
+
 BOOL _Swarm_EvalSteadyState (PsoSwarm_t *s)
 {
   UINT8 i;
@@ -685,6 +700,8 @@ const PsoSwarmInterface_t * PsoSwarmInterface (void)
       _swarms_if[i].GetUnitArray                = (PsoSwarmGetUnitArray_fct)              &_Swarm_GetUnitArray;
       _swarms_if[i].SetId                       = (PsoSwarmSetId_fct)                     &_Swarm_SetId;
       _swarms_if[i].GetParticlePos              = (PsoSwarmGetParticlePos_fct)            &_Swarm_GetParticlePos;
+      _swarms_if[i].GetParticleFitness          = (PsoSwarmGetParticleFitness_fct)        &_Swarm_GetParticleFitness;
+      _swarms_if[i].GetParticleSpeed            = (PsoSwarmGetParticleSpeed_fct)          &_Swarm_GetParticleSpeed;
       
       // Init the linked list
       _swarmsNodes[i].ctx = (void *) &_swarms_if[i];

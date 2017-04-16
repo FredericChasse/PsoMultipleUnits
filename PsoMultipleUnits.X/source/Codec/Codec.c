@@ -49,9 +49,10 @@ typedef struct
 // Private prototypes
 //==============================================================================
 
-UINT8               _Codec_Init           (Codec_t *c, UartModule_t uartChannel);
-DecoderReturnMsg_t  _Codec_DecoderFsmStep (Codec_t *c, UINT8 *rxMsg);
-UINT8               _Codec_CodeNewMsg     (Codec_t *c, ProtocolUnitsDataPayload_t *newMsg);
+UINT8               _Codec_Init             (Codec_t *c, UartModule_t uartChannel);
+DecoderReturnMsg_t  _Codec_DecoderFsmStep   (Codec_t *c, UINT8 *rxMsg);
+UINT8               _Codec_CodeNewUnitsMsg  (Codec_t *c, ProtocolUnitsDataPayload_t *newMsg);
+UINT8               _Codec_CodeNewPsoMsg    (Codec_t *c, ProtocolPsoDataPayload_t *newMsg);
 
 // Private variables
 //==============================================================================
@@ -67,7 +68,8 @@ const CodecInterface_t _codec_if =
   .ctx              = (void *)                    &_codec
  ,.Init             = (CodecInit_fct)             &_Codec_Init
  ,.DecoderFsmStep   = (CodecDecoderFsmStep_fct)   &_Codec_DecoderFsmStep
- ,.CodeNewMsg       = (CodecCodeNewMsg_fct)       &_Codec_CodeNewMsg
+ ,.CodeNewUnitsMsg  = (CodecCodeNewUnitsMsg_fct)  &_Codec_CodeNewUnitsMsg
+ ,.CodeNewPsoMsg    = (CodecCodeNewPsoMsg_fct)    &_Codec_CodeNewPsoMsg
 };
 
 // Private functions
@@ -83,8 +85,45 @@ UINT8 _Codec_Init (Codec_t *c, UartModule_t uartChannel)
   ByteBufferInit(c->decoder->buffer, _decoderArray, MAX_DECODER_LENGTH);
 }
 
+UINT8 _Codec_CodeNewPsoMsg (Codec_t *c, ProtocolPsoDataPayload_t *newMsg)
+{
+  sUartLineBuffer_t buf = {0};
+  size_t length = newMsg->nParticles * newMsg->nData * 4;
+  
+  ProtocolHeader_t header = 
+  {
+    .delimiter        = PROTOCOL_DELIMITER
+   ,.type             = PSO_DATA
+   ,.lengthOfPayload  = sizeOfPsoDataPayloadBase + length * 3
+  };
+  memcpy(&buf.buffer[0], &header, sizeOfProtocolHeader);
+  buf.length += sizeOfProtocolHeader;
+  
+  memcpy(&buf.buffer[buf.length], &newMsg->iteration, sizeOfPsoIteration);
+  buf.length += sizeOfPsoIteration;
+  
+  memcpy(&buf.buffer[buf.length], &newMsg->nParticles, sizeOfPsoNParticles);
+  buf.length += sizeOfPsoNParticles;
+  
+  memcpy(&buf.buffer[buf.length], &newMsg->nData, sizeOfPsoNData);
+  buf.length += sizeOfPsoNData;
+  
+  memcpy(&buf.buffer[buf.length], newMsg->speed, length);
+  buf.length += length;
+  
+  memcpy(&buf.buffer[buf.length], newMsg->pos, length);
+  buf.length += length;
+  
+  memcpy(&buf.buffer[buf.length], newMsg->fitness, length);
+  buf.length += length;
+  
+  while(Uart.PutTxFifoBuffer(c->uartChannel, &buf) < 0);
+  
+  return 0;
+}
 
-UINT8 _Codec_CodeNewMsg (Codec_t *c, ProtocolUnitsDataPayload_t *newMsg)
+
+UINT8 _Codec_CodeNewUnitsMsg (Codec_t *c, ProtocolUnitsDataPayload_t *newMsg)
 {
   sUartLineBuffer_t buf = {0};
   size_t length = newMsg->nUnits * newMsg->nData * 4;

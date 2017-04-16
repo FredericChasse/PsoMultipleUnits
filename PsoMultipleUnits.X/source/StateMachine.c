@@ -25,9 +25,11 @@
 #include "UnitMapping.h"
 #include "AlgoInterface.h"
 #include "Pso.h"
+#include "PsoSwarm.h"   // For debug
 #include "Characterization.h"
 #include "Codec.h"
 #include "Protocol.h"
+#include "Rng.h"
 
 
 extern volatile BOOL   oAdcReady
@@ -57,8 +59,8 @@ sUartFifoBuffer_t matlabData =
   ,.maxBufSize = UART_LINE_BUFFER_LENGTH
 };
 
-BOOL oSmoothData = 1;
-//BOOL oSmoothData = 0;
+//BOOL oSmoothData = 1;
+BOOL oSmoothData = 0;
 
 UINT16 nSamples = 0;
 
@@ -75,6 +77,14 @@ UnitArrayInterface_t   *algoArray
 PerturbInterface_t *perturb;
 
 CodecInterface_t *codec;
+
+BOOL oSendPsoDbgData = 1;
+BOOL oAlgoIsPso = 0;
+
+UINT8 dbgIdx = 0;
+float dbgPos[3] = {320.5882,410.7843,948.0392};
+BOOL oDbgBtn = 0;
+
 
 //==============================================================================
 //	STATES OF STATE MACHINE
@@ -214,7 +224,7 @@ void StateInit(void)
   INIT_SPI;
   INIT_WDT;
   
-  START_INTERRUPTS;
+//  START_INTERRUPTS;
   
 //  // Init digital potentiometers AD8403
 //  InitPot(0);
@@ -242,12 +252,11 @@ void StateInit(void)
   }
   algoArray->Init(algoArray->ctx, 1);
   
-//  for (i = 0; i < N_UNITS_TOTAL; i++)
-//  {
-//    algoArray->AddUnitToArray(algoArray->ctx, mainArray->GetUnitHandle(mainArray->ctx, i));
-//  }
+  START_INTERRUPTS;
+  
   perturb->Init(perturb->ctx, 500);
-
+  
+  nSamples = 0;
 }
 
 
@@ -257,7 +266,7 @@ void StateInit(void)
 //===============================================================
 void StateAcq(void)
 {
-  
+  float dbg; UINT8 idx;
   //==================================================================
   // ADC READ
   // Check cells voltage
@@ -314,6 +323,7 @@ void StateAcq(void)
         switch (retBuf[0])
         {
           case CLASSIC_PSO:
+            oAlgoIsPso      = 1;
             oSessionActive  = 1;
             nSamples        = 0;  // Reset the samples
             algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PSO_1D);
@@ -321,6 +331,7 @@ void StateAcq(void)
             break;
             
           case PARALLEL_PSO_MULTI_SWARM:
+            oAlgoIsPso      = 1;
             oSessionActive  = 1;
             nSamples        = 0;  // Reset the samples
             algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PARALLEL_PSO_MULTI_SWARM);
@@ -328,6 +339,7 @@ void StateAcq(void)
             break;
             
           case CHARACTERIZATION:
+            oAlgoIsPso      = 0;
             oSessionActive  = 1;
             nSamples        = 0;  // Reset the samples
             algo = (AlgoInterface_t *) CharacterizationInterface();
@@ -335,6 +347,7 @@ void StateAcq(void)
             break;
             
           case PARALLEL_PSO:
+            oAlgoIsPso      = 1;
             oSessionActive  = 1;
             nSamples        = 0;  // Reset the samples
             algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PARALLEL_PSO);
@@ -342,6 +355,7 @@ void StateAcq(void)
             break;
             
           default:
+            oAlgoIsPso      = 0;
             for (i = 0; i < nUnits; i++)
             {
               algoArray->RemoveUnitFromArray(algoArray->ctx, 0);
@@ -355,6 +369,7 @@ void StateAcq(void)
       if (oSessionActive)   // To ensure that we are currently running
       {
         oSessionActive = 0;
+        oAlgoIsPso     = 0;
         algo->Release(algo->ctx);
         nUnits = algoArray->GetNUnits(algoArray->ctx);
         for (i = 0; i < nUnits; i++)
@@ -364,9 +379,9 @@ void StateAcq(void)
       }
       break;
       
-    case DECODER_RET_MSG_NO_MSG:
     default:
-      LED2_ON;
+      LED1_ON;
+    case DECODER_RET_MSG_NO_MSG:
       break;
   }
 }
@@ -383,10 +398,14 @@ void StateCompute(void)
   UINT8 i;
   float  positions[N_UNITS_TOTAL]
         ,powers   [N_UNITS_TOTAL]
+        ,pSpeed   [PSO_SWARM_MAX_PARTICLES]
+        ,pFitness [PSO_SWARM_MAX_PARTICLES]
+        ,pPos     [PSO_SWARM_MAX_PARTICLES]
         ;
   UINT8 nUnits = algoArray->GetNUnits(algoArray->ctx);
   
-  ProtocolUnitsDataPayload_t newPayload = {0};
+  ProtocolUnitsDataPayload_t newUnitsPayload = {0};
+  ProtocolPsoDataPayload_t   newPsoPayload   = {0};
   
   ComputeMeanAdcValues();
   for (i = 0; i < nUnits; i++)
@@ -397,13 +416,22 @@ void StateCompute(void)
     algoArray->SetPower(algoArray->ctx, i, powers[i]);
   }
   
-  newPayload.timestamp_ms = algo->GetTimeElapsed(algo->ctx);
-  newPayload.nData        = 1;
-  newPayload.nUnits       = nUnits;
-  newPayload.positions    = positions;
-  newPayload.powers       = powers;
+  newUnitsPayload.timestamp_ms = algo->GetTimeElapsed(algo->ctx);
+  newUnitsPayload.nData        = 1;
+  newUnitsPayload.nUnits       = nUnits;
+  newUnitsPayload.positions    = positions;
+  newUnitsPayload.powers       = powers;
   
-  codec->CodeNewMsg(codec->ctx, &newPayload);
+  codec->CodeNewUnitsMsg(codec->ctx, &newUnitsPayload);
+  
+  if (oSendPsoDbgData && oAlgoIsPso)
+  {
+    newPsoPayload.pos     = pPos;
+    newPsoPayload.fitness = pFitness;
+    newPsoPayload.speed   = pSpeed;
+    algo->GetDebugData(algo->ctx, &newPsoPayload);
+    codec->CodeNewPsoMsg(codec->ctx, &newPsoPayload);
+  }
   
   algo->Run(algo->ctx);
 }

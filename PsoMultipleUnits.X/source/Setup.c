@@ -54,7 +54,7 @@ void InitTimer(void)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //	Open timers
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//  timerCounterValue = Timer.Open(TIMER_1, 500, SCALE_MS);   // Open Timer 1 with a period of 500 ms
+  timerCounterValue = Timer.Open(TIMER_1, 1000, SCALE_MS);   // Open Timer 1 with a period of 1000 ms
 //  timerCounterValue = Timer.Open(TIMER_2, 500, SCALE_US);   // Open Timer 2 with a period of 500 us
 //  timerCounterValue = Timer.Open(TIMER_3, 50, SCALE_MS);   // Timer used for ADC
 //  timerCounterValue = Timer.Open(TIMER_3, 1, SCALE_MS);   // Timer used for ADC
@@ -70,7 +70,7 @@ void InitTimer(void)
 //	Configure timer interrupts
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   INT8 err = 0;
-//  Timer.ConfigInterrupt(TIMER_1, TIMER1_INTERRUPT_PRIORITY, TIMER1_INTERRUPT_SUBPRIORITY); // Sets the priority of the TIMER_1 to the values specified in Interrupt.h
+  Timer.ConfigInterrupt(TIMER_1, TIMER1_INTERRUPT_PRIORITY, TIMER1_INTERRUPT_SUBPRIORITY); // Sets the priority of the TIMER_1 to the values specified in Interrupt.h
 //  Timer.ConfigInterrupt(TIMER_2, TIMER2_INTERRUPT_PRIORITY, TIMER2_INTERRUPT_SUBPRIORITY); // Sets the priority of the TIMER_2 to the values specified in Interrupt.h
   err = Timer.ConfigInterrupt(TIMER_3, TIMER3_INTERRUPT_PRIORITY, TIMER3_INTERRUPT_SUBPRIORITY); // Sets the priority of the TIMER_3 to the values specified in Interrupt.h
   if (err < 0)
@@ -359,7 +359,7 @@ void StartInterrupts(void)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // Enable timer interrupts
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//  Timer.EnableInterrupt(TIMER_1);
+  Timer.EnableInterrupt(TIMER_1);
 //  Timer.EnableInterrupt(TIMER_2);
   err = Timer.EnableInterrupt(TIMER_3);
   if (err < 0)

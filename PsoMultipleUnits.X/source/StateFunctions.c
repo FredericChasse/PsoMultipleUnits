@@ -47,6 +47,7 @@ sButtonStates_t buttons =
  ,.buttons.bits.sw3 = 1
 };
 
+extern BOOL oDbgBtn;
   
 //float sinus[2][15] = { {0 , .4189 , .8378 , 1.2566 , 1.6755 , 2.0944 , 2.5133 , 2.9322 , 3.3510 , 3.7699 , 4.1888 , 4.6077 , 5.0265 , 5.4454 , 5.8643} ,
 float sinus[2][15] = { {1 , 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ,12 ,13, 14, 15} ,
@@ -98,10 +99,10 @@ inline void GetAdcValues (void)
 
 inline void ComputeMeanAdcValues (void)
 {
-  UINT8 i = 0;
+  UINT16 i = 0;
   UINT32 meanCellRaw[16] = {0};
   
-  for (i = 0; i < N_SAMPLES_PER_ADC_READ; i++)
+  for (i = N_SAMPLES_TO_DROP; i < N_SAMPLES_PER_ADC_READ; i++)
   {
 //    meanCellRaw[ 0] += sCellValues.cells[ 0].cellVoltRaw[i];
 //    meanCellRaw[ 1] += sCellValues.cells[ 1].cellVoltRaw[i];
@@ -134,15 +135,15 @@ inline void ComputeMeanAdcValues (void)
 //  meanCellRaw[ 6] = (float) meanCellRaw[ 6] / (float) N_SAMPLES_PER_ADC_READ + 0.5;
 //  meanCellRaw[ 7] = (float) meanCellRaw[ 7] / (float) N_SAMPLES_PER_ADC_READ + 0.5;
   
-  meanCellRaw[ 8] = (float) meanCellRaw[ 8] / (float) N_SAMPLES_PER_ADC_READ + 0.5;
-  meanCellRaw[ 9] = (float) meanCellRaw[ 9] / (float) N_SAMPLES_PER_ADC_READ + 0.5;
-  meanCellRaw[10] = (float) meanCellRaw[10] / (float) N_SAMPLES_PER_ADC_READ + 0.5;
-  meanCellRaw[11] = (float) meanCellRaw[11] / (float) N_SAMPLES_PER_ADC_READ + 0.5;
+  meanCellRaw[ 8] = (float) meanCellRaw[ 8] / (float) N_TOTAL_SAMPLES + 0.5;
+  meanCellRaw[ 9] = (float) meanCellRaw[ 9] / (float) N_TOTAL_SAMPLES + 0.5;
+  meanCellRaw[10] = (float) meanCellRaw[10] / (float) N_TOTAL_SAMPLES + 0.5;
+  meanCellRaw[11] = (float) meanCellRaw[11] / (float) N_TOTAL_SAMPLES + 0.5;
   
-  meanCellRaw[12] = (float) meanCellRaw[12] / (float) N_SAMPLES_PER_ADC_READ + 0.5;
-  meanCellRaw[13] = (float) meanCellRaw[13] / (float) N_SAMPLES_PER_ADC_READ + 0.5;
-  meanCellRaw[14] = (float) meanCellRaw[14] / (float) N_SAMPLES_PER_ADC_READ + 0.5;
-  meanCellRaw[15] = (float) meanCellRaw[15] / (float) N_SAMPLES_PER_ADC_READ + 0.5;
+  meanCellRaw[12] = (float) meanCellRaw[12] / (float) N_TOTAL_SAMPLES + 0.5;
+  meanCellRaw[13] = (float) meanCellRaw[13] / (float) N_TOTAL_SAMPLES + 0.5;
+  meanCellRaw[14] = (float) meanCellRaw[14] / (float) N_TOTAL_SAMPLES + 0.5;
+  meanCellRaw[15] = (float) meanCellRaw[15] / (float) N_TOTAL_SAMPLES + 0.5;
 
   if (oSmoothData)  // Smoothing function
   {
@@ -178,15 +179,15 @@ inline void ComputeMeanAdcValues (void)
 //    sCellValues.cells[ 6].cellVoltFloat = meanCellRaw[ 6] * VREF / 1024.0f;
 //    sCellValues.cells[ 7].cellVoltFloat = meanCellRaw[ 7] * VREF / 1024.0f;
     
-    sCellValues.cells[ 8].cellVoltFloat = meanCellRaw[ 8] * VREF / 1024.0f;
-    sCellValues.cells[ 9].cellVoltFloat = meanCellRaw[ 9] * VREF / 1024.0f;
-    sCellValues.cells[10].cellVoltFloat = meanCellRaw[10] * VREF / 1024.0f;
-    sCellValues.cells[11].cellVoltFloat = meanCellRaw[11] * VREF / 1024.0f;
+    sCellValues.cells[ 8].cellVoltFloat = meanCellRaw[ 8] * VREF / 1023.0f;
+    sCellValues.cells[ 9].cellVoltFloat = meanCellRaw[ 9] * VREF / 1023.0f;
+    sCellValues.cells[10].cellVoltFloat = meanCellRaw[10] * VREF / 1023.0f;
+    sCellValues.cells[11].cellVoltFloat = meanCellRaw[11] * VREF / 1023.0f;
     
-    sCellValues.cells[12].cellVoltFloat = meanCellRaw[12] * VREF / 1024.0f;
-    sCellValues.cells[13].cellVoltFloat = meanCellRaw[13] * VREF / 1024.0f;
-    sCellValues.cells[14].cellVoltFloat = meanCellRaw[14] * VREF / 1024.0f;
-    sCellValues.cells[15].cellVoltFloat = meanCellRaw[15] * VREF / 1024.0f;
+    sCellValues.cells[12].cellVoltFloat = meanCellRaw[12] * VREF / 1023.0f;
+    sCellValues.cells[13].cellVoltFloat = meanCellRaw[13] * VREF / 1023.0f;
+    sCellValues.cells[14].cellVoltFloat = meanCellRaw[14] * VREF / 1023.0f;
+    sCellValues.cells[15].cellVoltFloat = meanCellRaw[15] * VREF / 1023.0f;
   }
 }
 
@@ -264,7 +265,8 @@ void AssessButtons (void)
 
       if (!buttons.buttons.bits.sw2)     // If SW2 is pressed
       {
-        
+        nSamples = 0;
+        oDbgBtn = 1;
       }
       else                              // If SW2 is not pressed
       {

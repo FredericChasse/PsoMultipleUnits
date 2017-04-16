@@ -46,6 +46,8 @@ void __ISR(_TIMER_1_VECTOR, T1_INTERRUPT_PRIORITY) Timer1InterruptHandler(void)
   // Increment the number of overflows from this timer. Used primarily by Input Capture
   Timer.Var.nOverflows[0]++;
   
+  LED2_TOGGLE;
+  
   mT1ClearIntFlag();
 }
 

@@ -52,7 +52,7 @@ float _SteadyState_GetMeanSamples (SteadyState_t *ss)
 }
 
 
-float _SteadyState_GetMinSamples (SteadyState_t *ss)
+float _SteadyState_GetMaxSamples (SteadyState_t *ss)
 {
   size_t i = 0;
   float max = 0;
@@ -63,10 +63,10 @@ float _SteadyState_GetMinSamples (SteadyState_t *ss)
   return max;
 }
 
-float _SteadyState_GetMaxSamples (SteadyState_t *ss)
+float _SteadyState_GetMinSamples (SteadyState_t *ss)
 {
   size_t i = 0;
-  float min = 0;
+  float min = ss->buf[0];
   for (i = 0; i < ss->bufSize; i++)
   {
     min = MIN(min, ss->buf[i]);
@@ -80,7 +80,7 @@ float _SteadyState_GetMaxSamples (SteadyState_t *ss)
 
 BOOL SteadyState_CheckForSteadyState (SteadyState_t *ss)
 {
-  float mean, min, max;
+  float mean, min, max, upper, lower;
   
   if (ss->count < ss->bufSize)
   {
@@ -91,9 +91,10 @@ BOOL SteadyState_CheckForSteadyState (SteadyState_t *ss)
   mean = _SteadyState_GetMeanSamples(ss);
   min  = _SteadyState_GetMinSamples (ss);
   max  = _SteadyState_GetMaxSamples (ss);
-  
-  if (  ( ( ABS(max - mean) / mean ) >= ss->oscAmp )
-     || ( ( ABS(min - mean) / mean ) >= ss->oscAmp ) )
+  upper = max - mean;
+  lower = min - max;
+  if (  ( ( ABS(upper) / mean ) >= ss->oscAmp )
+     || ( ( ABS(lower) / mean ) >= ss->oscAmp ) )
   {
     ss->oInSteadyState = 0;
     return 0;

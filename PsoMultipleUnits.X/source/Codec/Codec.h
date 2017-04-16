@@ -40,14 +40,16 @@ typedef enum
 
 typedef UINT8               (*CodecInit_fct)            (void *ctx, UartModule_t uartChannel);
 typedef DecoderReturnMsg_t  (*CodecDecoderFsmStep_fct)  (void *ctx, UINT8 *rxMsg);
-typedef UINT8               (*CodecCodeNewMsg_fct)      (void *ctx, ProtocolUnitsDataPayload_t *newMsg);
+typedef UINT8               (*CodecCodeNewUnitsMsg_fct) (void *ctx, ProtocolUnitsDataPayload_t *newMsg);
+typedef UINT8               (*CodecCodeNewPsoMsg_fct)   (void *ctx, ProtocolPsoDataPayload_t *newMsg);
 
 typedef struct
 {
   void                     *ctx;
   CodecInit_fct             Init;
   CodecDecoderFsmStep_fct   DecoderFsmStep;
-  CodecCodeNewMsg_fct       CodeNewMsg;
+  CodecCodeNewUnitsMsg_fct  CodeNewUnitsMsg;
+  CodecCodeNewPsoMsg_fct    CodeNewPsoMsg;
 } CodecInterface_t;
 
 // Public functions

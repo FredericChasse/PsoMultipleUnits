@@ -41,6 +41,8 @@ typedef pcg32_random_t Rng_t;
 
 BOOL oRngIsInitialized = 0;
 
+BOOL oReuseValues = 0;
+
 static Rng_t rng = 
 {
   .inc   = 1  // Must always be odd.
@@ -68,8 +70,11 @@ double _RandUint32ToDouble (UINT32 rand)
 
 void Rng_InitSeed (UINT64 seed1, UINT64 seed2)
 {
-  if (!oRngIsInitialized)
+  if ( (!oRngIsInitialized) || oReuseValues)
   {
+    rng.inc   = 1;
+    rng.state = 0;
+    
     seed2 |= 1;   // Must always be odd.
     pcg32_srandom_r(&rng, seed1, seed2);
     oRngIsInitialized = 1;

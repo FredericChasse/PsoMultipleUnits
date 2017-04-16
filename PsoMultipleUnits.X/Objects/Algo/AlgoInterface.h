@@ -32,6 +32,7 @@ typedef INT8  (*AlgoInit_fct)           (void *ctx, UnitArrayInterface_t *unitAr
 typedef INT8  (*AlgoRun_fct)            (void *ctx);
 typedef float (*AlgoGetTimeElapsed_fct) (void *ctx);
 typedef void  (*AlgoRelease_fct)        (void *ctx);
+typedef void  (*AlgoGetDebugData_fct)   (void *ctx, void *ret);
 
 typedef struct
 {
@@ -40,6 +41,7 @@ typedef struct
   AlgoRun_fct             Run;
   AlgoGetTimeElapsed_fct  GetTimeElapsed;
   AlgoRelease_fct         Release;
+  AlgoGetDebugData_fct    GetDebugData;
 } AlgoInterface_t;
 
 

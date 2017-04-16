@@ -16,6 +16,7 @@
 
 #include "Pso.h"
 #include "PsoSwarm.h"
+#include "Protocol.h" // For debugging
 
 // Private definitions
 //==============================================================================
@@ -43,6 +44,7 @@ INT8  _Pso1d_Init                   (Pso_t *pso, UnitArrayInterface_t *unitArray
 INT8  _Pso1d_Run                    (Pso_t *pso);
 float _Pso_GetTimeElapsed           (Pso_t *pso);
 void  _Pso_Release                  (Pso_t *pso);
+void  _Pso_GetDebugData             (Pso_t *pso, ProtocolPsoDataPayload_t *ret);
 
 void _Pso_RemoveSubSwarm            (Pso_t *pso, UINT8 swarmId);
 void _Pso_CreateSubSwarms           (Pso_t *pso, UINT8 *particlesToRemove, UINT8 nParticlesToRemove);
@@ -92,6 +94,7 @@ const AlgoInterface_t _parallelPsoMultiSwarm_if =
  ,.Run            = (AlgoRun_fct)             &_ParallelPsoMultiSwarm_Run
  ,.GetTimeElapsed = (AlgoGetTimeElapsed_fct)  &_Pso_GetTimeElapsed
  ,.Release        = (AlgoRelease_fct)         &_Pso_Release
+ ,.GetDebugData   = (AlgoGetDebugData_fct)    &_Pso_GetDebugData
 };
 
 const AlgoInterface_t _parallelPso_if =
@@ -101,6 +104,7 @@ const AlgoInterface_t _parallelPso_if =
  ,.Run            = (AlgoRun_fct)             &_ParallelPso_Run
  ,.GetTimeElapsed = (AlgoGetTimeElapsed_fct)  &_Pso_GetTimeElapsed
  ,.Release        = (AlgoRelease_fct)         &_Pso_Release
+ ,.GetDebugData   = (AlgoGetDebugData_fct)    &_Pso_GetDebugData
 };
 
 const AlgoInterface_t _pso1d_if =
@@ -110,10 +114,43 @@ const AlgoInterface_t _pso1d_if =
  ,.Run            = (AlgoRun_fct)             &_Pso1d_Run
  ,.GetTimeElapsed = (AlgoGetTimeElapsed_fct)  &_Pso_GetTimeElapsed
  ,.Release        = (AlgoRelease_fct)         &_Pso_Release
+ ,.GetDebugData   = (AlgoGetDebugData_fct)    &_Pso_GetDebugData
 };
 
 // Private functions
 //==============================================================================
+
+void  _Pso_GetDebugData (Pso_t *pso, ProtocolPsoDataPayload_t *ret)
+{
+  if ( (pso->type != PSO_TYPE_PARALLEL_PSO) && (pso->type != PSO_TYPE_PSO_1D) )
+  {
+    return;
+  }
+  
+  UINT8 nParticles = pso->swarms[0]->GetNParticles(pso->swarms[0]->ctx);
+  UINT8 nData = 1;
+  UINT16 iteration = pso->swarms[0]->GetIteration(pso->swarms[0]->ctx);
+  float speed  [PSO_SWARM_MAX_PARTICLES];
+  float fitness[PSO_SWARM_MAX_PARTICLES];
+  float pos    [PSO_SWARM_MAX_PARTICLES];
+  UINT8 i;
+  size_t length = nParticles*4;
+  
+  for (i = 0; i < nParticles; i++)
+  {
+    speed   [i] = pso->swarms[0]->GetParticleSpeed  (pso->swarms[0]->ctx, i);
+    pos     [i] = pso->swarms[0]->GetParticlePos    (pso->swarms[0]->ctx, i);
+    fitness [i] = pso->swarms[0]->GetParticleFitness(pso->swarms[0]->ctx, i);
+  }
+  
+  ret->iteration      = iteration;
+  ret->nData          = nData;
+  ret->nParticles     = nParticles;
+  memcpy(ret->speed   , speed   , length);
+  memcpy(ret->pos     , pos     , length);
+  memcpy(ret->fitness , fitness , length);
+}
+
 
 INT8 _ParallelPsoMultiSwarm_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
 {
@@ -137,9 +174,9 @@ INT8 _ParallelPsoMultiSwarm_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
   pso->unitArray->GetPosLimits(pso->unitArray->ctx, &minPos, &maxPos);
   const PsoSwarmParam_t swarmParam = 
   {
-    .c1                     = 1
-   ,.c2                     = 2
-   ,.omega                  = 0.4
+    .c1                     = .5
+   ,.c2                     = 1.3
+   ,.omega                  = 0.2
    ,.posMin                 = minPos
    ,.posMax                 = maxPos
    ,.minParticles           = 3
@@ -202,9 +239,9 @@ INT8 _ParallelPso_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
   pso->unitArray->GetPosLimits(pso->unitArray->ctx, &minPos, &maxPos);
   const PsoSwarmParam_t swarmParam = 
   {
-    .c1                     = 1
-   ,.c2                     = 2
-   ,.omega                  = 0.4
+    .c1                     = .5
+   ,.c2                     = 1.3
+   ,.omega                  = 0.2
    ,.posMin                 = minPos
    ,.posMax                 = maxPos
    ,.minParticles           = 3
@@ -230,10 +267,11 @@ INT8 _ParallelPso_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
 INT8 _Pso1d_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
 {
   UnitArrayInterface_t *swarmArrays[N_SWARMS_TOTAL];
-  UINT8 nUnits = pso->unitArray->GetNUnits(pso->unitArray->ctx);
   UINT8 i;
+  UINT8 nUnits;
   float minPos, maxPos;
   pso->unitArray    = unitArray;
+  nUnits            = pso->unitArray->GetNUnits(pso->unitArray->ctx);
   pso->nSwarms      = nUnits;
   pso->timeElapsed  = 0;
   pso->sampleTime   = SAMPLING_TIME_FLOAT;
@@ -241,9 +279,9 @@ INT8 _Pso1d_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
   pso->unitArray->GetPosLimits(pso->unitArray->ctx, &minPos, &maxPos);
   const PsoSwarmParam_t swarmParam = 
   {
-    .c1                     = 1
-   ,.c2                     = 2
-   ,.omega                  = 0.4
+    .c1                     = .5
+   ,.c2                     = 1.3
+   ,.omega                  = 0.2
    ,.posMin                 = minPos
    ,.posMax                 = maxPos
    ,.minParticles           = 3
@@ -564,7 +602,12 @@ INT8 _Pso1d_Run (Pso_t *pso)
       swarm->IncCurrentParticle(swarm->ctx);
       curParticle = swarm->GetCurParticle(swarm->ctx);
       
-      pso->unitArray->SetPos(pso->unitArray->ctx, iSwarm, swarm->GetParticlePos(swarm->ctx, curParticle));
+      nextPositions[0] = swarm->GetParticlePos(swarm->ctx, curParticle);
+      if (nextPositions[0] == 128.4314)
+      {
+        LED1_TOGGLE;
+      }
+      pso->unitArray->SetPos(pso->unitArray->ctx, iSwarm, nextPositions[0]);
     }
   }
   return 0;
@@ -576,7 +619,6 @@ INT8 _ParallelPso_Run (Pso_t *pso)
   UnitArrayInterface_t *array = pso->unitArray;
   PsoSwarmInterface_t *swarm = pso->swarms[0];
   UINT8  i            = 0
-        ,iSwarm       = 0
         ,nUnits       = array->GetNUnits(array->ctx)
         ,nParticles   = swarm->GetNParticles(swarm->ctx);
         ;
@@ -667,6 +709,8 @@ const AlgoInterface_t * PsoInterface(PsoType_t psoType)
       return &_pso1d_if;
     case PSO_TYPE_PARALLEL_PSO_MULTI_SWARM:
       return &_parallelPsoMultiSwarm_if;
+    case PSO_TYPE_PARALLEL_PSO:
+      return &_parallelPso_if;
     default:
       return NULL;
   }

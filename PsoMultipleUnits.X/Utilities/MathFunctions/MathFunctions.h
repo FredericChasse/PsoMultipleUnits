@@ -39,9 +39,9 @@ typedef struct
 // Public functions
 //==============================================================================
 
-#define MAX(_x, _y)   ( (_x > _y) ? _x :  _y )
-#define MIN(_x, _y)   ( (_x < _y) ? _x :  _y )
-#define ABS(_x)       ( (_x >= 0) ? _x : -_x )
+#define MAX(_x, _y)   ( ((_x) > (_y)) ? (_x) :  (_y) )
+#define MIN(_x, _y)   ( ((_x) < (_y)) ? (_x) :  (_y) )
+#define ABS(_x)       ( ((_x) >=  0 ) ? (_x) : -(_x) )
 
 void TustinZ (TustinValue_t *input, TustinValue_t *output, float acqTime);
 
