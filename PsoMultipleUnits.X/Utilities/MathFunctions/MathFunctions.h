@@ -43,7 +43,8 @@ typedef struct
 #define MIN(_x, _y)   ( ((_x) < (_y)) ? (_x) :  (_y) )
 #define ABS(_x)       ( ((_x) >=  0 ) ? (_x) : -(_x) )
 
-void TustinZ (TustinValue_t *input, TustinValue_t *output, float acqTime);
-
+void TustinZ  (TustinValue_t *input, TustinValue_t *output, float acqTime);
+void HpfZ     (TustinValue_t *input, TustinValue_t *output, float acqTime, float wh);
+void LpfZ     (TustinValue_t *input, TustinValue_t *output, float acqTime, float wl);
 
 #endif // __MATH_FUNCTIONS_H__

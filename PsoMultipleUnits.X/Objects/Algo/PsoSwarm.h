@@ -23,20 +23,13 @@
 
 #include "Setup.h"
 #include "UnitArray.h"
+#include "Position.h"
 
 // Public definitions
 //==============================================================================
 
 #define PSO_SWARM_MAX_PARTICLES   (10)
 #define N_SWARMS_TOTAL            (N_UNITS_TOTAL + 1)
-
-typedef struct
-{
-  float curPos;
-  float curFitness;
-  float prevPos;
-  float prevFitness;
-} Position_t;
 
 typedef enum
 {

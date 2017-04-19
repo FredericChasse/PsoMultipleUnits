@@ -27,6 +27,7 @@
 #include "Pso.h"
 #include "PsoSwarm.h"   // For debug
 #include "Characterization.h"
+#include "ExtremumSeeking.h"
 #include "Codec.h"
 #include "Protocol.h"
 #include "Rng.h"
@@ -351,6 +352,14 @@ void StateAcq(void)
             oSessionActive  = 1;
             nSamples        = 0;  // Reset the samples
             algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PARALLEL_PSO);
+            algo->Init(algo->ctx, algoArray);
+            break;
+            
+          case EXTREMUM_SEEKING:
+            oAlgoIsPso      = 0;
+            oSessionActive  = 1;
+            nSamples        = 0;  // Reset the samples
+            algo = (AlgoInterface_t *) ExtremumSeekingInterface();
             algo->Init(algo->ctx, algoArray);
             break;
             

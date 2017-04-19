@@ -46,3 +46,37 @@ void TustinZ (TustinValue_t *input, TustinValue_t *output, float acqTime)
   output->previousValue = output->currentValue;
   output->currentValue  = output->previousValue + acqTime/2 * (input->currentValue + input->previousValue);
 }
+
+
+/*  
+ * High Pass Filter
+ *
+ *  Y(s)         s
+ * ------ == ---------
+ *  U(s)       s + wh
+ */
+void HpfZ (TustinValue_t *input, TustinValue_t *output, float acqTime, float wh)
+{
+  float coeff = wh*acqTime;
+  output->previousValue = output->currentValue;
+  output->currentValue  = ( 2 * (input->currentValue - input->previousValue) 
+                            - output->previousValue * (coeff - 2) ) 
+                          / (coeff + 2);
+}
+
+
+/*  
+ * Low Pass Filter
+ *
+ *  Y(s)        wl
+ * ------ == ---------
+ *  U(s)       s + wl
+ */
+void LpfZ (TustinValue_t *input, TustinValue_t *output, float acqTime, float wl)
+{
+  float coeff = wl*acqTime;
+  output->previousValue = output->currentValue;
+  output->currentValue  = ( ( input->currentValue + input->previousValue) * coeff 
+                            - output->previousValue * (coeff - 2) ) 
+                          / (coeff + 2);
+}
