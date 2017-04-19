@@ -47,6 +47,7 @@ void  _UnitArray_Release              (UnitArray_t *array);
 void  _UnitArray_GetPosLimits         (UnitArray_t *array, float *minPos, float *maxPos);
 void  _UnitArray_SetPower             (UnitArray_t *array, UINT8 idx, float power);
 UINT8 _UnitArray_GetUnitPosIdx        (UnitArray_t *array, UINT8 idx);
+UINT8 _UnitArray_GetUnitId            (UnitArray_t *array, UINT8 idx);
 
 
 // Private variables
@@ -156,6 +157,12 @@ float _UnitArray_GetUnitPower (UnitArray_t *array, UINT8 idx)
 }
 
 
+UINT8 _UnitArray_GetUnitId (UnitArray_t *array, UINT8 idx)
+{
+  return array->units[idx]->GetId(array->units[idx]->ctx);
+}
+
+
 UINT8 _UnitArray_GetUnitPosIdx (UnitArray_t *array, UINT8 idx)
 {
   return array->units[idx]->GetPosIdx(array->units[idx]->ctx);
@@ -239,6 +246,7 @@ const UnitArrayInterface_t * UnitArrayInterface(void)
       _arrays_if[i].GetPosLimits        = (UnitArrayGetPosLimits_fct)         &_UnitArray_GetPosLimits;
       _arrays_if[i].SetPower            = (UnitArraySetPower_fct)             &_UnitArray_SetPower;
       _arrays_if[i].GetUnitPosIdx       = (UnitArrayGetUnitPosIdx_fct)        &_UnitArray_GetUnitPosIdx;
+      _arrays_if[i].GetUnitId           = (UnitArrayGetUnidId_fct)            &_UnitArray_GetUnitId;
       
       // Init the linked list
       _arraysNodes[i].ctx = (void *) &_arrays_if[i];

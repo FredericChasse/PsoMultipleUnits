@@ -78,7 +78,7 @@ PerturbInterface_t *perturb;
 
 CodecInterface_t *codec;
 
-BOOL oSendPsoDbgData = 1;
+BOOL oSendPsoDbgData = 0;
 BOOL oAlgoIsPso = 0;
 
 UINT8 dbgIdx = 0;
@@ -395,7 +395,7 @@ void StateCompute(void)
 {  
   oNewSample = 0;
   
-  UINT8 i;
+  UINT8 i, id;
   float  positions[N_UNITS_TOTAL]
         ,powers   [N_UNITS_TOTAL]
         ,pSpeed   [PSO_SWARM_MAX_PARTICLES]
@@ -411,8 +411,8 @@ void StateCompute(void)
   for (i = 0; i < nUnits; i++)
   {
     positions[i]  = algoArray->GetPos(algoArray->ctx, i);
-    powers[i]     = ComputeCellPower(unitAdcs[i], algoArray->GetUnitPosIdx(algoArray->ctx, i));
-//    powers[i] = sCellValues.cells[i + 8].cellVoltFloat;
+    id = algoArray->GetUnitId(algoArray->ctx, i);
+    powers[i]     = ComputeCellPower(unitAdcs[id], algoArray->GetUnitPosIdx(algoArray->ctx, i));
     algoArray->SetPower(algoArray->ctx, i, powers[i]);
   }
   

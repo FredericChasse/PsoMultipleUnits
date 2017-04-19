@@ -71,8 +71,8 @@ typeOfMsg = NEW_RNG_SEED;
 % lengthOfPayload = fliplr(typecast(uint16(16), 'uint8'));
 lengthOfPayload = typecast(uint16(16), 'uint8');
 % [seed1, seed2] = GenerateNewSeeds;
-seed1 = uint64(6164220316396781387);
-seed2 = uint64(3648947249236476354);
+seed1 = uint64(7827858136972333423);
+seed2 = uint64(14206939411198680430);
 seeds = typecast([seed1, seed2], 'uint8');
 
 buf = [delimiter, typeOfMsg, lengthOfPayload, seeds];
@@ -82,13 +82,13 @@ fwrite(port, buf);
 typeOfMsg = START_ACQ;
 startAlgoChar = PROTOCOL_START_ALGO;
 % algo = CHARACTERIZATION;
-% algo = CLASSIC_PSO;
-algo = PARALLEL_PSO;
+algo = CLASSIC_PSO;
+% algo = PARALLEL_PSO;
 % algo = PARALLEL_PSO_MULTI_SWARM;
 % algo = MULTI_UNIT;
 % algo = EXTREMUM_SEEKING;
 % units = uint8(0:1:7);
-units = uint8(0:1:3);
+units = uint8(0:1:6);
 nUnits = uint8(length(units));
 % lengthOfPayload = fliplr(typecast(uint16(3 + nUnits), 'uint8'));
 lengthOfPayload = typecast(uint16(3 + nUnits), 'uint8');
@@ -103,7 +103,7 @@ elseif algo == CLASSIC_PSO
 elseif algo == PARALLEL_PSO
   nIterations = 60;
 elseif algo == PARALLEL_PSO_MULTI_SWARM
-  nIterations = 80;
+  nIterations = 130;
 else
   nIterations = 20;
 end
@@ -187,36 +187,32 @@ delete(port);
 
 close all
 
-tmpFig = figure;
+% tmpFig = figure;
+% set(gcf, 'Position', get(0,'Screensize'));
+% maxPos = tmpFig.Position;
+% close(tmpFig);
+% maxHeigth = maxPos(4);
+% maxWidth  = maxPos(3);
+% figHeigth = maxHeigth;
+% figWidth  = floor(maxWidth /nUnits);
+
+% fig(1) = figure(1);
+% fig(1).Position = [1 1 figWidth figHeigth];
+% for i = 2 : nUnits
+%   fig(i) = figure(i);
+%   figPos = fig(i-1).Position;
+%   fig(i).Position = [figPos(1)+figWidth, 1, figWidth, figHeigth];
+% end
+
+fig = figure(1);
 set(gcf, 'Position', get(0,'Screensize'));
-maxPos = tmpFig.Position;
-close(tmpFig);
-maxHeigth = maxPos(4);
-maxWidth  = maxPos(3);
-figHeigth = floor(maxHeigth/2);
-figWidth  = floor(maxWidth /nUnits);
-
-fig(1) = figure(1);
-fig(1).Position = [1 figHeigth figWidth figHeigth];
-for i = 2 : nUnits
-  fig(i) = figure(i);
-  figPos = fig(i-1).Position;
-  fig(i).Position = [figPos(1)+figWidth, figPos(2), figWidth, figHeigth];
-end
-for i = nUnits+1 : nUnits*2
-  fig(i) = figure(i);
-  figPos = fig(i-nUnits).Position;
-  fig(i).Position = [figPos(1), 1, figWidth, figHeigth];
-end
-
 lengthOfData = length(posMem) / nData;
 for i = 1 : nUnits
-  fig(i) = figure(i);
+%   fig(i) = figure(i);
+  subplot(2,nUnits,i)
   plot(tsMem, posMem(i:nUnits:end));
-end
-for i = nUnits + 1 : 2*nUnits
-  fig(i) = figure(i);
-  plot(tsMem, powMem(i-nUnits:nUnits:end));
+  subplot(2,nUnits,i+nUnits)
+  plot(tsMem, powMem(i:nUnits:end));
 end
 
 % if matlabMode == 'c'

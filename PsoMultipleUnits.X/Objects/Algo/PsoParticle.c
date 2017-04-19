@@ -323,8 +323,8 @@ BOOL _Particle_FsmStep (PsoParticle_t *p, PsoSwarmInterface_t *swarm)
       else
       {
         // If no perturbation occurred
-        if (  (p->pos.curFitness < p->optPos.jinit) * (1 + param.sentinelMargin) 
-           && (p->pos.curFitness > p->optPos.jinit) * (1 - param.sentinelMargin) )
+        if (  p->pos.curFitness < (p->optPos.jinit * (1.0f + param.sentinelMargin)) 
+           && p->pos.curFitness > (p->optPos.jinit * (1.0f - param.sentinelMargin)) )
         {
           // If the final position is an optimum
           if ( (p->optPos.jminus <= p->pos.curFitness) && (p->optPos.jpos <= p->pos.curFitness) )

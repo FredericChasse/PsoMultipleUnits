@@ -17,6 +17,7 @@
 #include "Pso.h"
 #include "PsoSwarm.h"
 #include "Protocol.h" // For debugging
+#include "SteadyState.h"
 
 // Private definitions
 //==============================================================================
@@ -122,10 +123,10 @@ const AlgoInterface_t _pso1d_if =
 
 void  _Pso_GetDebugData (Pso_t *pso, ProtocolPsoDataPayload_t *ret)
 {
-  if ( (pso->type != PSO_TYPE_PARALLEL_PSO) && (pso->type != PSO_TYPE_PSO_1D) )
-  {
-    return;
-  }
+//  if ( (pso->type != PSO_TYPE_PARALLEL_PSO) && (pso->type != PSO_TYPE_PSO_1D) )
+//  {
+//    return;
+//  }
   
   UINT8 nParticles = pso->swarms[0]->GetNParticles(pso->swarms[0]->ctx);
   UINT8 nData = 1;
@@ -176,14 +177,14 @@ INT8 _ParallelPsoMultiSwarm_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
   {
     .c1                     = .5
    ,.c2                     = 1.3
-   ,.omega                  = 0.2
+   ,.omega                  = 0.4
    ,.posMin                 = minPos
    ,.posMax                 = maxPos
    ,.minParticles           = 3
    ,.perturbAmp             = 15.7
    ,.sentinelMargin         = 0.05
    ,.type                   = PSO_SWARM_TYPE_PARALLEL_PSO_MULTI_SWARM
-   ,.nSamplesForSteadyState = 5
+   ,.nSamplesForSteadyState = STEADY_STATE_MAX_SAMPLES
    ,.steadyStateOscAmp      = 0.01
    ,.iteration              = 0
    ,.currentParticle        = 0
@@ -241,14 +242,14 @@ INT8 _ParallelPso_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
   {
     .c1                     = .5
    ,.c2                     = 1.3
-   ,.omega                  = 0.2
+   ,.omega                  = 0.4
    ,.posMin                 = minPos
    ,.posMax                 = maxPos
    ,.minParticles           = 3
    ,.perturbAmp             = 15.7
    ,.sentinelMargin         = 0.05
    ,.type                   = PSO_SWARM_TYPE_PARALLEL_PSO
-   ,.nSamplesForSteadyState = 5
+   ,.nSamplesForSteadyState = STEADY_STATE_MAX_SAMPLES
    ,.steadyStateOscAmp      = 0.01
    ,.iteration              = 0
    ,.currentParticle        = 0
@@ -281,14 +282,14 @@ INT8 _Pso1d_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
   {
     .c1                     = .5
    ,.c2                     = 1.3
-   ,.omega                  = 0.2
+   ,.omega                  = 0.4
    ,.posMin                 = minPos
    ,.posMax                 = maxPos
    ,.minParticles           = 3
    ,.perturbAmp             = 15.7
    ,.sentinelMargin         = 0.05
    ,.type                   = PSO_SWARM_TYPE_PSO_1D
-   ,.nSamplesForSteadyState = 5
+   ,.nSamplesForSteadyState = STEADY_STATE_MAX_SAMPLES
    ,.steadyStateOscAmp      = 0.01
    ,.iteration              = 0
    ,.currentParticle        = 0
@@ -603,10 +604,6 @@ INT8 _Pso1d_Run (Pso_t *pso)
       curParticle = swarm->GetCurParticle(swarm->ctx);
       
       nextPositions[0] = swarm->GetParticlePos(swarm->ctx, curParticle);
-      if (nextPositions[0] == 128.4314)
-      {
-        LED1_TOGGLE;
-      }
       pso->unitArray->SetPos(pso->unitArray->ctx, iSwarm, nextPositions[0]);
     }
   }
