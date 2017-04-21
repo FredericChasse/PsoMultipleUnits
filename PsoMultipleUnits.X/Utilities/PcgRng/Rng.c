@@ -53,7 +53,7 @@ static Rng_t rng =
 // Private prototypes
 //==============================================================================
 
-double _RandUint32ToDouble_0to1 (UINT32 rand);
+double _RandUint32ToDouble (UINT32 rand);
 
 
 // Private functions

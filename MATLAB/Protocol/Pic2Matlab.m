@@ -70,9 +70,9 @@ delimiter = PROTOCOL_DELIMITER;
 typeOfMsg = NEW_RNG_SEED;
 % lengthOfPayload = fliplr(typecast(uint16(16), 'uint8'));
 lengthOfPayload = typecast(uint16(16), 'uint8');
-% [seed1, seed2] = GenerateNewSeeds;
-seed1 = uint64(7827858136972333423);
-seed2 = uint64(14206939411198680430);
+[seed1, seed2] = GenerateNewSeeds;
+% seed1 = uint64(7827858136972333423);
+% seed2 = uint64(14206939411198680430);
 seeds = typecast([seed1, seed2], 'uint8');
 
 buf = [delimiter, typeOfMsg, lengthOfPayload, seeds];
@@ -82,8 +82,8 @@ fwrite(port, buf);
 typeOfMsg = START_ACQ;
 startAlgoChar = PROTOCOL_START_ALGO;
 % algo = CHARACTERIZATION;
-algo = CLASSIC_PSO;
-% algo = PARALLEL_PSO;
+% algo = CLASSIC_PSO;
+algo = PARALLEL_PSO;
 % algo = PARALLEL_PSO_MULTI_SWARM;
 % algo = MULTI_UNIT;
 % algo = EXTREMUM_SEEKING;
@@ -185,7 +185,7 @@ delete(port);
 
 %% Figures
 
-close all
+% close all
 
 % tmpFig = figure;
 % set(gcf, 'Position', get(0,'Screensize'));
@@ -204,7 +204,7 @@ close all
 %   fig(i).Position = [figPos(1)+figWidth, 1, figWidth, figHeigth];
 % end
 
-fig = figure(1);
+fig = figure;
 set(gcf, 'Position', get(0,'Screensize'));
 lengthOfData = length(posMem) / nData;
 for i = 1 : nUnits

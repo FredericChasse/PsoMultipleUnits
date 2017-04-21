@@ -184,7 +184,7 @@ INT8 _ParallelPsoMultiSwarm_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
    ,.perturbAmp             = 15.7
    ,.sentinelMargin         = 0.05
    ,.type                   = PSO_SWARM_TYPE_PARALLEL_PSO_MULTI_SWARM
-   ,.nSamplesForSteadyState = STEADY_STATE_MAX_SAMPLES
+   ,.nSamplesForSteadyState = 5
    ,.steadyStateOscAmp      = 0.01
    ,.iteration              = 0
    ,.currentParticle        = 0
