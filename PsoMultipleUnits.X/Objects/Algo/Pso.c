@@ -175,13 +175,13 @@ INT8 _ParallelPsoMultiSwarm_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
   pso->unitArray->GetPosLimits(pso->unitArray->ctx, &minPos, &maxPos);
   const PsoSwarmParam_t swarmParam = 
   {
-    .c1                     = .5
-   ,.c2                     = 1.3
+    .c1                     = 1
+   ,.c2                     = 2
    ,.omega                  = 0.4
    ,.posMin                 = minPos
    ,.posMax                 = maxPos
    ,.minParticles           = 3
-   ,.perturbAmp             = 15.7
+   ,.perturbAmp             = 30
    ,.sentinelMargin         = 0.05
    ,.type                   = PSO_SWARM_TYPE_PARALLEL_PSO_MULTI_SWARM
    ,.nSamplesForSteadyState = 5
@@ -240,8 +240,8 @@ INT8 _ParallelPso_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
   pso->unitArray->GetPosLimits(pso->unitArray->ctx, &minPos, &maxPos);
   const PsoSwarmParam_t swarmParam = 
   {
-    .c1                     = .5
-   ,.c2                     = 1.3
+    .c1                     = 1
+   ,.c2                     = 2
    ,.omega                  = 0.4
    ,.posMin                 = minPos
    ,.posMax                 = maxPos
@@ -280,8 +280,8 @@ INT8 _Pso1d_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
   pso->unitArray->GetPosLimits(pso->unitArray->ctx, &minPos, &maxPos);
   const PsoSwarmParam_t swarmParam = 
   {
-    .c1                     = .5
-   ,.c2                     = 1.3
+    .c1                     = 1
+   ,.c2                     = 2
    ,.omega                  = 0.4
    ,.posMin                 = minPos
    ,.posMax                 = maxPos
@@ -314,14 +314,14 @@ INT8 _ParallelPsoMultiSwarm_Run (Pso_t *pso)
 {
   UnitArrayInterface_t *array;
   PsoSwarmInterface_t *swarm;
-  UINT8  i              = 0
-        ,iSwarm         = 0
+  UINT8  iSwarm         = 0
         ,nSwarmsMem     = pso->nSwarms    // So we don't do a swarm twice in the same iteration
         ,curParticle    = 0
         ,nParticles     = 0
         ,nParticlesMem  = 0
         ,nUnits         = 0
         ;
+  INT16 i               = 0;
   UINT8 idxPerturbed[PSO_SWARM_MAX_PARTICLES];
   UINT8 nPerturbed = 0;
   UINT8 swarmsToDelete[N_SWARMS_TOTAL];

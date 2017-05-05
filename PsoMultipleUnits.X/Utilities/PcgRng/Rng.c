@@ -41,7 +41,7 @@ typedef pcg32_random_t Rng_t;
 
 BOOL oRngIsInitialized = 0;
 
-BOOL oReuseValues = 0;
+BOOL oReuseValues = 1;
 
 static Rng_t rng = 
 {

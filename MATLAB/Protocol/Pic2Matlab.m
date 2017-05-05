@@ -70,9 +70,9 @@ delimiter = PROTOCOL_DELIMITER;
 typeOfMsg = NEW_RNG_SEED;
 % lengthOfPayload = fliplr(typecast(uint16(16), 'uint8'));
 lengthOfPayload = typecast(uint16(16), 'uint8');
-[seed1, seed2] = GenerateNewSeeds;
-% seed1 = uint64(7827858136972333423);
-% seed2 = uint64(14206939411198680430);
+% [seed1, seed2] = GenerateNewSeeds;
+seed1 = uint64(6634093205851280027);
+seed2 = uint64(9627091455319487185);
 seeds = typecast([seed1, seed2], 'uint8');
 
 buf = [delimiter, typeOfMsg, lengthOfPayload, seeds];

@@ -22,6 +22,7 @@
       <itemPath>Objects/Algo/SteadyState.c</itemPath>
       <itemPath>Objects/Algo/SteadyState.h</itemPath>
       <itemPath>Objects/Algo/Position.h</itemPath>
+      <itemPath>Objects/Algo/Position.c</itemPath>
     </logicalFolder>
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"

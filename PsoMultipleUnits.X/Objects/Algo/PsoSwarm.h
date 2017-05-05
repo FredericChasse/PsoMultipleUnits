@@ -122,8 +122,6 @@ typedef struct
 
 const PsoSwarmInterface_t * PsoSwarmInterface (void);
 
-void Position_Reset (Position_t *pos);
-
 
 
 #endif // __PSO_SWARM_H__

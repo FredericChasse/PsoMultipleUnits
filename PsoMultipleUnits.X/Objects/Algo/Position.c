@@ -4,7 +4,7 @@
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //
-// File    : Position.h
+// File    : Position.c
 // Author  : Frederic Chasse
 // Date    : 2017-03-19
 //
@@ -18,24 +18,16 @@
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-#ifndef __POSITION_H__
-#define __POSITION_H__
+#include "Position.h"
 
-// Public definitions
-//==============================================================================
-
-typedef struct
-{
-  float curPos;
-  float curFitness;
-  float prevPos;
-  float prevFitness;
-} Position_t;
 
 // Public functions
 //==============================================================================
 
-void Position_Reset (Position_t *pos);
-
-
-#endif // __POSITION_H__
+void Position_Reset (Position_t *pos)
+{
+  pos->curFitness   = 0;
+  pos->curPos       = 0;
+  pos->prevFitness  = 0;
+  pos->prevPos      = 0;
+}

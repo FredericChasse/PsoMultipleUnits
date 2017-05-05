@@ -651,15 +651,6 @@ static int _CompareFunc (const void *p1, const void *p2)
 // Public functions
 //==============================================================================
 
-void Position_Reset (Position_t *pos)
-{
-  pos->curFitness   = 0;
-  pos->curPos       = 0;
-  pos->prevFitness  = 0;
-  pos->prevPos      = 0;
-}
-
-
 const PsoSwarmInterface_t * PsoSwarmInterface (void)
 {
   UINT8 i;

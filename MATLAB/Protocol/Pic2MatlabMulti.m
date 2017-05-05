@@ -1,34 +1,6 @@
 % clear
 % close all
 
-%% Port setup
-
-% Create a serial port object.
-port = instrfind('Type', 'serial', 'Port', 'COM3', 'Tag', '');
-
-if isempty(port)
-%     port = serial('COM5');
-    port = serial('COM3');
-else
-    % Remove contents of input buffer
-    flushinput(port);
-    % Remove contents of output buffer
-    flushoutput(port);
-    fclose(port);
-    port = port(1);
-end
-
-% port.BytesAvailableFcnMode = 'byte';
-% port.BytesAvailableFcn = {@myCallback};
-
-port.BaudRate = 115200;
-port.DataBits = 8;
-port.Parity = 'none';
-port.StopBits = 1;
-port.Terminator = '';
-
-% Connect to instrument object, port.
-fopen(port);
 
 %% Data setup
 
@@ -38,8 +10,8 @@ typeOfMsg = NEW_RNG_SEED;
 % lengthOfPayload = fliplr(typecast(uint16(16), 'uint8'));
 lengthOfPayload = typecast(uint16(16), 'uint8');
 [seed1, seed2] = GenerateNewSeeds;
-% seed1 = uint64(7827858136972333423);
-% seed2 = uint64(14206939411198680430);
+% seed1 = uint64(14077928349875564221);
+% seed2 = uint64(12068114555164193632);
 seeds = typecast([seed1, seed2], 'uint8');
 
 buf = [delimiter, typeOfMsg, lengthOfPayload, seeds];
@@ -57,11 +29,11 @@ fwrite(port, buf);
 if algo == CHARACTERIZATION
   nIterations = 256;
 elseif algo == CLASSIC_PSO
-  nIterations = 140;
+  nIterations = 120;
 elseif algo == PARALLEL_PSO
-  nIterations = 60;
+  nIterations = 120;
 elseif algo == PARALLEL_PSO_MULTI_SWARM
-  nIterations = 130;
+  nIterations = 120;
 else
   nIterations = 20;
 end
@@ -75,9 +47,9 @@ nSolarCells = double(nUnits);
 % f = figure(i+1);
 % b = uicontrol('style','push','string','Stop','callback','stopBtn=stopBtn+1');
 
-tsMem  = [];
-posMem = [];
-powMem = [];
+tsMem  = zeros(nIterations, 1);
+posMem = zeros(nIterations, double(nUnits));
+powMem = zeros(nIterations, double(nUnits));
 
 sIteration = [];
 pSpeedMem = [];
@@ -103,9 +75,9 @@ for iIteration = 1 : nIterations
     positions = data(1:end/2);
     powers = data(end/2+1:end);
   
-    tsMem  = [tsMem; timestamp];
-    posMem = [posMem; positions];
-    powMem = [powMem; powers];
+    tsMem(iIteration) =  timestamp;
+    posMem(iIteration, :) = positions;
+    powMem(iIteration, :) = powers;
     
   elseif typeOfMsg == PSO_DATA
     swarmIteration = double(typecast(uint8(buf(1:2)'), 'uint16'));
@@ -132,25 +104,16 @@ stopAlgoChar = PROTOCOL_STOP_ALGO;
 buf = [delimiter, typeOfMsg, lengthOfPayload, stopAlgoChar];
 fwrite(port, buf);
 
-% Remove contents of input buffer
-flushinput(port);
-
-% Disconnect from instrument object, obj1.
-fclose(port);
-
-% Clean up all objects.
-delete(port);
-
 %% Figures
 
 
-% fig = figure;
-% set(gcf, 'Position', get(0,'Screensize'));
-% lengthOfData = length(posMem) / nData;
-% for i = 1 : nUnits
-% %   fig(i) = figure(i);
-%   subplot(2,nUnits,i)
-%   plot(tsMem, posMem(i:nUnits:end));
-%   subplot(2,nUnits,i+nUnits)
-%   plot(tsMem, powMem(i:nUnits:end));
-% end
+fig = figure;
+set(gcf, 'Position', get(0,'Screensize'));
+lengthOfData = length(posMem) / nData;
+for i = 1 : nUnits
+%   fig(i) = figure(i);
+  subplot(2,nUnits,i)
+  plot(tsMem, posMem(:,i));
+  subplot(2,nUnits,i+nUnits)
+  plot(tsMem, powMem(:,i));
+end

@@ -172,6 +172,12 @@ void _Particle_Release (PsoParticle_t *p)
   Node_t *node = &_particlesNodes[p->linkKey];
   LinkedList_RemoveNode(node->list, node);
   LinkedList_AddToEnd(&_unusedParticles, node);
+  
+  SteadyState_Reset(&p->steadyState);
+  _Particle_ResetOptPos(&p->optPos);
+  Position_Reset(&p->pbest);
+  Position_Reset(&p->pbestAbs);
+  Position_Reset(&p->pos);
 }
 
 
@@ -379,6 +385,7 @@ BOOL _Particle_FsmStep (PsoParticle_t *p, PsoSwarmInterface_t *swarm)
 BOOL _Particle_SentinelEval (PsoParticle_t *p, float margin)
 {
   float jCompare;
+  float error;
   if (p->state == PARTICLE_STATE_STEADY_STATE)
   {
     jCompare = p->jSteady;
@@ -389,7 +396,8 @@ BOOL _Particle_SentinelEval (PsoParticle_t *p, float margin)
   }
   if (p->pos.curPos == p->pos.prevPos)
   {
-    if ( (ABS(p->pos.curFitness - jCompare) / p->pos.curFitness) >= margin)
+    error = p->pos.curFitness - jCompare;
+    if ( ((ABS(error) / p->pos.curFitness) >= margin) && (jCompare != 0.0f) )
     {
       p->oSentinelWarning = 1;
     }

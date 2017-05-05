@@ -219,6 +219,19 @@ void InitPorts(void)
   LED1_OFF;
   LED2_OFF;
 
+// Device reset
+//=================================================================
+  if (RCONbits.BOR)
+  {
+    RCONCLR = _RCON_BOR_MASK;
+  }
+  if (RCONbits.SWR)
+  {
+    RCONCLR = _RCON_SWR_MASK;
+    Port.F.SetPinsDigitalOut(BIT_0);  // LED1
+    LED1_ON;
+  }
+//=================================================================
 }
 
 

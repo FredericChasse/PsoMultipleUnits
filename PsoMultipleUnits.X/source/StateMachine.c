@@ -277,6 +277,7 @@ void StateAcq(void)
     oAdcReady = 0;
 
     GetAdcValues();
+    
 
     nSamples++;
     if (nSamples >= N_SAMPLES_PER_ADC_READ)
