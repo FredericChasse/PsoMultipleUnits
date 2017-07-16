@@ -28,7 +28,7 @@
 // Public definitions
 //==============================================================================
 
-#define PSO_SWARM_MAX_PARTICLES   (10)
+#define PSO_SWARM_MAX_PARTICLES   (N_UNITS_TOTAL)
 #define N_SWARMS_TOTAL            (N_UNITS_TOTAL + 1)
 
 typedef enum

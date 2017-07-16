@@ -33,6 +33,17 @@ typedef struct
   PsoType_t type;
 } Pso_t;
 
+typedef struct
+{
+  UINT8 nParaSwarms;
+  UINT8 nSeqSwarms;
+  PsoSwarmInterface_t *seqSwarms[N_UNITS_TOTAL + 1];
+  PsoSwarmInterface_t *paraSwarms[N_UNITS_TOTAL + 1];
+  float sampleTime;
+  float timeElapsed;
+  UINT32 iteration;
+} PpsoPno_t;
+
 
 // Private prototypes
 //==============================================================================

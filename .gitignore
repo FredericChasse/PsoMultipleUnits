@@ -9,7 +9,9 @@
 *.obj.dmp
 html/
 nbproject/private/
+nbproject\private\
 nbproject/Package-*.bash
+nbproject\Package-*.bash
 build/
 nbbuild/
 dist/
@@ -18,6 +20,7 @@ nbactions.xml
 nb-configuration.xml
 funclist
 nbproject/Makefile-*
+nbproject\Makefile-*
 disassembly/
 *.map
 dist\

@@ -17,6 +17,8 @@
         <itemPath>Objects/Algo/PsoParticle.h</itemPath>
         <itemPath>Objects/Algo/PsoSwarm.c</itemPath>
         <itemPath>Objects/Algo/PsoSwarm.h</itemPath>
+        <itemPath>Objects/Algo/Classifier.c</itemPath>
+        <itemPath>Objects/Algo/Classifier.h</itemPath>
       </logicalFolder>
       <itemPath>Objects/Algo/AlgoInterface.h</itemPath>
       <itemPath>Objects/Algo/SteadyState.c</itemPath>
@@ -125,7 +127,7 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC32</languageToolchain>
-        <languageToolchainVersion>1.42</languageToolchainVersion>
+        <languageToolchainVersion>1.43</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <compileType>
@@ -157,6 +159,8 @@
           <parseOnProdLoad>false</parseOnProdLoad>
           <alternateLoadableFile></alternateLoadableFile>
         </loading>
+        <subordinates>
+        </subordinates>
       </compileType>
       <makeCustomizationType>
         <makeCustomizationPreStepEnabled>false</makeCustomizationPreStepEnabled>

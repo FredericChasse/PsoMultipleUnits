@@ -364,6 +364,14 @@ void StateAcq(void)
             algo->Init(algo->ctx, algoArray);
             break;
             
+          case PPSO_PNO:
+            oAlgoIsPso      = 1;
+            oSessionActive  = 1;
+            nSamples        = 0;  // Reset the samples
+            algo = (AlgoInterface_t *) ExtremumSeekingInterface();
+            algo->Init(algo->ctx, algoArray);
+            break;
+            
           default:
             oAlgoIsPso      = 0;
             for (i = 0; i < nUnits; i++)

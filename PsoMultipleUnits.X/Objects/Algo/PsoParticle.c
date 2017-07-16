@@ -25,7 +25,8 @@
 // Private definitions
 //==============================================================================
 
-#define N_PARTICLES_TOTAL      (100)
+#define N_PARTICLES_TOTAL      (N_UNITS_TOTAL*3)    // 3 is the minimum number of particles per swarm, 
+                                                    // so if every unit is using a swarm, we need 3 particles per unit.
 
 typedef enum
 {

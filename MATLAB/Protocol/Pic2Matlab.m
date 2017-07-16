@@ -18,6 +18,8 @@ PARALLEL_PSO_MULTI_SWARM = uint8(2);
 MULTI_UNIT = uint8(3);
 EXTREMUM_SEEKING = uint8(4);
 CHARACTERIZATION = uint8(5);
+PPSO_PNO = uint8(6);
+PNO = uint8(7);
 
 PROTOCOL_START_ALGO = uint8('!' - 0);
 
@@ -87,6 +89,8 @@ algo = PARALLEL_PSO;
 % algo = PARALLEL_PSO_MULTI_SWARM;
 % algo = MULTI_UNIT;
 % algo = EXTREMUM_SEEKING;
+% algo = PPSO_PNO;
+% algo = PNO;
 % units = uint8(0:1:7);
 units = uint8(0:1:6);
 nUnits = uint8(length(units));
