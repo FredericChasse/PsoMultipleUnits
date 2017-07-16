@@ -119,16 +119,18 @@ inline INT8 SetPotAllUnits (UINT8 numPot, UINT8 value);
 //==============================================================================
 //#define MAX_POT_VALUE   9.55k +9.56k+9.53k+9.54k
 //#define MAX_POT_VALUE   9545
-#define MAX_POT_VALUE   1050.0f
+#define MAX_POT_VALUE   (1050.0f)
 //#define WIPER_VALUE     (51.7 + 50.9 + 52.3 + 50.2) / 4
 //#define WIPER_VALUE     51
-#define WIPER_VALUE     50.0f
+#define WIPER_VALUE     (50.0f)
 #define MIN_POT_VALUE   (WIPER_VALUE)
 //#define MID_VALUE       4.79k+4.88k+4.79k+4.79k
 //#define MID_VALUE       4800
-#define MID_VALUE       545.30f
+#define MID_VALUE       (545.30f)
 
-#define VREF            2.489f
+#define POT_STEP_VALUE  (3.9215686f)
+
+#define VREF            (2.489f)
 //#define VREF            3.268f
 
 #define CS0             LATDbits.LATD4

@@ -207,11 +207,11 @@ INT16 _Classifier_Classify (Classifier_t *c, UINT8 *idx, UINT8 nIdx, UINT8 *grou
         {
           tmpIdx = tmpGroups[iGroup - 1][lengths[iGroup - 1] - 1];
           tmpGroups[iGroup][lengths[iGroup]++] = tmpIdx;
-          tmpGroups[iGroup][lengths[iGroup]++] = optPosSorted[i];
+          tmpGroups[iGroup][lengths[iGroup]++] = idxSorted[i];
         }
         else
         {
-          tmpGroups[iGroup][lengths[iGroup]++] = optPosSorted[i];
+          tmpGroups[iGroup][lengths[iGroup]++] = idxSorted[i];
         }
       }
       else

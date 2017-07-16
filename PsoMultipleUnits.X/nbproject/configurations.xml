@@ -10,6 +10,14 @@
         <itemPath>Objects/Algo/ExtremumSeeking.c</itemPath>
         <itemPath>Objects/Algo/ExtremumSeeking.h</itemPath>
       </logicalFolder>
+      <logicalFolder name="f4" displayName="PNO" projectFiles="true">
+        <itemPath>Objects/Algo/Pno.c</itemPath>
+        <itemPath>Objects/Algo/Pno.h</itemPath>
+        <itemPath>Objects/Algo/PnoInstance.c</itemPath>
+        <itemPath>Objects/Algo/PnoInstance.h</itemPath>
+        <itemPath>Objects/Algo/SteadyStatePno.c</itemPath>
+        <itemPath>Objects/Algo/SteadyStatePno.h</itemPath>
+      </logicalFolder>
       <logicalFolder name="f1" displayName="PSO" projectFiles="true">
         <itemPath>Objects/Algo/Pso.c</itemPath>
         <itemPath>Objects/Algo/Pso.h</itemPath>
