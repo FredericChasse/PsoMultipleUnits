@@ -4,35 +4,38 @@
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //
-// File    : Pso.c
+// File    : PpsoPno.c
 // Author  : Frederic Chasse
-// Date    : 2017-03-19
+// Date    : 2017-07-16
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //
-// Purpose : This file implements the Particle Swarm Optimization.
+// Purpose : This file implements the Particle Swarm Optimization hybrid with P&O.
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-#include "Pso.h"
+#include "PpsoPno.h"
 #include "PsoSwarm.h"
-#include "Protocol.h" // For debugging
 #include "SteadyState.h"
-
+#include "Classifier.h"
 
 // Private definitions
 //==============================================================================
 
 typedef struct
 {
-  PsoType_t type;
-  UINT8 nSwarms;
   UnitArrayInterface_t *unitArray;
-  PsoSwarmInterface_t *swarms[N_UNITS_TOTAL + 1];
   float sampleTime;
   float timeElapsed;
   UINT32 iteration;
-} Pso_t;
+  UINT8 nParaSwarms;
+  UINT8 nSeqSwarms;
+  UINT8 nPnos;
+  void *pnos[N_UNITS_TOTAL+1];
+  PsoSwarmInterface_t *seqSwarms[N_UNITS_TOTAL + 1];
+  PsoSwarmInterface_t *paraSwarms[N_UNITS_TOTAL + 1];
+  ClassifierInterface_t *classifier;
+} PpsoPno_t;
 
 
 // Private prototypes
@@ -695,17 +698,7 @@ static int _CompareFunc (const void *p1, const void *p2)
 // Public functions
 //==============================================================================
 
-const AlgoInterface_t * PsoInterface(PsoType_t psoType)
+const AlgoInterface_t * PpsoPnoInterface()
 {
-  switch (psoType)
-  {
-    case PSO_TYPE_PSO_1D:
-      return &_pso1d_if;
-    case PSO_TYPE_PARALLEL_PSO_MULTI_SWARM:
-      return &_parallelPsoMultiSwarm_if;
-    case PSO_TYPE_PARALLEL_PSO:
-      return &_parallelPso_if;
-    default:
-      return NULL;
-  }
+  return NULL;
 }

@@ -18,6 +18,10 @@
         <itemPath>Objects/Algo/SteadyStatePno.c</itemPath>
         <itemPath>Objects/Algo/SteadyStatePno.h</itemPath>
       </logicalFolder>
+      <logicalFolder name="f5" displayName="PpsoPno" projectFiles="true">
+        <itemPath>Objects/Algo/PpsoPno.c</itemPath>
+        <itemPath>Objects/Algo/PpsoPno.h</itemPath>
+      </logicalFolder>
       <logicalFolder name="f1" displayName="PSO" projectFiles="true">
         <itemPath>Objects/Algo/Pso.c</itemPath>
         <itemPath>Objects/Algo/Pso.h</itemPath>

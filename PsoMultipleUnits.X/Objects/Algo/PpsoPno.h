@@ -4,13 +4,13 @@
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //
-// File    : Pso.h
+// File    : PpsoPno.h
 // Author  : Frederic Chasse
-// Date    : 2017-03-19
+// Date    : 2017-07-16
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //
-// Purpose : This file implements the Particle Swarm Optimization.
+// Purpose : This file implements the Particle Swarm Optimization hybrid with P&O.
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //
@@ -18,8 +18,8 @@
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-#ifndef __PSO_H__
-#define __PSO_H__
+#ifndef __PPSO_PNO_H__
+#define __PPSO_PNO_H__
 
 #include "Setup.h"
 #include "UnitArray.h"
@@ -28,19 +28,11 @@
 // Public definitions
 //==============================================================================
 
-typedef enum
-{
-  PSO_TYPE_PARALLEL_PSO_MULTI_SWARM
- ,PSO_TYPE_PARALLEL_PSO
- ,PSO_TYPE_PSO_1D
-} PsoType_t;
-
-
 // Public functions
 //==============================================================================
-const AlgoInterface_t * PsoInterface(PsoType_t psoType);
+const AlgoInterface_t * PpsoPnoInterface (void);
 
 
 
 
-#endif // __PSO_H__
+#endif // __PPSO_PNO_H__

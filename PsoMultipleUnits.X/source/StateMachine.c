@@ -28,6 +28,8 @@
 #include "PsoSwarm.h"   // For debug
 #include "Characterization.h"
 #include "ExtremumSeeking.h"
+#include "Pno.h"
+#include "PpsoPno.h"
 #include "Codec.h"
 #include "Protocol.h"
 #include "Rng.h"
@@ -365,10 +367,10 @@ void StateAcq(void)
             break;
             
           case PPSO_PNO:
-            oAlgoIsPso      = 1;
+            oAlgoIsPso      = 0;
             oSessionActive  = 1;
             nSamples        = 0;  // Reset the samples
-            algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PPSO_PNO);
+            algo = (AlgoInterface_t *) PpsoPnoInterface();
             algo->Init(algo->ctx, algoArray);
             break;
             
