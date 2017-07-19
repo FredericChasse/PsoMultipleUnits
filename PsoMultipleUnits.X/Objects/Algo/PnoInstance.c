@@ -38,6 +38,7 @@ typedef struct
   float umax;
   float k;
   float delta;
+  float perturbOsc;
   
   SteadyStatePno_t ss;
   float ssBuf[STEADY_STATE_PNO_MAX_SAMPLES];
@@ -47,12 +48,14 @@ typedef struct
 // Private prototypes
 //==============================================================================
 
-void  _PnoInstance_Init             (PnoInstance_t *pnoi, UINT8 id, float delta, float pos, float umin, float umax);
-void  _PnoInstance_SetSteadyState   (PnoInstance_t *pnoi, UINT8 samplesForSs, UINT8 oscAmp);
-float _PnoInstance_ComputePos       (PnoInstance_t *pnoi);
-void  _PnoInstance_SetPos           (PnoInstance_t *pnoi, float pos);
-void  _PnoInstance_SetFitness       (PnoInstance_t *pnoi, float fitness);
-void  _PnoInstance_Release          (PnoInstance_t *pnoi);
+void  _PnoInstance_Init               (PnoInstance_t *pnoi, UINT8 id, float delta, float pos, float umin, float umax, float perturbOsc);
+void  _PnoInstance_SetSteadyState     (PnoInstance_t *pnoi, UINT8 samplesForSs, UINT8 oscAmp);
+BOOL  _PnoInstance_GetSteadyState     (PnoInstance_t *pnoi);
+float _PnoInstance_ComputePosClassic  (PnoInstance_t *pnoi, BOOL *oPerturbed);
+float _PnoInstance_ComputePosSwarm    (PnoInstance_t *pnoi, BOOL *oPerturbed);
+void  _PnoInstance_SetPos             (PnoInstance_t *pnoi, float pos);
+void  _PnoInstance_SetFitness         (PnoInstance_t *pnoi, float fitness);
+void  _PnoInstance_Release            (PnoInstance_t *pnoi);
 
 
 // Private variables
@@ -71,7 +74,7 @@ static BOOL _oInstanceArrayInitialized = 0;
 // Private functions
 //==============================================================================
 
-void _PnoInstance_Init (PnoInstance_t *pnoi, UINT8 id, float delta, float pos, float umin, float umax)
+void _PnoInstance_Init (PnoInstance_t *pnoi, UINT8 id, float delta, float pos, float umin, float umax, float perturbOsc)
 {
   pnoi->id = id;
   pnoi->delta = delta;
@@ -80,12 +83,13 @@ void _PnoInstance_Init (PnoInstance_t *pnoi, UINT8 id, float delta, float pos, f
   pnoi->k = 1;
   pnoi->umax = umax;
   pnoi->umin = umin;
+  pnoi->perturbOsc = perturbOsc;
 }
 
 
-float _PnoInstance_ComputePos (PnoInstance_t *pnoi)
+float _PnoInstance_ComputePosClassic (PnoInstance_t *pnoi, BOOL *oPerturbed)
 {
-  SteadyStatePno_AddSample(&pnoi->ss, &pnoi->pos.curPos);
+  *oPerturbed = 0;
   
   if (pnoi->pos.curFitness < pnoi->pos.prevFitness)
   {
@@ -101,6 +105,48 @@ float _PnoInstance_ComputePos (PnoInstance_t *pnoi)
   if (pnoi->pos.curPos < pnoi->umin)
   {
     pnoi->pos.curPos = pnoi->umin;
+  }
+}
+
+
+float _PnoInstance_ComputePosSwarm (PnoInstance_t *pnoi, BOOL *oPerturbed)
+{
+  float error;
+  SteadyStatePno_AddSample(&pnoi->ss, &pnoi->pos.curPos);
+  
+  if (pnoi->pos.curFitness < pnoi->pos.prevFitness)
+  {
+    pnoi->k = -pnoi->k;
+  }
+  
+  if (!SteadyStatePno_CheckForSteadyState(&pnoi->ss))
+  {
+    pnoi->pos.prevPos = pnoi->pos.curPos;
+    pnoi->pos.curPos += pnoi->delta*pnoi->k;
+    if (pnoi->pos.curPos > pnoi->umax)
+    {
+      pnoi->pos.curPos = pnoi->umax;
+    }
+    if (pnoi->pos.curPos < pnoi->umin)
+    {
+      pnoi->pos.curPos = pnoi->umin;
+    }
+  }
+  else
+  {
+    if (pnoi->pos.curPos == pnoi->pos.prevPos)
+    {
+      error = (pnoi->pos.curFitness - pnoi->pos.prevFitness)/pnoi->pos.prevFitness;
+      if ( ABS(error) > pnoi->perturbOsc )
+      {
+        *oPerturbed = 1;
+      }
+      else
+      {
+        *oPerturbed = 0;
+      }
+    }
+    pnoi->pos.prevPos = pnoi->pos.curPos;
   }
 }
 
@@ -146,13 +192,24 @@ void _PnoInstance_SetSteadyState (PnoInstance_t *pnoi, UINT8 samplesForSs, UINT8
 }
 
 
+BOOL _PnoInstance_GetSteadyState (PnoInstance_t *pnoi)
+{
+  return pnoi->ss.oInSteadyState;
+}
+
+
 // Public functions
 //==============================================================================
 
-const PnoInstanceInterface_t * PnoInstanceInterface (void)
+const PnoInstanceInterface_t * PnoInstanceInterface (PnoType_t type)
 {
   UINT8 i;
   Node_t *temp;
+  
+  if (type > PNO_SWARM)
+  {
+    return NULL;
+  }
   
   if (!_oInstanceArrayInitialized)
   {
@@ -168,11 +225,12 @@ const PnoInstanceInterface_t * PnoInstanceInterface (void)
       
       _instances_if[i].ctx            = (void *)                  &_instances[i];
       _instances_if[i].Init           = (PnoiInit_fct)            &_PnoInstance_Init;
-      _instances_if[i].ComputePos     = (PnoiComputePos_fct)      &_PnoInstance_ComputePos;
+      _instances_if[i].ComputePos     = (PnoiComputePos_fct)      &_PnoInstance_ComputePosClassic;
       _instances_if[i].SetPos         = (PnoiSetPos_fct)          &_PnoInstance_SetPos;
       _instances_if[i].SetFitness     = (PnoiSetFitness_fct)      &_PnoInstance_SetFitness;
       _instances_if[i].Release        = (PnoiRelease_fct)         &_PnoInstance_Release;
       _instances_if[i].SetSteadyState = (PnoiSetSteadyState_fct)  &_PnoInstance_SetSteadyState;
+      _instances_if[i].GetSteadyState = (PnoiGetSteadyState_fct)  &_PnoInstance_GetSteadyState;
       
       // Init the linked list
       _instancesNodes[i].ctx = (void *) &_instances_if[i];
@@ -199,5 +257,15 @@ const PnoInstanceInterface_t * PnoInstanceInterface (void)
   temp = _unusedInstances.tail;
   LinkedList_RemoveNode(&_unusedInstances, temp);
   LinkedList_AddToEnd(&_usedInstances, temp);
+  
+  
+  if (type == PNO_CLASSIC)
+  {
+    ((PnoInstanceInterface_t *) temp->ctx)->ComputePos = (PnoiComputePos_fct) &_PnoInstance_ComputePosClassic;
+  }
+  else
+  {
+    ((PnoInstanceInterface_t *) temp->ctx)->ComputePos = (PnoiComputePos_fct) &_PnoInstance_ComputePosSwarm;
+  }
   return temp->ctx;
 }

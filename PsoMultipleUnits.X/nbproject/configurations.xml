@@ -17,6 +17,8 @@
         <itemPath>Objects/Algo/PnoInstance.h</itemPath>
         <itemPath>Objects/Algo/SteadyStatePno.c</itemPath>
         <itemPath>Objects/Algo/SteadyStatePno.h</itemPath>
+        <itemPath>Objects/Algo/PnoSwarm.c</itemPath>
+        <itemPath>Objects/Algo/PnoSwarm.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f5" displayName="PpsoPno" projectFiles="true">
         <itemPath>Objects/Algo/PpsoPno.c</itemPath>

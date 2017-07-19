@@ -27,13 +27,19 @@
 // Public definitions
 //==============================================================================
 
+typedef enum
+{
+  PNO_CLASSIC
+ ,PNO_SWARM
+} PnoType_t;
 
-typedef void  (*PnoiInit_fct)             (void *ctx, UINT8 id, float delta, float pos, float umin, float umax);
-typedef float (*PnoiComputePos_fct)       (void *ctx);
+typedef void  (*PnoiInit_fct)             (void *ctx, UINT8 id, float delta, float pos, float umin, float umax, float perturbOsc);
+typedef float (*PnoiComputePos_fct)       (void *ctx, BOOL *oPerturbed);
 typedef void  (*PnoiSetPos_fct)           (void *ctx, float pos);
 typedef void  (*PnoiSetFitness_fct)       (void *ctx, float fitness);
 typedef void  (*PnoiRelease_fct)          (void *ctx);
 typedef void  (*PnoiSetSteadyState_fct)   (void *ctx, UINT8 nSamplesForSs, UINT8 oscAmp);
+typedef BOOL  (*PnoiGetSteadyState_fct)   (void *ctx);
 
 typedef struct
 {
@@ -44,13 +50,14 @@ typedef struct
   PnoiSetFitness_fct      SetFitness;
   PnoiRelease_fct         Release;
   PnoiSetSteadyState_fct  SetSteadyState;
+  PnoiGetSteadyState_fct  GetSteadyState;
 } PnoInstanceInterface_t;
 
 
 // Public functions
 //==============================================================================
 
-const PnoInstanceInterface_t * PnoInstanceInterface (void);
+const PnoInstanceInterface_t * PnoInstanceInterface (PnoType_t type);
 
 
 

@@ -4,25 +4,28 @@
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //
-// File    : Pno.c
+// File    : PnoSwarm.c
 // Author  : Frederic Chasse
 // Date    : 2017-04-19
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //
 // Purpose : This file implements the methods needed for the Perturb & Observe
-//           algorithm.
+//           swarm algorithm used with PPSO-P&O.
 //
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-#include "Pno.h"
+#include "PnoSwarm.h"
 #include "Potentiometer.h"
 #include "MathFunctions.h"
 #include "Position.h"
 #include "PnoInstance.h"
+#include "LinkedList.h"
 
 // Private definitions
 //==============================================================================
+
+#define N_PNO_SWARMS_TOTAL    (N_UNITS_TOTAL)
 
 typedef struct
 {
@@ -80,6 +83,15 @@ const AlgoInterface_t _pno_if =
  ,.GetDebugData   = (AlgoGetDebugData_fct)    &_Pno_GetDebugData
 };
 
+PnoInstance_t           _instances    [N_PNO_SWARMS_TOTAL];
+PnoInstanceInterface_t  _instances_if [N_PNO_SWARMS_TOTAL];
+
+LinkedList_t _unusedInstances       = {NULL, NULL, 0, N_PNO_SWARMS_TOTAL};
+LinkedList_t _usedInstances         = {NULL, NULL, 0, N_PNO_SWARMS_TOTAL};
+Node_t       _instancesNodes          [N_PNO_SWARMS_TOTAL];
+
+static BOOL _oInstanceArrayInitialized = 0;
+
 
 // Private functions
 //==============================================================================
@@ -94,7 +106,7 @@ INT8 _Pno_Init (Pno_t *pno, UnitArrayInterface_t *unitArray)
   
   for (i = 0; i < pno->nInstances; i++)
   {
-    pno->instances[i] = (PnoInstanceInterface_t *) PnoInstanceInterface(PNO_CLASSIC);
+    pno->instances[i] = (PnoInstanceInterface_t *) PnoInstanceInterface(PNO_SWARM);
     pno->param[i].delta = POT_STEP_VALUE;
     pno->param[i].uinit = potRealValues[POT_MAX_INDEX/2];
     pno->param[i].umax = potRealValues[POT_MIN_INDEX];
@@ -134,7 +146,7 @@ void _Pno_Release (Pno_t *pno)
 INT8 _Pno_Run (Pno_t *pno)
 {
   UINT8 i;
-  BOOL dummy;
+  BOOL oPerturbed[N_UNITS_TOTAL];
   PnoInstanceInterface_t *pnoi;
   float newPos;
   BOOL oFirstIteration = pno->timeElapsed == 0 ? 1 : 0;
@@ -151,7 +163,7 @@ INT8 _Pno_Run (Pno_t *pno)
       pnoi->SetFitness(pnoi->ctx, pno->unitArray->GetPower(pno->unitArray->ctx, i));
     }
     
-    newPos = pnoi->ComputePos(pnoi->ctx, &dummy);
+    newPos = pnoi->ComputePos(pnoi->ctx, &oPerturbed[i]);
     pno->unitArray->SetPos(pno->unitArray->ctx, i, newPos);
   }
   
@@ -168,7 +180,7 @@ float _Pno_GetTimeElapsed (Pno_t *pno)
 // Public functions
 //==============================================================================
 
-const AlgoInterface_t * PnoInterface (void)
+const AlgoInterface_t * PnoSwarmInterface (void)
 {
   return &_pno_if;
 }
