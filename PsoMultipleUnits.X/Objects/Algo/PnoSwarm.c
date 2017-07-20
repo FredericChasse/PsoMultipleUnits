@@ -40,67 +40,63 @@ typedef struct
 
 typedef struct
 {
+  UINT8 id;
+  UINT8 linkKey;
+  
   UnitArrayInterface_t *unitArray;
   
-  float sampleTime;
-  float timeElapsed;
   UINT8 nInstances;
+  UINT32 iteration;
   PnoParam_t param[N_UNITS_TOTAL];
   PnoInstanceInterface_t *instances[N_UNITS_TOTAL];
-} Pno_t;
+} PnoSwarm_t;
 
 
 // Private prototypes
 //==============================================================================
 
-INT8  _Pno_Init            (Pno_t *pno, UnitArrayInterface_t *unitArray);
-INT8  _Pno_Run             (Pno_t *pno);
-float _Pno_GetTimeElapsed  (Pno_t *pno);
-void  _Pno_Release         (Pno_t *pno);
-void  _Pno_GetDebugData    (Pno_t *pno, void *ret);
+typedef INT8  (*PnoSwarmInit_fct)             (void *ctx, UnitArrayInterface_t *unitArray);
+typedef void  (*PnoSwarmComputeAllPos_fct)    (void *ctx, float *newPos, BOOL *oPerturbed, UINT8 *nPerturbed);
+typedef void  (*PnoSwarmRemoveInstances_fct)  (void *ctx, UINT8 *idx, UINT8 nInstances);
+typedef void  (*PnoSwarmRelease_fct)          (void *ctx);
+
+INT8  _Pno_Init             (PnoSwarm_t *pno, UnitArrayInterface_t *unitArray);
+void  _Pno_ComputeAllPos    (PnoSwarm_t *pno, float *newPos, BOOL *oPerturbed, UINT8 *nPerturbed);
+void  _Pno_RemoveInstances  (PnoSwarm_t *pno, UINT8 *idx, UINT8 nInstances);
+void  _Pno_Release          (PnoSwarm_t *pno);
+void  _Pno_GetDebugData     (PnoSwarm_t *pno, void *ret);
+
+static int _CompareFunc (const void *p1, const void *p2);
 
 
 // Private variables
 //==============================================================================
 
-Pno_t _pno = 
+PnoSwarm_t _pno = 
 {
   .unitArray      = NULL
  ,.instances      = NULL
- ,.sampleTime     = SAMPLING_TIME_FLOAT
- ,.timeElapsed    = 0
  ,.nInstances     = 0
  ,.param          = {0}
 };
 
-const AlgoInterface_t _pno_if = 
-{
-  .ctx            = (void *)                  &_pno
- ,.Init           = (AlgoInit_fct)            &_Pno_Init
- ,.Run            = (AlgoRun_fct)             &_Pno_Run
- ,.GetTimeElapsed = (AlgoGetTimeElapsed_fct)  &_Pno_GetTimeElapsed
- ,.Release        = (AlgoRelease_fct)         &_Pno_Release
- ,.GetDebugData   = (AlgoGetDebugData_fct)    &_Pno_GetDebugData
-};
+PnoSwarm_t            _pnos         [N_PNO_SWARMS_TOTAL];
+PnoSwarmInterface_t   _pnos_if      [N_PNO_SWARMS_TOTAL];
 
-PnoInstance_t           _instances    [N_PNO_SWARMS_TOTAL];
-PnoInstanceInterface_t  _instances_if [N_PNO_SWARMS_TOTAL];
+LinkedList_t          _unusedPnos = {NULL, NULL, 0, N_PNO_SWARMS_TOTAL};
+LinkedList_t          _usedPnos   = {NULL, NULL, 0, N_PNO_SWARMS_TOTAL};
+Node_t                _pnosNodes    [N_PNO_SWARMS_TOTAL];
 
-LinkedList_t _unusedInstances       = {NULL, NULL, 0, N_PNO_SWARMS_TOTAL};
-LinkedList_t _usedInstances         = {NULL, NULL, 0, N_PNO_SWARMS_TOTAL};
-Node_t       _instancesNodes          [N_PNO_SWARMS_TOTAL];
-
-static BOOL _oInstanceArrayInitialized = 0;
+static BOOL _oPnoArrayInitialized = 0;
 
 
 // Private functions
 //==============================================================================
 
-INT8 _Pno_Init (Pno_t *pno, UnitArrayInterface_t *unitArray)
+INT8 _Pno_Init (PnoSwarm_t *pno, UnitArrayInterface_t *unitArray)
 {
   UINT8 i = 0;
   
-  pno->timeElapsed    = 0;
   pno->unitArray      = unitArray;
   pno->nInstances     = unitArray->GetNUnits(unitArray->ctx);
   
@@ -123,13 +119,13 @@ INT8 _Pno_Init (Pno_t *pno, UnitArrayInterface_t *unitArray)
 }
 
 
-void _Pno_GetDebugData (Pno_t *pno, void *ret)
+void _Pno_GetDebugData (PnoSwarm_t *pno, void *ret)
 {
   return;
 }
 
 
-void _Pno_Release (Pno_t *pno)
+void _Pno_Release (PnoSwarm_t *pno)
 {
   UINT8 i;
   
@@ -138,12 +134,11 @@ void _Pno_Release (Pno_t *pno)
     pno->instances[i]->Release(pno->instances[i]->ctx);
   }
   pno->nInstances     = 0;
-  pno->timeElapsed    = 0;
   pno->unitArray      = NULL;
 }
 
 
-INT8 _Pno_Run (Pno_t *pno)
+INT8 _Pno_Run (PnoSwarm_t *pno)
 {
   UINT8 i;
   BOOL oPerturbed[N_UNITS_TOTAL];
@@ -171,16 +166,103 @@ INT8 _Pno_Run (Pno_t *pno)
 }
 
 
-float _Pno_GetTimeElapsed (Pno_t *pno)
+void _Swarm_RemoveParticles (PsoSwarm_t *s, UINT8 *idx, UINT8 nParticles)
 {
-  return pno->timeElapsed;
+  UINT8 i;
+  
+  if (nParticles > s->nParticles)
+  {
+    return;
+  }
+  
+  qsort( (void *) idx, (size_t) nParticles, sizeof(UINT8), &_CompareFunc);
+  
+  for (i = 0; i < nParticles; i++)
+  {
+    s->particles[idx[i]]->Release(s->particles[idx[i]]->ctx);
+    _Swarm_ShiftParticlesLeft(s, idx[i]);
+    s->nParticles--;
+  }
+  
+  for (i = 0; i < s->nParticles; i++)
+  {
+    s->particles[i]->SetId(s->particles[i]->ctx, i);
+  }
+}
+
+
+void _PnoSwarm_ShiftInstancesLeft (PnoSwarm_t *pno, UINT8 idxToShift)
+{
+  if (idxToShift == (pno->nInstances - 1))
+  {
+    return;
+  }
+  UINT8 offset = pno->nInstances - idxToShift - 1;
+  memmove(&pno->instances[idxToShift], &pno->instances[idxToShift + 1], offset * sizeof(PnoInstanceInterface_t *));
+}
+
+
+static int _CompareFunc (const void *p1, const void *p2)
+{
+  if ( *(UINT8 *) p1  > *(UINT8 *) p2 ) return -1;
+  if ( *(UINT8 *) p1 == *(UINT8 *) p2 ) return  0;
+  if ( *(UINT8 *) p1  < *(UINT8 *) p2 ) return  1;
 }
 
 
 // Public functions
 //==============================================================================
 
-const AlgoInterface_t * PnoSwarmInterface (void)
+const PnoSwarmInterface_t * PnoSwarmInterface (void)
 {
-  return &_pno_if;
+  UINT8 i;
+  Node_t *temp;
+  
+  if (!_oPnoArrayInitialized)
+  {
+    _oPnoArrayInitialized = 1;
+    
+    _unusedInstances.head = (void *) &_instancesNodes[0];
+    _unusedInstances.count = 1;
+    
+    for (i = 0; i < N_PNO_SWARMS_TOTAL; i++)
+    {
+      // Init the instance itself and its interface
+      _pnos[i].linkKey = i;
+      
+      _pnos_if[i].ctx            = (void *)                  &_pnos[i];
+      _pnos_if[i].Init           = (PnoiInit_fct)            &_PnoInstance_Init;
+      _pnos_if[i].ComputePos     = (PnoiComputePos_fct)      &_PnoInstance_ComputePosClassic;
+      _pnos_if[i].SetPos         = (PnoiSetPos_fct)          &_PnoInstance_SetPos;
+      _pnos_if[i].SetFitness     = (PnoiSetFitness_fct)      &_PnoInstance_SetFitness;
+      _pnos_if[i].Release        = (PnoiRelease_fct)         &_PnoInstance_Release;
+      _pnos_if[i].SetSteadyState = (PnoiSetSteadyState_fct)  &_PnoInstance_SetSteadyState;
+      _pnos_if[i].GetSteadyState = (PnoiGetSteadyState_fct)  &_PnoInstance_GetSteadyState;
+      
+      // Init the linked list
+      _pnosNodes[i].ctx = (void *) &_pnos_if[i];
+      _pnosNodes[i].key = i;
+      
+      if (i < (N_PNO_SWARMS_TOTAL - 1))
+      {
+        _pnosNodes[i].next = &_pnosNodes[i + 1];
+      }
+      else
+      {
+        _pnosNodes[i].next = NULL;
+      }
+    }
+    
+    LinkedList_Init(&_unusedPnos, &_pnosNodes[0]);
+  }
+  
+  if (_unusedPnos.count == 0)
+  {
+    return NULL;
+  }
+  
+  temp = _unusedPnos.tail;
+  LinkedList_RemoveNode(&_unusedPnos, temp);
+  LinkedList_AddToEnd(&_usedPnos, temp);
+  return temp->ctx;
 }
