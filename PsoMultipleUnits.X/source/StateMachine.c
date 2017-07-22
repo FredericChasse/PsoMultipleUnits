@@ -286,6 +286,12 @@ void StateAcq(void)
     {
       nSamples = 0;
       
+      sUartLineBuffer_t buf = {0};
+      UINT8 string[6] = {'a','l','l','o','\r','\n'};
+      memcpy(buf.buffer, string, 6);
+      buf.length = 6;
+      Uart.PutTxFifoBuffer(UART6, &buf);
+      
       if (oSessionActive)
       {
         oNewSample = 1;   // Go to stateCompute

@@ -90,7 +90,7 @@ void StartInterrupts  (void);
 
 #define PI            (3.14159265359f)
 
-#define N_UNITS_TOTAL (8u)
+#define N_UNITS_TOTAL (15u)
 
 #define ADC_TIMER_PERIOD        (200)
 #define ADC_TIMER_SCALE         (SCALE_US)

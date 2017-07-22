@@ -24,7 +24,7 @@
 typedef struct
 {
   UINT16  intensities[N_UNITS_TOTAL];
-  UINT8   leds      [16];
+  UINT8   leds       [N_UNITS_TOTAL];
   UINT8   nLeds;
 } Perturb_t;
 
@@ -43,7 +43,7 @@ Perturb_t _perturb =
 {
   .intensities = {0}
  ,.nLeds      = N_UNITS_TOTAL
- ,.leds       = {UNIT_0_PWM, UNIT_1_PWM, UNIT_2_PWM, UNIT_3_PWM, UNIT_4_PWM, UNIT_5_PWM, UNIT_6_PWM, UNIT_7_PWM}
+ ,.leds       = {UNIT_0_PWM, UNIT_1_PWM, UNIT_2_PWM, UNIT_3_PWM, UNIT_4_PWM, UNIT_5_PWM, UNIT_6_PWM, UNIT_7_PWM, UNIT_8_PWM, UNIT_9_PWM, UNIT_10_PWM, UNIT_11_PWM, UNIT_12_PWM, UNIT_13_PWM, UNIT_14_PWM}
 };
 
 const PerturbInterface_t _perturb_if = 

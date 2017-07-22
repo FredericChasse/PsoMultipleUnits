@@ -311,13 +311,20 @@ void InitAdc(void)
   // Hardware config.
   //================================================
   UINT32 configHardware = ADC_VREF_EXT_AVSS         // Vref+ external and Vref- is AVss
-                        | ADC_SAMPLES_PER_INT_8;    // 8 sample/interrupt
+                        | ADC_SAMPLES_PER_INT_15;    // 8 sample/interrupt
   //================================================
 
   // Port config.
   //================================================
   UINT32 configPort =   //ENABLE_ALL_ANA
-                        ENABLE_AN8_ANA
+                        ENABLE_AN1_ANA
+                      | ENABLE_AN2_ANA
+                      | ENABLE_AN3_ANA
+                      | ENABLE_AN4_ANA
+                      | ENABLE_AN5_ANA
+                      | ENABLE_AN6_ANA
+                      | ENABLE_AN7_ANA
+                      | ENABLE_AN8_ANA
                       | ENABLE_AN9_ANA
                       | ENABLE_AN10_ANA
                       | ENABLE_AN11_ANA
@@ -328,13 +335,13 @@ void InitAdc(void)
                       ; // Enable AN1-AN15 in analog mode
   
   UINT32 configScan =   SKIP_SCAN_AN0  // Skip AN0 as it's vref+
-                      | SKIP_SCAN_AN1
-                      | SKIP_SCAN_AN2
-                      | SKIP_SCAN_AN3
-                      | SKIP_SCAN_AN4
-                      | SKIP_SCAN_AN5
-                      | SKIP_SCAN_AN6
-                      | SKIP_SCAN_AN7
+//                      | SKIP_SCAN_AN1
+//                      | SKIP_SCAN_AN2
+//                      | SKIP_SCAN_AN3
+//                      | SKIP_SCAN_AN4
+//                      | SKIP_SCAN_AN5
+//                      | SKIP_SCAN_AN6
+//                      | SKIP_SCAN_AN7
 //                      | SKIP_SCAN_AN8
 //                      | SKIP_SCAN_AN9
 //                      | SKIP_SCAN_AN10

@@ -1,6 +1,10 @@
 clear
 % close all
 
+% Next 2 lines are to close any open waitbar
+f = findall(0,'tag','TMWWaitbar');
+delete(f);
+
 %% Constants
 
 % PROTOCOL_DELIMITER = uint8(hex2num('7E'));
@@ -83,16 +87,16 @@ fwrite(port, buf);
 % Start algo
 typeOfMsg = START_ACQ;
 startAlgoChar = PROTOCOL_START_ALGO;
-% algo = CHARACTERIZATION;
+algo = CHARACTERIZATION;
 % algo = CLASSIC_PSO;
-algo = PARALLEL_PSO;
+% algo = PARALLEL_PSO;
 % algo = PARALLEL_PSO_MULTI_SWARM;
 % algo = MULTI_UNIT;
 % algo = EXTREMUM_SEEKING;
 % algo = PPSO_PNO;
 % algo = PNO;
 % units = uint8(0:1:7);
-units = uint8(0:1:6);
+units = uint8(4:1:11);
 nUnits = uint8(length(units));
 % lengthOfPayload = fliplr(typecast(uint16(3 + nUnits), 'uint8'));
 lengthOfPayload = typecast(uint16(3 + nUnits), 'uint8');
@@ -101,13 +105,18 @@ buf = [delimiter, typeOfMsg, lengthOfPayload, startAlgoChar, algo, nUnits, units
 fwrite(port, buf);
 
 if algo == CHARACTERIZATION
-  nIterations = 256;
+%   nIterations = 256;
+  nIterations = 30;
 elseif algo == CLASSIC_PSO
   nIterations = 140;
 elseif algo == PARALLEL_PSO
   nIterations = 60;
 elseif algo == PARALLEL_PSO_MULTI_SWARM
   nIterations = 130;
+elseif algo == PPSO_PNO
+  nIterations = 130;
+elseif algo == PNO
+  nIterations = 50;
 else
   nIterations = 20;
 end
@@ -131,6 +140,7 @@ pPosMem = [];
 pPowMem = [];
 
 tic
+wbh = waitbar(0, ['Iteration : ' num2str(0) '/' num2str(nIterations)]);  % Waitbar handle
 for iIteration = 1 : nIterations
   % header
 %   buf = fread(port, SIZE_OF_PROTOCOL_HEADER, 'uint8');
@@ -167,8 +177,10 @@ for iIteration = 1 : nIterations
     pPosMem = [pPosMem; particlesPos];
     pPowMem = [pPowMem; particlesPow];
   end
+    waitbar(iIteration/nIterations, wbh, ['Iteration: ' num2str(iIteration) '/' num2str(nIterations)])
 end
 toc
+close(wbh)
 
 % Stop algo
 typeOfMsg = STOP_ACQ;
@@ -218,161 +230,3 @@ for i = 1 : nUnits
   subplot(2,nUnits,i+nUnits)
   plot(tsMem, powMem(i:nUnits:end));
 end
-
-% if matlabMode == 'c'
-%   % Extract data from figure
-%   for i = 1 : nSolarCells
-%     axesObjs = get(fig(i), 'Children');
-%     dataObjs = get(axesObjs, 'Children');
-%     xdata = get(dataObjs, 'XData');
-%     ydata = get(dataObjs, 'YData');
-%     ndata = length(xdata);
-% 
-%     x1 = [xdata{ndata}];
-%     y1 = [ydata{ndata}];
-%     for j = ndata - 1 : -1 : 1
-%       x1 = [x1 xdata{j}];
-%       y1 = [y1 ydata{j}];
-%     end
-% 
-%     R(i,:) = x1./255.*1000 + 50;
-%   %   P(i,:) = y1.^2 ./ R(i,:);
-%     P(i,:) = y1;
-%   end
-% 
-%   fig(i+1) = figure(i +1);
-%   hold on
-%   set(gcf,'units','normalized','outerposition',[0 0 1 1])
-%   
-%   plotLines  = {'-' '-' '-' '-' '--' '--' '--' '--'};
-%   plotWidths = [.5 .5 .5 .5 1 1 1 1];
-%   
-%   for i = 1 : nSolarCells
-%     Ropt(i) = R(i,find(P(i,:) >= max(P(i,:))));
-%   end
-%   
-%   for i = 1 : nSolarCells
-%     if matlabMode == 'c'
-%       plot(R(i,:), P(i,:), plotLines{i}, 'LineWidth', plotWidths(i))
-%     else
-%       plot(R(i,:), P(i,:))
-%     end
-%     legendStr{i} = ['Cellule ' num2str(i)];
-%   end
-%   legend(legendStr);
-% %   legend({'Cellule 1' 'Cellule 2' 'Cellule 3' 'Cellule 4'})
-%   title('Duty cycle = test%')
-%   
-%   yAxis = ylim;
-%   for i = 1 : nSolarCells
-%     text(800, yAxis(2)*(1.01 - i*.03), ['Ropt' num2str(i) ' = ' num2str(Ropt(i)) ' \Omega'])
-%   end
-%   
-%   Ropt
-%   
-%   % saveas(fig(nSolarCells + 1),'4cells/test','fig')
-%   % saveas(fig(nSolarCells + 1),'4cells/test','jpg')
-%   
-% elseif matlabMode == 'p'
-%   format short g
-% %   psoString = {'i' 'Pbest1' 'Pbest2' 'Pbest3' 'Gbest' 'v1' 'v2' 'v3'};
-% %   psoData;
-% %   close all
-%   % Extract data from figure
-%   for i = 1 : nSolarCells*2
-%     axesObjs = get(fig(i), 'Children');
-%     dataObjs = get(axesObjs, 'Children');
-%     xdata = get(dataObjs, 'XData');
-%     ydata = get(dataObjs, 'YData');
-%     ndata = length(xdata);
-% 
-%     x1 = [xdata{ndata}];
-%     y1 = [ydata{ndata}];
-%     for j = ndata - 1 : -1 : 1
-%       x1 = [x1 xdata{j}];
-%       y1 = [y1 ydata{j}];
-%     end
-% 
-%     tt(i,:) = x1;
-%     yy(i,:) = y1;
-%   end
-%   
-%   plotLines  = {'-' '-' '-' '-' '--' '--' '--' '--'};
-%   plotWidths = [.5 .5 .5 .5 1 1 1 1];
-% 
-%   fig(i+1) = figure(i +1);
-%   subplot(2,1,1)
-%   hold on
-%   for i = 1 : nSolarCells
-% %     plot(tt(i,:), yy(i,:), plotLines{i}, 'LineWidth', plotWidths(i))
-%     plot(tt(i,:), yy(i,:))
-%     legendStr{i} = ['Cellule ' num2str(i)];
-%   end
-%   legend(legendStr);
-%   xlabel('Itération')
-%   ylabel('Résistance externe [\Omega]')
-%   title('Évolution des résistances externes')
-%   
-%   subplot(2,1,2)
-%   hold on
-%   for i = nSolarCells + 1 : nSolarCells*2
-% %     plot(tt(i,:), yy(i,:), plotLines{i}, 'LineWidth', plotWidths(i))
-%     plot(tt(i,:), yy(i,:))
-%   end
-%   legend(legendStr);
-%   xlabel('Itération')
-%   ylabel('Puissance [W]')
-%   title('Évolution des puissances des cellules')
-%   
-% %   set(gcf,'units','normalized','outerposition',[0 0 1 1])
-%  
-% elseif matlabMode == 'm'
-% %   close all
-% % Extract data from figure
-%   for i = 1 : nSolarCells*2
-%     axesObjs = get(fig(i), 'Children');
-%     dataObjs = get(axesObjs, 'Children');
-%     xdata = get(dataObjs, 'XData');
-%     ydata = get(dataObjs, 'YData');
-%     ndata = length(xdata);
-% 
-%     x1 = [xdata{ndata}];
-%     y1 = [ydata{ndata}];
-%     for j = ndata - 1 : -1 : 1
-%       x1 = [x1 xdata{j}];
-%       y1 = [y1 ydata{j}];
-%     end
-% 
-%     tt(i,:) = x1;
-%     yy(i,:) = y1;
-%   end
-%   
-%   plotLines  = {'-' '-' '-' '-' '--' '--' '--' '--'};
-%   plotWidths = [.5 .5 .5 .5 1 1 1 1];
-% 
-%   fig(i+1) = figure(i +1);
-%   subplot(2,1,1)
-%   hold on
-%   for i = 1 : nSolarCells
-% %     plot(tt(i,:), yy(i,:), plotLines{i}, 'LineWidth', plotWidths(i))
-%     plot(tt(i,:), yy(i,:))
-%     legendStr{i} = ['Cellule ' num2str(i)];
-%   end
-%   legend(legendStr);
-%   xlabel('Itération')
-%   ylabel('Résistance externe [\Omega]')
-%   title('Évolution des résistances externes')
-%   
-%   subplot(2,1,2)
-%   hold on
-%   for i = nSolarCells + 1 : nSolarCells*2
-% %     plot(tt(i,:), yy(i,:), plotLines{i}, 'LineWidth', plotWidths(i))
-%     plot(tt(i,:), yy(i,:))
-%   end
-%   legend(legendStr);
-%   xlabel('Itération')
-%   ylabel('Puissance [W]')
-%   title('Évolution des puissances des cellules')
-%   
-% %   set(gcf,'units','normalized','outerposition',[0 0 1 1])
-% end
