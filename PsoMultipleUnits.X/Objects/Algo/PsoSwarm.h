@@ -83,6 +83,8 @@ typedef void    (*PsoSwarmSetId_fct)                      (void *ctx, UINT8 id);
 typedef float   (*PsoSwarmGetParticlePos_fct)             (void *ctx, UINT8 idx);
 typedef float   (*PsoSwarmGetParticleSpeed_fct)           (void *ctx, UINT8 idx);
 typedef float   (*PsoSwarmGetParticleFitness_fct)         (void *ctx, UINT8 idx);
+typedef void    (*PsoSwarmUpdateParticlesFitness_fct)     (void *ctx);
+typedef void    (*PsoSwarmSetParticlePos_fct)             (void *ctx, UINT8 idx, float pos);
   
 typedef struct
 {
@@ -114,6 +116,8 @@ typedef struct
   PsoSwarmGetParticlePos_fct            GetParticlePos;
   PsoSwarmGetParticleSpeed_fct          GetParticleSpeed;
   PsoSwarmGetParticleFitness_fct        GetParticleFitness;
+  PsoSwarmUpdateParticlesFitness_fct    UpdateParticlesFitness;
+  PsoSwarmSetParticlePos_fct            SetParticlePos;
 } PsoSwarmInterface_t;
 
 

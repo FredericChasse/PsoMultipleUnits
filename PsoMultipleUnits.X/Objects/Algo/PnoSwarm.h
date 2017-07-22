@@ -24,24 +24,47 @@
 
 #include "Setup.h"
 #include "UnitArray.h"
-#include "AlgoInterface.h"
 
 // Public definitions
 //==============================================================================
 
-typedef INT8  (*PnoSwarmInit_fct)             (void *ctx, UnitArrayInterface_t *unitArray);
-typedef void  (*PnoSwarmComputeAllPos_fct)    (void *ctx, float *newPos, BOOL *oPerturbed, UINT8 *nPerturbed);
+typedef struct
+{
+  float         delta;
+  float         umin;
+  float         umax;
+  float         uinit;
+  UINT8         nSamplesForSs;
+  UINT8         oscAmp;
+  float         perturbOsc;
+} PnoSwarmParam_t;
+
+typedef INT8  (*PnoSwarmInit_fct)             (void *ctx, UnitArrayInterface_t *unitArray, PnoSwarmParam_t *param, UINT8 id);
+typedef UINT8 (*PnoSwarmComputeAllPos_fct)    (void *ctx, float *newPos, UINT8 *idxPerturbed);
 typedef void  (*PnoSwarmRemoveInstances_fct)  (void *ctx, UINT8 *idx, UINT8 nInstances);
-typedef void  (*PnoSwarmGetSteadyState_fct)   (void *ctx, UINT8 *idx);
+typedef BOOL  (*PnoSwarmGetSteadyState_fct)   (void *ctx, UINT8 idx);
 typedef void  (*PnoSwarmRelease_fct)          (void *ctx);
+typedef void  (*PnoSwarmSetPos_fct)           (void *ctx, UINT8 idx, float pos);
+typedef void  (*PnoSwarmSetFitness_fct)       (void *ctx, UINT8 idx, float fitness);
+typedef UINT8 (*PnoSwarmGetNInstances_fct)    (void *ctx);
+typedef void  (*PnoSwarmIncIteration_fct)     (void *ctx);
+typedef void* (*PnoSwarmGetArray_fct)         (void *ctx);
+typedef void  (*PnoSwarmSetId_fct)            (void *ctx, UINT8 id);
 
 typedef struct
 {
   void                       *ctx;
-  AlgoInit_fct                Init;
+  PnoSwarmInit_fct            Init;
   PnoSwarmComputeAllPos_fct   ComputeAllPos;
   PnoSwarmRemoveInstances_fct RemoveInstances;
-  AlgoRelease_fct             Release;
+  PnoSwarmRelease_fct         Release;
+  PnoSwarmGetSteadyState_fct  GetSteadyState;
+  PnoSwarmSetPos_fct          SetPos;
+  PnoSwarmGetNInstances_fct   GetNInstances;
+  PnoSwarmSetFitness_fct      SetFitness;
+  PnoSwarmIncIteration_fct    IncIteration;
+  PnoSwarmGetArray_fct        GetArray;
+  PnoSwarmSetId_fct           SetId;
 } PnoSwarmInterface_t;
 
 // Public functions

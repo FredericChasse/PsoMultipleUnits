@@ -34,6 +34,7 @@ typedef INT8  (*ClassifierUpdateValues_fct) (void *ctx);
 typedef INT8  (*ClassifierResetValues_fct)  (void *ctx, UINT8 *idx, UINT8 nIdx);
 typedef INT16 (*ClassifierClassify_fct)     (void *ctx, UINT8 *idx, UINT8 nIdx, UINT8 *groups, UINT8 *lengths);
 typedef void  (*ClassifierRelease_fct)      (void *ctx);
+typedef float (*ClassifierGetBestPos_fct)   (void *ctx, UINT8 idx);
 
 typedef struct
 {
@@ -43,6 +44,7 @@ typedef struct
   ClassifierResetValues_fct   ResetValues;
   ClassifierClassify_fct      Classify;
   ClassifierRelease_fct       Release;
+  ClassifierGetBestPos_fct    GetBestPos;
 } ClassifierInterface_t;
 
 

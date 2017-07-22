@@ -23,6 +23,8 @@
       <logicalFolder name="f5" displayName="PpsoPno" projectFiles="true">
         <itemPath>Objects/Algo/PpsoPno.c</itemPath>
         <itemPath>Objects/Algo/PpsoPno.h</itemPath>
+        <itemPath>Objects/Algo/Classifier.c</itemPath>
+        <itemPath>Objects/Algo/Classifier.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="PSO" projectFiles="true">
         <itemPath>Objects/Algo/Pso.c</itemPath>
@@ -31,8 +33,6 @@
         <itemPath>Objects/Algo/PsoParticle.h</itemPath>
         <itemPath>Objects/Algo/PsoSwarm.c</itemPath>
         <itemPath>Objects/Algo/PsoSwarm.h</itemPath>
-        <itemPath>Objects/Algo/Classifier.c</itemPath>
-        <itemPath>Objects/Algo/Classifier.h</itemPath>
       </logicalFolder>
       <itemPath>Objects/Algo/AlgoInterface.h</itemPath>
       <itemPath>Objects/Algo/SteadyState.c</itemPath>

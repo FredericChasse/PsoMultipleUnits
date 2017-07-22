@@ -78,6 +78,8 @@ void *  _Swarm_GetUnitArray               (PsoSwarm_t *s);
 UINT8   _Swarm1d_ComputeNextPositions     (PsoSwarm_t *s, float *positions, UINT8 *dummy);
 UINT8   _SwarmPara_ComputeNextPositions   (PsoSwarm_t *s, float *positions, UINT8 *idxToRemove);
 UINT8   _SubSwarm_ComputeNextPositions    (PsoSwarm_t *s, float *positions, UINT8 *idxToRemove);
+void    _Swarm_UpdateParticlesFitness     (PsoSwarm_t *s);
+void    _Swarm_SetParticlePos             (PsoSwarm_t *s, UINT8 idx, float pos);
 
 
 // Private variables
@@ -420,6 +422,16 @@ void _Swarm_SetParticleFitness (PsoSwarm_t *s, UINT8 idx, float fitness)
 }
 
 
+void _Swarm_UpdateParticlesFitness (PsoSwarm_t *s)
+{
+  UINT8 i;
+  for (i = 0; i < s->nParticles; i++)
+  {
+    s->particles[i]->SetFitness(s->particles[i]->ctx, s->unitArray->GetPower(s->unitArray->ctx, i));
+  }
+}
+
+
 UINT8 _SubSwarm_ComputeNextPositions (PsoSwarm_t *s, float *positions, UINT8 *idxToRemove)
 {
   UINT8 i;
@@ -566,6 +578,12 @@ UINT8 _Swarm1d_ComputeNextPositions (PsoSwarm_t *s, float *positions, UINT8 *dum
 }
 
 
+void _Swarm_SetParticlePos (PsoSwarm_t *s, UINT8 idx, float pos)
+{
+  s->particles[idx]->SetPos(s->particles[idx]->ctx, pos);
+}
+
+
 UINT8 _Swarm_GetId (PsoSwarm_t *s)
 {
   return s->id;
@@ -693,6 +711,8 @@ const PsoSwarmInterface_t * PsoSwarmInterface (void)
       _swarms_if[i].GetParticlePos              = (PsoSwarmGetParticlePos_fct)            &_Swarm_GetParticlePos;
       _swarms_if[i].GetParticleFitness          = (PsoSwarmGetParticleFitness_fct)        &_Swarm_GetParticleFitness;
       _swarms_if[i].GetParticleSpeed            = (PsoSwarmGetParticleSpeed_fct)          &_Swarm_GetParticleSpeed;
+      _swarms_if[i].UpdateParticlesFitness      = (PsoSwarmUpdateParticlesFitness_fct)    &_Swarm_UpdateParticlesFitness;
+      _swarms_if[i].SetParticlePos              = (PsoSwarmSetParticlePos_fct)            &_Swarm_SetParticlePos;
       
       // Init the linked list
       _swarmsNodes[i].ctx = (void *) &_swarms_if[i];

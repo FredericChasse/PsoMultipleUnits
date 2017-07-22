@@ -22,7 +22,7 @@
 // Private definitions
 //==============================================================================
 
-#define N_ARRAYS_TOTAL      ((N_UNITS_TOTAL << 1) | 1)  // N_UNITS_TOTAL*2 + 1
+#define N_ARRAYS_TOTAL      ((N_UNITS_TOTAL << 2) | 1)  // N_UNITS_TOTAL*4 + 1
 
 typedef struct
 {
@@ -48,6 +48,7 @@ void  _UnitArray_GetPosLimits         (UnitArray_t *array, float *minPos, float 
 void  _UnitArray_SetPower             (UnitArray_t *array, UINT8 idx, float power);
 UINT8 _UnitArray_GetUnitPosIdx        (UnitArray_t *array, UINT8 idx);
 UINT8 _UnitArray_GetUnitId            (UnitArray_t *array, UINT8 idx);
+void* _UnitArray_CreateSubArray       (UnitArray_t *array, UINT8 *idx, UINT8 nIdx);
 
 
 // Private variables
@@ -181,6 +182,24 @@ INT8 _UnitArray_AddUnitToArray (UnitArray_t *array, UnitInterface_t *unit)
 }
 
 
+void * _UnitArray_CreateSubArray (UnitArray_t *array, UINT8 *idx, UINT8 nIdx)
+{
+  if (nIdx > array->nUnits)
+  {
+    return NULL;
+  }
+  UINT8 i;
+  UnitArrayInterface_t *newArray = (UnitArrayInterface_t *) UnitArrayInterface();
+  
+  for (i = 0; i < nIdx; i++)
+  {
+    _UnitArray_AddUnitToArray((UnitArray_t *) newArray->ctx, (UnitInterface_t *) _UnitArray_GetUnitHandle(array, idx[i]));
+  }
+  
+  return (void *) newArray;
+}
+
+
 void _UnitArray_SplitInto2Arrays (UnitArray_t *array, UINT8 *idxToSplit, UINT8 nToSplit, void *splitArray, void *keepArray)
 {
   UnitInterface_t *unitsToKeep[N_UNITS_TOTAL];
@@ -247,6 +266,7 @@ const UnitArrayInterface_t * UnitArrayInterface(void)
       _arrays_if[i].SetPower            = (UnitArraySetPower_fct)             &_UnitArray_SetPower;
       _arrays_if[i].GetUnitPosIdx       = (UnitArrayGetUnitPosIdx_fct)        &_UnitArray_GetUnitPosIdx;
       _arrays_if[i].GetUnitId           = (UnitArrayGetUnidId_fct)            &_UnitArray_GetUnitId;
+      _arrays_if[i].CreateSubArray      = (UnitArrayCreateSubArray_fct)       &_UnitArray_CreateSubArray;
       
       // Init the linked list
       _arraysNodes[i].ctx = (void *) &_arrays_if[i];

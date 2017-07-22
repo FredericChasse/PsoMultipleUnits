@@ -56,6 +56,7 @@ float _PnoInstance_ComputePosSwarm    (PnoInstance_t *pnoi, BOOL *oPerturbed);
 void  _PnoInstance_SetPos             (PnoInstance_t *pnoi, float pos);
 void  _PnoInstance_SetFitness         (PnoInstance_t *pnoi, float fitness);
 void  _PnoInstance_Release            (PnoInstance_t *pnoi);
+void  _PnoInstance_SetId              (PnoInstance_t *pnoi, UINT8 id);
 
 
 // Private variables
@@ -84,6 +85,12 @@ void _PnoInstance_Init (PnoInstance_t *pnoi, UINT8 id, float delta, float pos, f
   pnoi->umax = umax;
   pnoi->umin = umin;
   pnoi->perturbOsc = perturbOsc;
+}
+
+
+void _PnoInstance_SetId (PnoInstance_t *pnoi, UINT8 id)
+{
+  pnoi->id = id;
 }
 
 
@@ -231,6 +238,7 @@ const PnoInstanceInterface_t * PnoInstanceInterface (PnoType_t type)
       _instances_if[i].Release        = (PnoiRelease_fct)         &_PnoInstance_Release;
       _instances_if[i].SetSteadyState = (PnoiSetSteadyState_fct)  &_PnoInstance_SetSteadyState;
       _instances_if[i].GetSteadyState = (PnoiGetSteadyState_fct)  &_PnoInstance_GetSteadyState;
+      _instances_if[i].SetId          = (PnoiSetId_fct)           &_PnoInstance_SetId;
       
       // Init the linked list
       _instancesNodes[i].ctx = (void *) &_instances_if[i];

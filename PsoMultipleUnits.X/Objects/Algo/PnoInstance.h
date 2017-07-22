@@ -40,6 +40,7 @@ typedef void  (*PnoiSetFitness_fct)       (void *ctx, float fitness);
 typedef void  (*PnoiRelease_fct)          (void *ctx);
 typedef void  (*PnoiSetSteadyState_fct)   (void *ctx, UINT8 nSamplesForSs, UINT8 oscAmp);
 typedef BOOL  (*PnoiGetSteadyState_fct)   (void *ctx);
+typedef void  (*PnoiSetId_fct)            (void *ctx, UINT8 id);
 
 typedef struct
 {
@@ -51,6 +52,7 @@ typedef struct
   PnoiRelease_fct         Release;
   PnoiSetSteadyState_fct  SetSteadyState;
   PnoiGetSteadyState_fct  GetSteadyState;
+  PnoiSetId_fct           SetId;
 } PnoInstanceInterface_t;
 
 

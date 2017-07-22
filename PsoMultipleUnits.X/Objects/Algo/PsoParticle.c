@@ -62,6 +62,7 @@ typedef struct
   SteadyState_t steadyState;
   float steadyStateBuf[STEADY_STATE_MAX_SAMPLES];
   UINT8 linkKey;
+  BOOL oTestOptPos;
 } PsoParticle_t;
 
 
@@ -134,6 +135,7 @@ void _Particle_Init (PsoParticle_t *p, UINT8 id)
   p->prevSpeed = 0;
   p->jSteady = 0;
   p->oSentinelWarning = 0;
+  p->oTestOptPos = 0;
   p->state = PARTICLE_STATE_SEARCHING;
   SteadyState_Reset(&p->steadyState);
   _Particle_ResetOptPos(&p->optPos);
@@ -259,16 +261,19 @@ BOOL _Particle_FsmStep (PsoParticle_t *p, PsoSwarmInterface_t *swarm)
     {
       p->jSteady = p->pos.curFitness;
       p->state = PARTICLE_STATE_STEADY_STATE;
+      p->oTestOptPos = 0;
     }
     else if (param.type == PSO_SWARM_TYPE_PARALLEL_PSO_MULTI_SWARM)
     {
       p->state = PARTICLE_STATE_VALIDATE_OPTIMUM;
+      p->oTestOptPos = 0;
     }
   }
   
   if (p->oSentinelWarning)
   {
     p->state = PARTICLE_STATE_PERTURB_OCCURRED;
+    p->oTestOptPos = 0;
   }
   
   switch (p->state)
@@ -344,15 +349,18 @@ BOOL _Particle_FsmStep (PsoParticle_t *p, PsoSwarmInterface_t *swarm)
           }
           else  // If the position is not an optimum
           {
-            if (p->optPos.dinit == p->pbestAbs.curPos)  // If we were testing for Pbest
+//            if (p->optPos.dinit == p->pbestAbs.curPos)  // If we were testing for Pbest
+            if (p->oTestOptPos)  // If we were testing for Pbest
             {
               p->state = PARTICLE_STATE_SEARCHING;
+              p->oTestOptPos = 0;
               oRemoveParticle = 1;
             }
             else
             {
               p->pos.prevPos = p->pos.curPos;
               p->pos.curPos = p->pbestAbs.curPos;
+              p->oTestOptPos = 1;
               oRemoveParticle = 0;
             }
             _Particle_ResetOptPos(&p->optPos);
@@ -371,6 +379,8 @@ BOOL _Particle_FsmStep (PsoParticle_t *p, PsoSwarmInterface_t *swarm)
       p->pos.prevPos = p->pos.curPos;
       p->prevSpeed = p->curSpeed;
       p->curSpeed = 0;
+      p->pos.prevFitness = p->pos.curFitness;
+      p->pos.prevPos = p->pos.curPos;
       oRemoveParticle = 0;
       break;
       

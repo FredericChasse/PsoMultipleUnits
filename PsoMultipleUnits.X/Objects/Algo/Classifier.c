@@ -42,6 +42,7 @@ INT8  _Classifier_UpdateValues  (Classifier_t *c);
 INT8  _Classifier_ResetValues   (Classifier_t *c, UINT8 *idx, UINT8 nIdx);
 INT16 _Classifier_Classify      (Classifier_t *c, UINT8 *idx, UINT8 nIdx, UINT8 *groups, UINT8 *lengths);
 void  _Classifier_Release       (Classifier_t *c);
+float _Classifier_GetBestPos    (Classifier_t *c, UINT8 idx);
 
 static int _CompareFunc         (const void *p1, const void *p2);
 
@@ -66,6 +67,7 @@ const ClassifierInterface_t _classifier_if =
  ,.ResetValues  = (ClassifierResetValues_fct)   &_Classifier_ResetValues
  ,.Classify     = (ClassifierClassify_fct)      &_Classifier_Classify
  ,.Release      = (ClassifierRelease_fct)       &_Classifier_Release
+ ,.GetBestPos   = (ClassifierGetBestPos_fct)    &_Classifier_GetBestPos
 };
 
 
@@ -89,6 +91,12 @@ INT8 _Classifier_Init (Classifier_t *c, UnitArrayInterface_t *unitArray, float m
     Position_Reset(&c->optPos[i]);
   }
   return 0;
+}
+
+
+float _Classifier_GetBestPos (Classifier_t *c, UINT8 idx)
+{
+  return c->optPos[idx].curPos;
 }
 
 
