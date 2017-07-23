@@ -95,10 +95,10 @@ INT8 _Pno_Init (Pno_t *pno, UnitArrayInterface_t *unitArray)
   for (i = 0; i < pno->nInstances; i++)
   {
     pno->instances[i] = (PnoInstanceInterface_t *) PnoInstanceInterface(PNO_CLASSIC);
-    pno->param[i].delta = POT_STEP_VALUE;
-    pno->param[i].uinit = potRealValues[POT_MAX_INDEX/2];
-    pno->param[i].umax = potRealValues[POT_MIN_INDEX];
-    pno->param[i].umin = potRealValues[POT_MAX_INDEX];
+    pno->param[i].delta = 2*POT_STEP_VALUE;
+    pno->param[i].uinit = 226.4706;
+    pno->param[i].umax = potRealValues[POT_MAX_INDEX];
+    pno->param[i].umin = potRealValues[POT_MIN_INDEX];
     pno->param[i].nSamplesForSs = 6;
     pno->param[i].oscAmp = 2;
     pno->param[i].perturbOsc = 0.05;
@@ -106,7 +106,7 @@ INT8 _Pno_Init (Pno_t *pno, UnitArrayInterface_t *unitArray)
     pno->instances[i]->Init(pno->instances[i]->ctx, i, pno->param[i].delta, pno->param[i].uinit, pno->param[i].umin, pno->param[i].umax, pno->param[i].perturbOsc);
     pno->instances[i]->SetSteadyState(pno->instances[i]->ctx, pno->param[i].nSamplesForSs, pno->param[i].oscAmp);
     
-    unitArray->SetPos(unitArray->ctx, i, potRealValues[POT_MAX_INDEX/2]);
+    unitArray->SetPos(unitArray->ctx, i, pno->instances[i]->GetPos(pno->instances[i]->ctx));
   }
 }
 

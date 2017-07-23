@@ -171,7 +171,7 @@ inline INT16 ComputePotValueFloat2Dec(float desiredValue)
  *************************************************************/
 inline void ComputePotValueDec2Float(UINT8 desiredValue, float *realValue)
 {
-  *realValue = (float) desiredValue * (MAX_POT_VALUE - WIPER_VALUE) / 255.0 + 50;
+  *realValue = (float) desiredValue * (MAX_POT_VALUE - WIPER_VALUE) / 255.0f + 50.0f;
 }
 
 

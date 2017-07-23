@@ -54,6 +54,7 @@ BOOL  _PnoInstance_GetSteadyState     (PnoInstance_t *pnoi);
 float _PnoInstance_ComputePosClassic  (PnoInstance_t *pnoi, BOOL *oPerturbed);
 float _PnoInstance_ComputePosSwarm    (PnoInstance_t *pnoi, BOOL *oPerturbed);
 void  _PnoInstance_SetPos             (PnoInstance_t *pnoi, float pos);
+float _PnoInstance_GetPos             (PnoInstance_t *pnoi);
 void  _PnoInstance_SetFitness         (PnoInstance_t *pnoi, float fitness);
 void  _PnoInstance_Release            (PnoInstance_t *pnoi);
 void  _PnoInstance_SetId              (PnoInstance_t *pnoi, UINT8 id);
@@ -113,6 +114,8 @@ float _PnoInstance_ComputePosClassic (PnoInstance_t *pnoi, BOOL *oPerturbed)
   {
     pnoi->pos.curPos = pnoi->umin;
   }
+  
+  return pnoi->pos.curPos;
 }
 
 
@@ -155,6 +158,14 @@ float _PnoInstance_ComputePosSwarm (PnoInstance_t *pnoi, BOOL *oPerturbed)
     }
     pnoi->pos.prevPos = pnoi->pos.curPos;
   }
+  
+  return pnoi->pos.curPos;
+}
+
+
+float _PnoInstance_GetPos (PnoInstance_t *pnoi)
+{
+  return pnoi->pos.curPos;
 }
 
 
@@ -234,6 +245,7 @@ const PnoInstanceInterface_t * PnoInstanceInterface (PnoType_t type)
       _instances_if[i].Init           = (PnoiInit_fct)            &_PnoInstance_Init;
       _instances_if[i].ComputePos     = (PnoiComputePos_fct)      &_PnoInstance_ComputePosClassic;
       _instances_if[i].SetPos         = (PnoiSetPos_fct)          &_PnoInstance_SetPos;
+      _instances_if[i].GetPos         = (PnoiGetPos_fct)          &_PnoInstance_GetPos;
       _instances_if[i].SetFitness     = (PnoiSetFitness_fct)      &_PnoInstance_SetFitness;
       _instances_if[i].Release        = (PnoiRelease_fct)         &_PnoInstance_Release;
       _instances_if[i].SetSteadyState = (PnoiSetSteadyState_fct)  &_PnoInstance_SetSteadyState;

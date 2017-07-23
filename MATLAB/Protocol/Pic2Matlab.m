@@ -87,16 +87,17 @@ fwrite(port, buf);
 % Start algo
 typeOfMsg = START_ACQ;
 startAlgoChar = PROTOCOL_START_ALGO;
-algo = CHARACTERIZATION;
+% algo = CHARACTERIZATION;
 % algo = CLASSIC_PSO;
 % algo = PARALLEL_PSO;
 % algo = PARALLEL_PSO_MULTI_SWARM;
 % algo = MULTI_UNIT;
 % algo = EXTREMUM_SEEKING;
 % algo = PPSO_PNO;
-% algo = PNO;
+algo = PNO;
 % units = uint8(0:1:7);
-units = uint8(4:1:11);
+units = uint8(7:1:14);
+% units = uint8(7);
 nUnits = uint8(length(units));
 % lengthOfPayload = fliplr(typecast(uint16(3 + nUnits), 'uint8'));
 lengthOfPayload = typecast(uint16(3 + nUnits), 'uint8');
@@ -105,8 +106,8 @@ buf = [delimiter, typeOfMsg, lengthOfPayload, startAlgoChar, algo, nUnits, units
 fwrite(port, buf);
 
 if algo == CHARACTERIZATION
-%   nIterations = 256;
-  nIterations = 30;
+  nIterations = 256;
+%   nIterations = 10;
 elseif algo == CLASSIC_PSO
   nIterations = 140;
 elseif algo == PARALLEL_PSO
@@ -116,7 +117,7 @@ elseif algo == PARALLEL_PSO_MULTI_SWARM
 elseif algo == PPSO_PNO
   nIterations = 130;
 elseif algo == PNO
-  nIterations = 50;
+  nIterations = 40;
 else
   nIterations = 20;
 end

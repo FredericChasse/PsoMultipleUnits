@@ -218,27 +218,20 @@ void StateInit(void)
 
   INTDisableInterrupts();   // Disable all interrupts of the system.
 
-  INIT_PORTS;
-  INIT_TIMER;
-  INIT_ADC;
-  INIT_UART;
-  INIT_SKADI;
-  INIT_I2C;
-  INIT_SPI;
-  INIT_WDT;
-  
-//  START_INTERRUPTS;
+  InitPorts();
+  InitTimer();
+  InitAdc();
+  InitUart();
+  InitSkadi();
+  InitI2c();
+  InitSpi();
+  InitWdt();
   
 //  // Init digital potentiometers AD8403
-//  InitPot(0);
-//  InitPot(1);
+  InitPot(0);
+  InitPot(1);
   InitPot(2);
   InitPot(3);
-//  TurnOnPot(2);
-//  TurnOnPot(3);
-  
-//  Timer.DelayMs(10000);
-//  LED1_ON;
   
   mainArray = (UnitArrayInterface_t *)  UnitArrayInterface();
   algoArray = (UnitArrayInterface_t *)  UnitArrayInterface();
@@ -255,11 +248,13 @@ void StateInit(void)
   }
   algoArray->Init(algoArray->ctx, 1);
   
-  START_INTERRUPTS;
+  StartInterrupts();
+//  START_INTERRUPTS;
   
   perturb->Init(perturb->ctx, 500);
   
   nSamples = 0;
+  
 }
 
 
@@ -286,16 +281,20 @@ void StateAcq(void)
     {
       nSamples = 0;
       
-      sUartLineBuffer_t buf = {0};
-      UINT8 string[6] = {'a','l','l','o','\r','\n'};
-      memcpy(buf.buffer, string, 6);
-      buf.length = 6;
-      Uart.PutTxFifoBuffer(UART6, &buf);
+//      sUartLineBuffer_t buf = {0};
+//      UINT8 string[6] = {'a','l','l','o','\r','\n'};
+//      memcpy(buf.buffer, string, 6);
+//      buf.length = 6;
+//      Uart.PutTxFifoBuffer(UART6, &buf);
       
       if (oSessionActive)
       {
         oNewSample = 1;   // Go to stateCompute
       }
+//      else
+//      {
+//        ComputeMeanAdcValues();
+//      }
     }
   }
   
@@ -447,6 +446,7 @@ void StateCompute(void)
     positions[i]  = algoArray->GetPos(algoArray->ctx, i);
     id = algoArray->GetUnitId(algoArray->ctx, i);
     powers[i]     = ComputeCellPower(unitAdcs[id], algoArray->GetUnitPosIdx(algoArray->ctx, i));
+//    powers[i]     = sCellValues.cells[unitAdcs[id]].cellVoltFloat;
     algoArray->SetPower(algoArray->ctx, i, powers[i]);
   }
   

@@ -36,6 +36,7 @@ void    _Perturb_Init             (Perturb_t *p, UINT16 intensityInit);
 UINT16  _Perturb_GetUnitIntensity (Perturb_t *p, UINT8 unit);
 void    _Perturb_SetUnitIntensity (Perturb_t *p, UINT8 unit, UINT16 intensity);
 
+
 // Private variables
 //==============================================================================
 
@@ -53,6 +54,7 @@ const PerturbInterface_t _perturb_if =
  ,.SetUnitIntensity = (PerturbSetUnitIntensity_fct) &_Perturb_SetUnitIntensity
  ,.GetUnitIntensity = (PerturbGetUnitIntensity_fct) &_Perturb_GetUnitIntensity
 };
+
 
 // Private functions
 //==============================================================================

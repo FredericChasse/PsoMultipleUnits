@@ -36,6 +36,7 @@ typedef enum
 typedef void  (*PnoiInit_fct)             (void *ctx, UINT8 id, float delta, float pos, float umin, float umax, float perturbOsc);
 typedef float (*PnoiComputePos_fct)       (void *ctx, BOOL *oPerturbed);
 typedef void  (*PnoiSetPos_fct)           (void *ctx, float pos);
+typedef float (*PnoiGetPos_fct)           (void *ctx);
 typedef void  (*PnoiSetFitness_fct)       (void *ctx, float fitness);
 typedef void  (*PnoiRelease_fct)          (void *ctx);
 typedef void  (*PnoiSetSteadyState_fct)   (void *ctx, UINT8 nSamplesForSs, UINT8 oscAmp);
@@ -48,6 +49,7 @@ typedef struct
   PnoiInit_fct            Init;
   PnoiComputePos_fct      ComputePos;
   PnoiSetPos_fct          SetPos;
+  PnoiGetPos_fct          GetPos;
   PnoiSetFitness_fct      SetFitness;
   PnoiRelease_fct         Release;
   PnoiSetSteadyState_fct  SetSteadyState;

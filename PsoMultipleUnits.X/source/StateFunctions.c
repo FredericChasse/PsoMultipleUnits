@@ -75,15 +75,15 @@ inline void GetAdcValues (void)
 {
   memcpy((void *) &cellVoltageRaw[0], (void *) &Adc.Var.adcReadValues[0], 64);  // sizeof(UINT32) * 16 = 64
 
-//  sCellValues.cells[ 8].cellVoltRaw[nSamples] = cellVoltageRaw[ 0];
-//  sCellValues.cells[ 8].cellVoltRaw[nSamples] = cellVoltageRaw[ 1];
-//  sCellValues.cells[ 8].cellVoltRaw[nSamples] = cellVoltageRaw[ 2];
-//  sCellValues.cells[ 8].cellVoltRaw[nSamples] = cellVoltageRaw[ 3];
+//  sCellValues.cells[ 0].cellVoltRaw[nSamples] = cellVoltageRaw[ 0];
+  sCellValues.cells[ 1].cellVoltRaw[nSamples] = cellVoltageRaw[ 1];
+  sCellValues.cells[ 2].cellVoltRaw[nSamples] = cellVoltageRaw[ 2];
+  sCellValues.cells[ 3].cellVoltRaw[nSamples] = cellVoltageRaw[ 3];
   
-//  sCellValues.cells[ 8].cellVoltRaw[nSamples] = cellVoltageRaw[ 4];
-//  sCellValues.cells[ 8].cellVoltRaw[nSamples] = cellVoltageRaw[ 5];
-//  sCellValues.cells[ 8].cellVoltRaw[nSamples] = cellVoltageRaw[ 6];
-//  sCellValues.cells[ 8].cellVoltRaw[nSamples] = cellVoltageRaw[ 7];
+  sCellValues.cells[ 4].cellVoltRaw[nSamples] = cellVoltageRaw[ 4];
+  sCellValues.cells[ 5].cellVoltRaw[nSamples] = cellVoltageRaw[ 5];
+  sCellValues.cells[ 6].cellVoltRaw[nSamples] = cellVoltageRaw[ 6];
+  sCellValues.cells[ 7].cellVoltRaw[nSamples] = cellVoltageRaw[ 7];
   
   sCellValues.cells[ 8].cellVoltRaw[nSamples] = cellVoltageRaw[ 8];
   sCellValues.cells[ 9].cellVoltRaw[nSamples] = cellVoltageRaw[ 9];
@@ -105,14 +105,14 @@ inline void ComputeMeanAdcValues (void)
   for (i = N_SAMPLES_TO_DROP; i < N_SAMPLES_PER_ADC_READ; i++)
   {
 //    meanCellRaw[ 0] += sCellValues.cells[ 0].cellVoltRaw[i];
-//    meanCellRaw[ 1] += sCellValues.cells[ 1].cellVoltRaw[i];
-//    meanCellRaw[ 2] += sCellValues.cells[ 2].cellVoltRaw[i];
-//    meanCellRaw[ 3] += sCellValues.cells[ 3].cellVoltRaw[i];
+    meanCellRaw[ 1] += sCellValues.cells[ 1].cellVoltRaw[i];
+    meanCellRaw[ 2] += sCellValues.cells[ 2].cellVoltRaw[i];
+    meanCellRaw[ 3] += sCellValues.cells[ 3].cellVoltRaw[i];
     
-//    meanCellRaw[ 4] += sCellValues.cells[ 4].cellVoltRaw[i];
-//    meanCellRaw[ 5] += sCellValues.cells[ 5].cellVoltRaw[i];
-//    meanCellRaw[ 6] += sCellValues.cells[ 6].cellVoltRaw[i];
-//    meanCellRaw[ 7] += sCellValues.cells[ 7].cellVoltRaw[i];
+    meanCellRaw[ 4] += sCellValues.cells[ 4].cellVoltRaw[i];
+    meanCellRaw[ 5] += sCellValues.cells[ 5].cellVoltRaw[i];
+    meanCellRaw[ 6] += sCellValues.cells[ 6].cellVoltRaw[i];
+    meanCellRaw[ 7] += sCellValues.cells[ 7].cellVoltRaw[i];
     
     meanCellRaw[ 8] += sCellValues.cells[ 8].cellVoltRaw[i];
     meanCellRaw[ 9] += sCellValues.cells[ 9].cellVoltRaw[i];
@@ -125,15 +125,15 @@ inline void ComputeMeanAdcValues (void)
     meanCellRaw[15] += sCellValues.cells[15].cellVoltRaw[i];
   }
 
-//  meanCellRaw[ 0] = (float) meanCellRaw[ 0] / (float) N_SAMPLES_PER_ADC_READ + 0.5;
-//  meanCellRaw[ 1] = (float) meanCellRaw[ 1] / (float) N_SAMPLES_PER_ADC_READ + 0.5;
-//  meanCellRaw[ 2] = (float) meanCellRaw[ 2] / (float) N_SAMPLES_PER_ADC_READ + 0.5;
-//  meanCellRaw[ 3] = (float) meanCellRaw[ 3] / (float) N_SAMPLES_PER_ADC_READ + 0.5;
+//  meanCellRaw[ 0] = (float) meanCellRaw[ 0] / (float) N_TOTAL_SAMPLES + 0.5;
+  meanCellRaw[ 1] = (float) meanCellRaw[ 1] / (float) N_TOTAL_SAMPLES + 0.5;
+  meanCellRaw[ 2] = (float) meanCellRaw[ 2] / (float) N_TOTAL_SAMPLES + 0.5;
+  meanCellRaw[ 3] = (float) meanCellRaw[ 3] / (float) N_TOTAL_SAMPLES + 0.5;
   
-//  meanCellRaw[ 4] = (float) meanCellRaw[ 4] / (float) N_SAMPLES_PER_ADC_READ + 0.5;
-//  meanCellRaw[ 5] = (float) meanCellRaw[ 5] / (float) N_SAMPLES_PER_ADC_READ + 0.5;
-//  meanCellRaw[ 6] = (float) meanCellRaw[ 6] / (float) N_SAMPLES_PER_ADC_READ + 0.5;
-//  meanCellRaw[ 7] = (float) meanCellRaw[ 7] / (float) N_SAMPLES_PER_ADC_READ + 0.5;
+  meanCellRaw[ 4] = (float) meanCellRaw[ 4] / (float) N_TOTAL_SAMPLES + 0.5;
+  meanCellRaw[ 5] = (float) meanCellRaw[ 5] / (float) N_TOTAL_SAMPLES + 0.5;
+  meanCellRaw[ 6] = (float) meanCellRaw[ 6] / (float) N_TOTAL_SAMPLES + 0.5;
+  meanCellRaw[ 7] = (float) meanCellRaw[ 7] / (float) N_TOTAL_SAMPLES + 0.5;
   
   meanCellRaw[ 8] = (float) meanCellRaw[ 8] / (float) N_TOTAL_SAMPLES + 0.5;
   meanCellRaw[ 9] = (float) meanCellRaw[ 9] / (float) N_TOTAL_SAMPLES + 0.5;
@@ -148,14 +148,14 @@ inline void ComputeMeanAdcValues (void)
   if (oSmoothData)  // Smoothing function
   {
 //    sCellValues.cells[ 0].cellVoltFloat = (kFilter*sCellValues.cells[ 0].cellVoltFloat) + (meanCellRaw[ 0] * VREF / 1024.0f)*(1 - kFilter);
-//    sCellValues.cells[ 1].cellVoltFloat = (kFilter*sCellValues.cells[ 1].cellVoltFloat) + (meanCellRaw[ 1] * VREF / 1024.0f)*(1 - kFilter);
-//    sCellValues.cells[ 2].cellVoltFloat = (kFilter*sCellValues.cells[ 2].cellVoltFloat) + (meanCellRaw[ 2] * VREF / 1024.0f)*(1 - kFilter);
-//    sCellValues.cells[ 3].cellVoltFloat = (kFilter*sCellValues.cells[ 3].cellVoltFloat) + (meanCellRaw[ 3] * VREF / 1024.0f)*(1 - kFilter);
+    sCellValues.cells[ 1].cellVoltFloat = (kFilter*sCellValues.cells[ 1].cellVoltFloat) + (meanCellRaw[ 1] * VREF / 1024.0f)*(1 - kFilter);
+    sCellValues.cells[ 2].cellVoltFloat = (kFilter*sCellValues.cells[ 2].cellVoltFloat) + (meanCellRaw[ 2] * VREF / 1024.0f)*(1 - kFilter);
+    sCellValues.cells[ 3].cellVoltFloat = (kFilter*sCellValues.cells[ 3].cellVoltFloat) + (meanCellRaw[ 3] * VREF / 1024.0f)*(1 - kFilter);
    
-//    sCellValues.cells[ 4].cellVoltFloat = (kFilter*sCellValues.cells[ 4].cellVoltFloat) + (meanCellRaw[ 4] * VREF / 1024.0f)*(1 - kFilter);
-//    sCellValues.cells[ 5].cellVoltFloat = (kFilter*sCellValues.cells[ 5].cellVoltFloat) + (meanCellRaw[ 5] * VREF / 1024.0f)*(1 - kFilter);
-//    sCellValues.cells[ 6].cellVoltFloat = (kFilter*sCellValues.cells[ 6].cellVoltFloat) + (meanCellRaw[ 6] * VREF / 1024.0f)*(1 - kFilter);
-//    sCellValues.cells[ 7].cellVoltFloat = (kFilter*sCellValues.cells[ 7].cellVoltFloat) + (meanCellRaw[ 7] * VREF / 1024.0f)*(1 - kFilter);
+    sCellValues.cells[ 4].cellVoltFloat = (kFilter*sCellValues.cells[ 4].cellVoltFloat) + (meanCellRaw[ 4] * VREF / 1024.0f)*(1 - kFilter);
+    sCellValues.cells[ 5].cellVoltFloat = (kFilter*sCellValues.cells[ 5].cellVoltFloat) + (meanCellRaw[ 5] * VREF / 1024.0f)*(1 - kFilter);
+    sCellValues.cells[ 6].cellVoltFloat = (kFilter*sCellValues.cells[ 6].cellVoltFloat) + (meanCellRaw[ 6] * VREF / 1024.0f)*(1 - kFilter);
+    sCellValues.cells[ 7].cellVoltFloat = (kFilter*sCellValues.cells[ 7].cellVoltFloat) + (meanCellRaw[ 7] * VREF / 1024.0f)*(1 - kFilter);
     
     sCellValues.cells[ 8].cellVoltFloat = (kFilter*sCellValues.cells[ 8].cellVoltFloat) + (meanCellRaw[ 8] * VREF / 1024.0f)*(1 - kFilter);
     sCellValues.cells[ 9].cellVoltFloat = (kFilter*sCellValues.cells[ 9].cellVoltFloat) + (meanCellRaw[ 9] * VREF / 1024.0f)*(1 - kFilter);
@@ -170,14 +170,14 @@ inline void ComputeMeanAdcValues (void)
   else
   {
 //    sCellValues.cells[ 0].cellVoltFloat = meanCellRaw[ 0] * VREF / 1024.0f;
-//    sCellValues.cells[ 1].cellVoltFloat = meanCellRaw[ 1] * VREF / 1024.0f;
-//    sCellValues.cells[ 2].cellVoltFloat = meanCellRaw[ 2] * VREF / 1024.0f;
-//    sCellValues.cells[ 3].cellVoltFloat = meanCellRaw[ 3] * VREF / 1024.0f;
+    sCellValues.cells[ 1].cellVoltFloat = meanCellRaw[ 1] * VREF / 1024.0f;
+    sCellValues.cells[ 2].cellVoltFloat = meanCellRaw[ 2] * VREF / 1024.0f;
+    sCellValues.cells[ 3].cellVoltFloat = meanCellRaw[ 3] * VREF / 1024.0f;
     
-//    sCellValues.cells[ 4].cellVoltFloat = meanCellRaw[ 4] * VREF / 1024.0f;
-//    sCellValues.cells[ 5].cellVoltFloat = meanCellRaw[ 5] * VREF / 1024.0f;
-//    sCellValues.cells[ 6].cellVoltFloat = meanCellRaw[ 6] * VREF / 1024.0f;
-//    sCellValues.cells[ 7].cellVoltFloat = meanCellRaw[ 7] * VREF / 1024.0f;
+    sCellValues.cells[ 4].cellVoltFloat = meanCellRaw[ 4] * VREF / 1024.0f;
+    sCellValues.cells[ 5].cellVoltFloat = meanCellRaw[ 5] * VREF / 1024.0f;
+    sCellValues.cells[ 6].cellVoltFloat = meanCellRaw[ 6] * VREF / 1024.0f;
+    sCellValues.cells[ 7].cellVoltFloat = meanCellRaw[ 7] * VREF / 1024.0f;
     
     sCellValues.cells[ 8].cellVoltFloat = meanCellRaw[ 8] * VREF / 1023.0f;
     sCellValues.cells[ 9].cellVoltFloat = meanCellRaw[ 9] * VREF / 1023.0f;
