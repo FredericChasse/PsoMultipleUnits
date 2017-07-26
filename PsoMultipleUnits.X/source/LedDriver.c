@@ -186,7 +186,8 @@ inline void InitLedDriver (void)
   while(I2c.Var.oI2cWriteIsRunning[I2C5]);  // Wait for any I2C5 write sequence to end 
   I2c.AddDataToFifoWriteQueue(I2C5, &dataBuffer[0], 3, TRUE);
   
-  prescaleReg.value = 5;                // PWM frequency of 1017.25 Hz
+  prescaleReg.value = 3;                // PWM frequency of 1526 Hz
+//  prescaleReg.value = 5;                // PWM frequency of 1017.25 Hz
 //  prescaleReg.value = 60;                // PWM frequency of 100 Hz
 //  prescaleReg.value = 30;                // PWM frequency of 200 Hz
   dataBuffer[1] = prescaleReg.regAdd;

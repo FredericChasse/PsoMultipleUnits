@@ -80,3 +80,46 @@ void LpfZ (TustinValue_t *input, TustinValue_t *output, float acqTime, float wl)
                             - output->previousValue * (coeff - 2) ) 
                           / (coeff + 2);
 }
+
+
+/*  
+ * Second order Notch Pass Filter
+ *
+ *  Y(s)           s^2 + wn^2
+ * ------ == ----------------------
+ *  U(s)       s^2 + 2*wn*s + wn^2
+ */
+void NpfZ (TustinValue2_t *input, TustinValue2_t *output, float acqTime, float wn)
+{
+  output->oldest = output->previous;
+  output->previous = output->current;
+  
+  float wn2 = wn*wn;
+  float wnT = wn*acqTime;
+  float wn2T = wn2*acqTime;
+  float wn2T2 = wn2T*acqTime;
+  float uk0 = input->current;
+  float uk1 = input->previous;
+  float uk2 = input->oldest;
+  float yk1 = output->previous;
+  float yk2 = output->oldest;
+  output->current = ((wn2T2+4)*uk0+(2*wn2T2-8)*uk1+(wn2T2+4)*uk2-(2*wn2T2-8)*yk1-(wn2T2-4*wnT+4)*yk2)/(wn2T2+4*wnT+4);
+}
+
+void NpfZ32 (TustinValue32_t *input, TustinValue32_t *output, UINT32 acqTimeInUs, UINT32 wn)
+{
+  output->oldest = output->previous;
+  output->previous = output->current;
+  
+  UINT32 wn2 = wn*wn;
+  UINT32 wnT = wn*acqTimeInUs;
+  UINT32 wn2T = wn2*acqTimeInUs;
+  UINT32 wn2T2 = wn2T*acqTimeInUs;
+  UINT32 uk0 = input->current;
+  UINT32 uk1 = input->previous;
+  UINT32 uk2 = input->oldest;
+  UINT32 yk1 = output->previous;
+  UINT32 yk2 = output->oldest;
+  output->current = ((wn2T2+4)*uk0+(2*wn2T2-8)*uk1+(wn2T2+4)*uk2-(2*wn2T2-8)*yk1-(wn2T2-4*wnT+4)*yk2)/(wn2T2+4*wnT+4);
+  output->current /= 1000000;
+}

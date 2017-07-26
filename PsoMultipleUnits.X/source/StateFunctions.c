@@ -21,6 +21,7 @@
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 #include "..\headers\StateFunctions.h"
+#include "MathFunctions.h"
 
 
 //==============================================================================
@@ -70,7 +71,10 @@ inline float ComputeCellPower (UINT8 cellIndex, UINT8 potIndex)
   return sCellValues.cells[cellIndex].cellPowerFloat;
 }
 
+const UINT32 wn = 1526*2*PI;
+const UINT32 T = ADC_TIMER_PERIOD * N_UNITS_TOTAL;
 
+TustinValue32_t in = {0}, out = {0};
 inline void GetAdcValues (void)
 {
   memcpy((void *) &cellVoltageRaw[0], (void *) &Adc.Var.adcReadValues[0], 64);  // sizeof(UINT32) * 16 = 64
@@ -94,6 +98,12 @@ inline void GetAdcValues (void)
   sCellValues.cells[13].cellVoltRaw[nSamples] = cellVoltageRaw[13];
   sCellValues.cells[14].cellVoltRaw[nSamples] = cellVoltageRaw[14];
   sCellValues.cells[15].cellVoltRaw[nSamples] = cellVoltageRaw[15];
+  
+  in.oldest = in.previous;
+  in.previous = in.current;
+  in.current = cellVoltageRaw[ 8];
+  NpfZ32(&in, &out, T, wn);
+  sCellValues.cells[ 8].cellVoltRaw[nSamples] = out.current;
 }
 
 

@@ -33,6 +33,7 @@
 #include "Codec.h"
 #include "Protocol.h"
 #include "Rng.h"
+#include "MathFunctions.h"
 
 
 extern volatile BOOL   oAdcReady
@@ -459,6 +460,12 @@ void StateCompute(void)
   ProtocolUnitsDataPayload_t newUnitsPayload = {0};
   ProtocolPsoDataPayload_t   newPsoPayload   = {0};
   
+//  static TustinValue_t in = {0}, out1 = {0}, out2 = {0}, out3 = {0}, out4 = {0};
+//  static float wl = 2*PI*10;
+//  static float wn = 2*PI*1526;
+//  static TustinValue2_t in = {0}, out = {0};
+//  static float T = SAMPLING_TIME_FLOAT;
+  
   ComputeMeanAdcValues();
   for (i = 0; i < nUnits; i++)
   {
@@ -467,6 +474,13 @@ void StateCompute(void)
     if (oDbgAdc)
     {
       powers[i] = sCellValues.cells[unitAdcs[id]].cellVoltFloat;
+//      in.previousValue = in.currentValue;
+//      in.currentValue = powers[i];
+//      LpfZ(&in, &out1, SAMPLING_TIME_FLOAT, wl);
+//      LpfZ(&out1, &out2, SAMPLING_TIME_FLOAT, wl);
+//      LpfZ(&out2, &out3, SAMPLING_TIME_FLOAT, wl);
+//      LpfZ(&out3, &out4, SAMPLING_TIME_FLOAT, wl);
+//      powers[i] = out4.currentValue;
     }
     else
     {

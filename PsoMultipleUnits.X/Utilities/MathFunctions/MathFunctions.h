@@ -36,6 +36,22 @@ typedef struct
         ;
 } TustinValue_t;
 
+typedef struct
+{
+  float  current
+        ,previous
+        ,oldest
+        ;
+} TustinValue2_t;
+
+typedef struct
+{
+  UINT32 current
+        ,previous
+        ,oldest
+        ;
+} TustinValue32_t;
+
 // Public functions
 //==============================================================================
 
@@ -46,5 +62,7 @@ typedef struct
 void TustinZ  (TustinValue_t *input, TustinValue_t *output, float acqTime);
 void HpfZ     (TustinValue_t *input, TustinValue_t *output, float acqTime, float wh);
 void LpfZ     (TustinValue_t *input, TustinValue_t *output, float acqTime, float wl);
+void NpfZ     (TustinValue2_t *input, TustinValue2_t *output, float acqTime, float wn);
+void NpfZ32   (TustinValue32_t *input, TustinValue32_t *output, UINT32 acqTimeInUs, UINT32 wn);
 
 #endif // __MATH_FUNCTIONS_H__
