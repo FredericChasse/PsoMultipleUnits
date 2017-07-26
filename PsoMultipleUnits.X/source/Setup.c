@@ -148,6 +148,17 @@ void InitPorts(void)
 
 //  Port.B.SetPinsAnalogIn(0xFFFF);   // ADC0-15, RB0 = Vref+
   Port.B.SetPinsAnalogIn  ( BIT_0     // Vref+
+                          | BIT_1
+                          | BIT_2
+                          | BIT_3
+                          | BIT_4
+                          | BIT_5
+                          | BIT_6
+                          | BIT_7
+                          | BIT_8
+                          | BIT_9
+                          | BIT_10
+                          | BIT_11
                           | BIT_12    // POT12
                           | BIT_13    // POT12
                           | BIT_14    // POT12

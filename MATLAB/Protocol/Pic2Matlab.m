@@ -24,6 +24,7 @@ EXTREMUM_SEEKING = uint8(4);
 CHARACTERIZATION = uint8(5);
 PPSO_PNO = uint8(6);
 PNO = uint8(7);
+DEBUG_ADC = uint8(8);
 
 PROTOCOL_START_ALGO = uint8('!' - 0);
 
@@ -94,9 +95,10 @@ startAlgoChar = PROTOCOL_START_ALGO;
 % algo = MULTI_UNIT;
 % algo = EXTREMUM_SEEKING;
 % algo = PPSO_PNO;
-algo = PNO;
+% algo = PNO;
+algo = DEBUG_ADC;
 % units = uint8(0:1:7);
-units = uint8(7:1:14);
+units = uint8([3:6 11:14]);
 % units = uint8(7);
 nUnits = uint8(length(units));
 % lengthOfPayload = fliplr(typecast(uint16(3 + nUnits), 'uint8'));
@@ -118,6 +120,8 @@ elseif algo == PPSO_PNO
   nIterations = 130;
 elseif algo == PNO
   nIterations = 40;
+elseif algo == DEBUG_ADC
+  nIterations = 200;
 else
   nIterations = 20;
 end

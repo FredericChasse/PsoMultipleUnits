@@ -69,6 +69,7 @@ typedef enum
  ,CHARACTERIZATION          = 0x05
  ,PPSO_PNO                  = 0x06
  ,PNO                       = 0x07
+ ,DEBUG_ADC                 = 0x08
 } ProtocolTypeOfAlgo_t;
 
 #define PROTOCOL_START_ALGO   ('!')

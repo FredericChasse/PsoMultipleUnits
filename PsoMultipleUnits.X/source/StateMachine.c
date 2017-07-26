@@ -64,6 +64,7 @@ sUartFifoBuffer_t matlabData =
 
 //BOOL oSmoothData = 1;
 BOOL oSmoothData = 0;
+BOOL oDbgAdc = 0;
 
 UINT16 nSamples = 0;
 
@@ -333,6 +334,7 @@ void StateAcq(void)
         {
           case CLASSIC_PSO:
             oAlgoIsPso      = 1;
+            oDbgAdc         = 0;
             oSessionActive  = 1;
             nSamples        = 0;  // Reset the samples
             algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PSO_1D);
@@ -341,6 +343,7 @@ void StateAcq(void)
             
           case PARALLEL_PSO_MULTI_SWARM:
             oAlgoIsPso      = 1;
+            oDbgAdc         = 0;
             oSessionActive  = 1;
             nSamples        = 0;  // Reset the samples
             algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PARALLEL_PSO_MULTI_SWARM);
@@ -349,6 +352,7 @@ void StateAcq(void)
             
           case CHARACTERIZATION:
             oAlgoIsPso      = 0;
+            oDbgAdc         = 0;
             oSessionActive  = 1;
             nSamples        = 0;  // Reset the samples
             algo = (AlgoInterface_t *) CharacterizationInterface();
@@ -357,6 +361,7 @@ void StateAcq(void)
             
           case PARALLEL_PSO:
             oAlgoIsPso      = 1;
+            oDbgAdc         = 0;
             oSessionActive  = 1;
             nSamples        = 0;  // Reset the samples
             algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PARALLEL_PSO);
@@ -365,6 +370,7 @@ void StateAcq(void)
             
           case EXTREMUM_SEEKING:
             oAlgoIsPso      = 0;
+            oDbgAdc         = 0;
             oSessionActive  = 1;
             nSamples        = 0;  // Reset the samples
             algo = (AlgoInterface_t *) ExtremumSeekingInterface();
@@ -373,6 +379,7 @@ void StateAcq(void)
             
           case PPSO_PNO:
             oAlgoIsPso      = 0;
+            oDbgAdc         = 0;
             oSessionActive  = 1;
             nSamples        = 0;  // Reset the samples
             algo = (AlgoInterface_t *) PpsoPnoInterface();
@@ -381,14 +388,25 @@ void StateAcq(void)
             
           case PNO:
             oAlgoIsPso      = 0;
+            oDbgAdc         = 0;
             oSessionActive  = 1;
             nSamples        = 0;  // Reset the samples
             algo = (AlgoInterface_t *) PnoInterface();
             algo->Init(algo->ctx, algoArray);
             break;
             
+          case DEBUG_ADC:
+            oAlgoIsPso      = 0;
+            oDbgAdc         = 1;
+            oSessionActive  = 1;
+            nSamples        = 0;  // Reset the samples
+            algo = (AlgoInterface_t *) DebugAdcInterface();
+            algo->Init(algo->ctx, algoArray);
+            break;
+            
           default:
             oAlgoIsPso      = 0;
+            oDbgAdc         = 0;
             for (i = 0; i < nUnits; i++)
             {
               algoArray->RemoveUnitFromArray(algoArray->ctx, 0);
@@ -403,6 +421,7 @@ void StateAcq(void)
       {
         oSessionActive = 0;
         oAlgoIsPso     = 0;
+        oDbgAdc        = 0;
         algo->Release(algo->ctx);
         nUnits = algoArray->GetNUnits(algoArray->ctx);
         for (i = 0; i < nUnits; i++)
@@ -445,8 +464,14 @@ void StateCompute(void)
   {
     positions[i]  = algoArray->GetPos(algoArray->ctx, i);
     id = algoArray->GetUnitId(algoArray->ctx, i);
-    powers[i]     = ComputeCellPower(unitAdcs[id], algoArray->GetUnitPosIdx(algoArray->ctx, i));
-//    powers[i]     = sCellValues.cells[unitAdcs[id]].cellVoltFloat;
+    if (oDbgAdc)
+    {
+      powers[i] = sCellValues.cells[unitAdcs[id]].cellVoltFloat;
+    }
+    else
+    {
+      powers[i] = ComputeCellPower(unitAdcs[id], algoArray->GetUnitPosIdx(algoArray->ctx, i));
+    }
     algoArray->SetPower(algoArray->ctx, i, powers[i]);
   }
   

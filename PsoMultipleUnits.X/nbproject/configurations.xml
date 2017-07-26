@@ -6,6 +6,10 @@
         <itemPath>Objects/Algo/Characterization.c</itemPath>
         <itemPath>Objects/Algo/Characterization.h</itemPath>
       </logicalFolder>
+      <logicalFolder name="f6" displayName="DebugAdc" projectFiles="true">
+        <itemPath>Objects/Algo/DebugAdc.c</itemPath>
+        <itemPath>Objects/Algo/DebugAdc.h</itemPath>
+      </logicalFolder>
       <logicalFolder name="f3" displayName="ExtremumSeeking" projectFiles="true">
         <itemPath>Objects/Algo/ExtremumSeeking.c</itemPath>
         <itemPath>Objects/Algo/ExtremumSeeking.h</itemPath>
