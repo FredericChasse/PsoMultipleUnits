@@ -64,5 +64,7 @@ void HpfZ     (TustinValue_t *input, TustinValue_t *output, float acqTime, float
 void LpfZ     (TustinValue_t *input, TustinValue_t *output, float acqTime, float wl);
 void NpfZ     (TustinValue2_t *input, TustinValue2_t *output, float acqTime, float wn);
 void NpfZ32   (TustinValue32_t *input, TustinValue32_t *output, UINT32 acqTimeInUs, UINT32 wn);
+void NpfZ32Static (TustinValue32_t *input, TustinValue32_t *output);
+void NpfZ32StaticOptimized (TustinValue32_t *input, TustinValue32_t *output);
 
 #endif // __MATH_FUNCTIONS_H__

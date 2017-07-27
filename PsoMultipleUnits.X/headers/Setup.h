@@ -99,11 +99,6 @@ void StartInterrupts  (void);
 #define N_SAMPLES_TO_DROP       (30)      // Ignore n first samples
 #define N_TOTAL_SAMPLES         (N_SAMPLES_PER_ADC_READ - N_SAMPLES_TO_DROP)
 
-#ifndef __DEBUG
 #define SAMPLING_TIME_FLOAT     (ADC_TIMER_SCALE_FLOAT * ADC_TIMER_PERIOD * N_SAMPLES_PER_ADC_READ * N_UNITS_TOTAL)
-#else
-// We need to skip AN6 and AN7
-#define SAMPLING_TIME_FLOAT     (ADC_TIMER_SCALE_FLOAT * ADC_TIMER_PERIOD * N_SAMPLES_PER_ADC_READ * (N_UNITS_TOTAL - 2))
-#endif
 
 #endif	/* __SETUP_H__ */
