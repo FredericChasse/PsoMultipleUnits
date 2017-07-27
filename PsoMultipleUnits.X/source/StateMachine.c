@@ -511,7 +511,13 @@ void StateCompute(void)
     codec->CodeNewPsoMsg(codec->ctx, &newPsoPayload);
   }
   
+  UINT32 coreTickRate = Timer.Tic(1500, SCALE_US); // ... Function ... // 
   algo->Run(algo->ctx);
+  INT32 time = Timer.Toc(1500, coreTickRate);
+  if (time < 0)
+  {
+    LED1_ON;
+  }
 }
 
 

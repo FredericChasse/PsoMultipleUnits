@@ -121,7 +121,7 @@ elseif algo == PPSO_PNO
 elseif algo == PNO
   nIterations = 100;
 elseif algo == DEBUG_ADC
-  nIterations = 200;
+  nIterations = 100;
 else
   nIterations = 20;
 end

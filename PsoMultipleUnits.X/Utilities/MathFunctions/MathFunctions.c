@@ -111,22 +111,37 @@ void NpfZ32 (TustinValue32_t *input, TustinValue32_t *output, UINT32 acqTimeInUs
   output->oldest = output->previous;
   output->previous = output->current;
   
-  float T = acqTimeInUs*0.000001;
-  float wn2 = wn*wn;
-//  float wnT = wn*acqTimeInUs;
-//  float wn2T = wn2*acqTimeInUs;
-//  float wn2T2 = wn2T*acqTimeInUs;
-  float wnT = wn*T;
-  float wn2T = wn2*T;
-  float wn2T2 = wn2T*T;
-  float uk0 = input->current;
-  float uk1 = input->previous;
-  float uk2 = input->oldest;
-  float yk1 = output->previous;
-  float yk2 = output->oldest;
+  UINT64 wn2 = wn*wn;
+  UINT64 wnT = wn*acqTimeInUs;
+  UINT64 wn2T2 = wn2*acqTimeInUs*acqTimeInUs;
+  UINT64 uk0 = input->current;
+  UINT64 uk1 = input->previous;
+  UINT64 uk2 = input->oldest;
+  UINT64 yk1 = output->previous;
+  UINT64 yk2 = output->oldest;
 //  output->current = ((wn2T2+4)*uk0+(2*wn2T2-8)*uk1+(wn2T2+4)*uk2-(2*wn2T2-8)*yk1-(wn2T2-4*wnT+4)*yk2)/(wn2T2+4*wnT+4);
 //  output->current /= 1000000;
   
-  output->current = (((uk0+2*uk1+uk2-2*yk1-yk2)*wn2T2+4*wnT*yk2+4*(uk0-2*uk1+uk2+2*yk1-yk2))/(wn2T2+4*wnT+4));
-//  output->current /= 1000000;
+  output->current = (((uk0+2*uk1+uk2-2*yk1-yk2)*wn2T2/1000000+4*wnT*yk2/1000000+4*(uk0-2*uk1+uk2+2*yk1-yk2))/((wn2T2+4*wnT)/1000000+4));
+  
+//  output->oldest = output->previous;
+//  output->previous = output->current;
+//  
+//  float T = acqTimeInUs*0.000001;
+//  float wn2 = wn*wn;
+////  float wnT = wn*acqTimeInUs;
+////  float wn2T = wn2*acqTimeInUs;
+////  float wn2T2 = wn2T*acqTimeInUs;
+//  float wnT = wn*T;
+//  float wn2T = wn2*T;
+//  float wn2T2 = wn2T*T;
+//  float uk0 = input->current;
+//  float uk1 = input->previous;
+//  float uk2 = input->oldest;
+//  float yk1 = output->previous;
+//  float yk2 = output->oldest;
+////  output->current = ((wn2T2+4)*uk0+(2*wn2T2-8)*uk1+(wn2T2+4)*uk2-(2*wn2T2-8)*yk1-(wn2T2-4*wnT+4)*yk2)/(wn2T2+4*wnT+4);
+////  output->current /= 1000000;
+//  
+//  output->current = (((uk0+2*uk1+uk2-2*yk1-yk2)*wn2T2+4*wnT*yk2+4*(uk0-2*uk1+uk2+2*yk1-yk2))/(wn2T2+4*wnT+4));
 }

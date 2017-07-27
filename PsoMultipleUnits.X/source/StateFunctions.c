@@ -104,16 +104,31 @@ inline void GetAdcValues (UINT8 *active, UINT8 nActive)
   
 //  for (i = 0; i < nActive; i++)
 //  {
+//    in[active[i]].oldest = in[active[i]].previous;
 //    in[active[i]].previous = in[active[i]].current;
 //    in[active[i]].current = cellVoltageRaw[active[i]];
 //    NpfZ32(&in[active[i]], &out[active[i]], T, wn);
 //    sCellValues.cells[active[i]].cellVoltRaw[nSamples] = out[active[i]].current;
 //  }
+//  for (i = 0; i < 1; i++)
+//  {
+//    in[10].previous = in[10].current;
+//    in[10].current = cellVoltageRaw[10];
+//    NpfZ32(&in[10], &out[10], T, wn);
+//    sCellValues.cells[10].cellVoltRaw[nSamples] = out[10].current;
+//  }
   in.oldest = in.previous;
   in.previous = in.current;
   in.current = cellVoltageRaw[10];
+//  UINT32 coreTickRate = Timer.Tic(1500, SCALE_US); // ... Function ... // 
   NpfZ32(&in, &out, T, wn);
+//  INT32 time = Timer.Toc(1500, coreTickRate);
   sCellValues.cells[10].cellVoltRaw[nSamples] = out.current;
+//  in.oldest = in.previous;
+//  in.previous = in.current;
+//  in.current = cellVoltageRaw[active[0]];
+//  NpfZ32(&in, &out, T, wn);
+//  sCellValues.cells[active[0]].cellVoltRaw[nSamples] = out.current;
 }
 
 
