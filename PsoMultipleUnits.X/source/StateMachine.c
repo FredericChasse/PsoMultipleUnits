@@ -90,6 +90,9 @@ UINT8 dbgIdx = 0;
 float dbgPos[3] = {320.5882,410.7843,948.0392};
 BOOL oDbgBtn = 0;
 
+UINT8 activeAdcs[16] = {0};
+UINT8 nActiveAdcs = 0;
+
 
 //==============================================================================
 //	STATES OF STATE MACHINE
@@ -275,8 +278,7 @@ void StateAcq(void)
   {
     oAdcReady = 0;
 
-    GetAdcValues();
-    
+    GetAdcValues(activeAdcs, nActiveAdcs);
 
     nSamples++;
     if (nSamples >= N_SAMPLES_PER_ADC_READ)
@@ -326,10 +328,12 @@ void StateAcq(void)
       if (!oSessionActive) // Ensure we are not already started
       {
         nUnits = retBuf[1];
+        nActiveAdcs = nUnits;
         memcpy(units, &retBuf[2], nUnits);
         for (i = 0; i < nUnits; i++)
         {
           algoArray->AddUnitToArray(algoArray->ctx, mainArray->GetUnitHandle(mainArray->ctx, units[i]));
+          activeAdcs[i] = unitAdcs[units[i]];
         }
         switch (retBuf[0])
         {
@@ -420,6 +424,7 @@ void StateAcq(void)
     case DECODER_RET_MSG_STOP_ALGO:
       if (oSessionActive)   // To ensure that we are currently running
       {
+        nActiveAdcs    = 0;
         oSessionActive = 0;
         oAlgoIsPso     = 0;
         oDbgAdc        = 0;

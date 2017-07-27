@@ -74,9 +74,12 @@ inline float ComputeCellPower (UINT8 cellIndex, UINT8 potIndex)
 const UINT32 wn = 1526*2*PI;
 const UINT32 T = ADC_TIMER_PERIOD * N_UNITS_TOTAL;
 
+//TustinValue32_t in[16] = {0}, out[16] = {0};
 TustinValue32_t in = {0}, out = {0};
-inline void GetAdcValues (void)
+
+inline void GetAdcValues (UINT8 *active, UINT8 nActive)
 {
+  UINT8 i;
   memcpy((void *) &cellVoltageRaw[0], (void *) &Adc.Var.adcReadValues[0], 64);  // sizeof(UINT32) * 16 = 64
 
 //  sCellValues.cells[ 0].cellVoltRaw[nSamples] = cellVoltageRaw[ 0];
@@ -99,11 +102,18 @@ inline void GetAdcValues (void)
   sCellValues.cells[14].cellVoltRaw[nSamples] = cellVoltageRaw[14];
   sCellValues.cells[15].cellVoltRaw[nSamples] = cellVoltageRaw[15];
   
+//  for (i = 0; i < nActive; i++)
+//  {
+//    in[active[i]].previous = in[active[i]].current;
+//    in[active[i]].current = cellVoltageRaw[active[i]];
+//    NpfZ32(&in[active[i]], &out[active[i]], T, wn);
+//    sCellValues.cells[active[i]].cellVoltRaw[nSamples] = out[active[i]].current;
+//  }
   in.oldest = in.previous;
   in.previous = in.current;
-  in.current = cellVoltageRaw[ 8];
+  in.current = cellVoltageRaw[10];
   NpfZ32(&in, &out, T, wn);
-  sCellValues.cells[ 8].cellVoltRaw[nSamples] = out.current;
+  sCellValues.cells[10].cellVoltRaw[nSamples] = out.current;
 }
 
 

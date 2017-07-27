@@ -1,5 +1,5 @@
 clear
-close all
+% close all
 
 % Next 2 lines are to close any open waitbar
 f = findall(0,'tag','TMWWaitbar');
