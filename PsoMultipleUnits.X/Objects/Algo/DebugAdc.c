@@ -73,7 +73,7 @@ INT8 _DbgAdc_Init (DbgAdc_t *d, UnitArrayInterface_t *unitArray)
   UINT8 i = 0;
   
   d->iteration      = 0;
-  d->currentPos     = MIN_POT_VALUE;
+  d->currentPos     = 50;
   d->currentPosIdx  = 0;
   d->timeElapsed    = 0;
   d->unitArray      = unitArray;
@@ -109,22 +109,34 @@ void _DbgAdc_Release (DbgAdc_t *d)
 INT8 _DbgAdc_Run (DbgAdc_t *d)
 {
   UINT8 i;
+  static BOOL oToggle = 0;
   
   d->iteration++;
   d->timeElapsed += d->sampleTime;
   
-  if (d->iteration < 10)
+  if (oToggle)
   {
-    d->currentPosIdx = 0;
-  }
-  else if (d->iteration < 60)
-  {
-    d->currentPosIdx = 255;
+    oToggle = 0;
+    d->currentPosIdx -= 2;
   }
   else
   {
-    d->currentPosIdx = 255 >> 1;
+    oToggle = 1;
+    d->currentPosIdx += 2;
   }
+  
+//  if (d->iteration < 10)
+//  {
+//    d->currentPosIdx = 0;
+//  }
+//  else if (d->iteration < 60)
+//  {
+//    d->currentPosIdx = 255;
+//  }
+//  else
+//  {
+//    d->currentPosIdx = 255 >> 1;
+//  }
   
   if (d->currentPosIdx <= 255)
   {
