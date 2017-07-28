@@ -49,7 +49,7 @@ BOOL  oSendData       = 0
      ,oErrorFlag      = 0
      ;
 
-UINT32 cellVoltageRaw [16] = {0};
+UINT16 cellVoltageRaw [16] = {0};
 
 struct sAllCells sCellValues = {0};
 
@@ -67,7 +67,7 @@ sUartFifoBuffer_t matlabData =
 BOOL oSmoothData = 0;
 BOOL oDbgAdc = 0;
 
-UINT16 nSamples = 0;
+volatile UINT16 nSamples = 0;
 
 extern UINT32 iteration;
 
@@ -90,8 +90,10 @@ UINT8 dbgIdx = 0;
 float dbgPos[3] = {320.5882,410.7843,948.0392};
 BOOL oDbgBtn = 0;
 
-UINT8 activeAdcs[16] = {0};
-UINT8 nActiveAdcs = 0;
+extern volatile BOOL oAcqOngoing;
+
+UINT32 coreTickRate;
+INT32 time;
 
 
 //==============================================================================
@@ -254,7 +256,6 @@ void StateInit(void)
   algoArray->Init(algoArray->ctx, 1);
   
   StartInterrupts();
-//  START_INTERRUPTS;
   
   perturb->Init(perturb->ctx, 500);
   
@@ -278,12 +279,13 @@ void StateAcq(void)
   {
     oAdcReady = 0;
 
-    GetAdcValues(activeAdcs, nActiveAdcs);
+//    GetAdcValues();
 
-    nSamples++;
-    if (nSamples >= N_SAMPLES_PER_ADC_READ)
-    {
-      nSamples = 0;
+//    while(oAcqOngoing);
+//    nSamples++;
+//    if (nSamples >= N_SAMPLES_PER_ADC_READ)
+//    {
+//      nSamples = 0;
       
 //      sUartLineBuffer_t buf = {0};
 //      UINT8 string[6] = {'a','l','l','o','\r','\n'};
@@ -291,15 +293,18 @@ void StateAcq(void)
 //      buf.length = 6;
 //      Uart.PutTxFifoBuffer(UART6, &buf);
       
+      ComputeMeanAdcValues();
       if (oSessionActive)
       {
+        
+        coreTickRate = Timer.Tic(2000000, SCALE_US);
         oNewSample = 1;   // Go to stateCompute
       }
 //      else
 //      {
 //        ComputeMeanAdcValues();
 //      }
-    }
+//    }
   }
   
   //==================================================================
@@ -328,12 +333,10 @@ void StateAcq(void)
       if (!oSessionActive) // Ensure we are not already started
       {
         nUnits = retBuf[1];
-        nActiveAdcs = nUnits;
         memcpy(units, &retBuf[2], nUnits);
         for (i = 0; i < nUnits; i++)
         {
           algoArray->AddUnitToArray(algoArray->ctx, mainArray->GetUnitHandle(mainArray->ctx, units[i]));
-          activeAdcs[i] = unitAdcs[units[i]];
         }
         switch (retBuf[0])
         {
@@ -341,6 +344,7 @@ void StateAcq(void)
             oAlgoIsPso      = 1;
             oDbgAdc         = 0;
             oSessionActive  = 1;
+            while(oAcqOngoing);
             nSamples        = 0;  // Reset the samples
             algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PSO_1D);
             algo->Init(algo->ctx, algoArray);
@@ -350,6 +354,7 @@ void StateAcq(void)
             oAlgoIsPso      = 1;
             oDbgAdc         = 0;
             oSessionActive  = 1;
+            while(oAcqOngoing);
             nSamples        = 0;  // Reset the samples
             algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PARALLEL_PSO_MULTI_SWARM);
             algo->Init(algo->ctx, algoArray);
@@ -359,6 +364,7 @@ void StateAcq(void)
             oAlgoIsPso      = 0;
             oDbgAdc         = 0;
             oSessionActive  = 1;
+            while(oAcqOngoing);
             nSamples        = 0;  // Reset the samples
             algo = (AlgoInterface_t *) CharacterizationInterface();
             algo->Init(algo->ctx, algoArray);
@@ -368,6 +374,7 @@ void StateAcq(void)
             oAlgoIsPso      = 1;
             oDbgAdc         = 0;
             oSessionActive  = 1;
+            while(oAcqOngoing);
             nSamples        = 0;  // Reset the samples
             algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PARALLEL_PSO);
             algo->Init(algo->ctx, algoArray);
@@ -377,6 +384,7 @@ void StateAcq(void)
             oAlgoIsPso      = 0;
             oDbgAdc         = 0;
             oSessionActive  = 1;
+            while(oAcqOngoing);
             nSamples        = 0;  // Reset the samples
             algo = (AlgoInterface_t *) ExtremumSeekingInterface();
             algo->Init(algo->ctx, algoArray);
@@ -386,6 +394,7 @@ void StateAcq(void)
             oAlgoIsPso      = 0;
             oDbgAdc         = 0;
             oSessionActive  = 1;
+            while(oAcqOngoing);
             nSamples        = 0;  // Reset the samples
             algo = (AlgoInterface_t *) PpsoPnoInterface();
             algo->Init(algo->ctx, algoArray);
@@ -395,6 +404,7 @@ void StateAcq(void)
             oAlgoIsPso      = 0;
             oDbgAdc         = 0;
             oSessionActive  = 1;
+            while(oAcqOngoing);
             nSamples        = 0;  // Reset the samples
             algo = (AlgoInterface_t *) PnoInterface();
             algo->Init(algo->ctx, algoArray);
@@ -404,6 +414,7 @@ void StateAcq(void)
             oAlgoIsPso      = 0;
             oDbgAdc         = 1;
             oSessionActive  = 1;
+            while(oAcqOngoing);
             nSamples        = 0;  // Reset the samples
             algo = (AlgoInterface_t *) DebugAdcInterface();
             algo->Init(algo->ctx, algoArray);
@@ -424,7 +435,6 @@ void StateAcq(void)
     case DECODER_RET_MSG_STOP_ALGO:
       if (oSessionActive)   // To ensure that we are currently running
       {
-        nActiveAdcs    = 0;
         oSessionActive = 0;
         oAlgoIsPso     = 0;
         oDbgAdc        = 0;
@@ -451,9 +461,8 @@ void StateAcq(void)
 //===============================================================
 void StateCompute(void)
 {  
-  
-  UINT32 coreTickRate = Timer.Tic(200000, SCALE_NS);
   oNewSample = 0;
+//  UINT32 coreTickRate = Timer.Tic(200000, SCALE_US);
   
   UINT8 i, id;
   float  positions[N_UNITS_TOTAL]
@@ -467,13 +476,6 @@ void StateCompute(void)
   ProtocolUnitsDataPayload_t newUnitsPayload = {0};
   ProtocolPsoDataPayload_t   newPsoPayload   = {0};
   
-//  static TustinValue_t in = {0}, out1 = {0}, out2 = {0}, out3 = {0}, out4 = {0};
-//  static float wl = 2*PI*10;
-//  static float wn = 2*PI*1526;
-//  static TustinValue2_t in = {0}, out = {0};
-//  static float T = SAMPLING_TIME_FLOAT;
-  
-  ComputeMeanAdcValues();
   for (i = 0; i < nUnits; i++)
   {
     positions[i]  = algoArray->GetPos(algoArray->ctx, i);
@@ -481,13 +483,6 @@ void StateCompute(void)
     if (oDbgAdc)
     {
       powers[i] = sCellValues.cells[unitAdcs[id]].cellVoltFloat;
-//      in.previousValue = in.currentValue;
-//      in.currentValue = powers[i];
-//      LpfZ(&in, &out1, SAMPLING_TIME_FLOAT, wl);
-//      LpfZ(&out1, &out2, SAMPLING_TIME_FLOAT, wl);
-//      LpfZ(&out2, &out3, SAMPLING_TIME_FLOAT, wl);
-//      LpfZ(&out3, &out4, SAMPLING_TIME_FLOAT, wl);
-//      powers[i] = out4.currentValue;
     }
     else
     {
@@ -514,7 +509,8 @@ void StateCompute(void)
   }
   
   algo->Run(algo->ctx);
-  INT32 time = Timer.Toc(200000, coreTickRate);
+  
+  time = Timer.Toc(2000000, coreTickRate);
   if (time < 0)
   {
     LED1_ON;

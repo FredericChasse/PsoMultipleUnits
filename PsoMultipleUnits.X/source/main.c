@@ -63,7 +63,7 @@ void main(void)
     Wdt.Disable();        // Disable WDT and
     Wdt.ClearEvent();     // the WDT event bit
     
-    INIT_PORTS;           // Init all ports
+    InitPorts();           // Init all ports
     pState = &StateError; // Go to StateError
   }
   else

@@ -119,6 +119,8 @@ UINT8 _Codec_CodeNewPsoMsg (Codec_t *c, ProtocolPsoDataPayload_t *newMsg)
   
   while(Uart.PutTxFifoBuffer(c->uartChannel, &buf) < 0);
   
+//  Uart.SendDataBuffer(U_MATLAB, buf.buffer, buf.length);
+  
   return 0;
 }
 

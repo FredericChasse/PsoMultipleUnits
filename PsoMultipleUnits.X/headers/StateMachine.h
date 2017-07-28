@@ -99,10 +99,10 @@ void (*pState)(void);       // State pointer, used to navigate between states
 
 struct sCell
 {
-  UINT32 cellVoltRaw [N_SAMPLES_PER_ADC_READ];
+  UINT16 cellVoltRaw [N_SAMPLES_PER_ADC_READ];
   float  cellVoltFloat;
   float  cellPowerFloat;
-  UINT8  nSamples;
+  UINT16 nSamples;
 };
 
 struct sAllCells

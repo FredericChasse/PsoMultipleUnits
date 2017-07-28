@@ -68,15 +68,15 @@
  * | 5        | 2           | I2C 5             |
  * | 5        | 3           |                   |
  * |----------+-------------+-------------------|
- * | 6        | 0           | SPI 3             |
+ * | 6        | 0           | Timer 3           |
  * | 6        | 1           |                   |
  * | 6        | 2           |                   |
- * | 6        | 3           | ADC               |
+ * | 6        | 3           |                   |
  * |----------+-------------+-------------------|
  * | 7        | 0           |                   |
  * | 7        | 1           |                   |
  * | 7        | 2           |                   |
- * | 7        | 3           | Timer 3           |
+ * | 7        | 3           | ADC               |
  * +----------+-------------+-------------------+
  * 
  */
@@ -88,8 +88,8 @@
 #define T1_INTERRUPT_PRIORITY           ipl2auto  // Used in ISR
 #define TIMER2_INTERRUPT_PRIORITY       2         // Used in ChinookLib function
 #define T2_INTERRUPT_PRIORITY           ipl2auto  // Used in ISR
-#define TIMER3_INTERRUPT_PRIORITY       7         // Used in ChinookLib function
-#define T3_INTERRUPT_PRIORITY           ipl7auto  // Used in ISR
+#define TIMER3_INTERRUPT_PRIORITY       6         // Used in ChinookLib function
+#define T3_INTERRUPT_PRIORITY           ipl6auto  // Used in ISR
 #define TIMER4_INTERRUPT_PRIORITY       1         // Used in ChinookLib function
 #define T4_INTERRUPT_PRIORITY           ipl1auto  // Used in ISR
 #define TIMER5_INTERRUPT_PRIORITY       1         // Used in ChinookLib function
@@ -97,7 +97,7 @@
 
 #define TIMER1_INTERRUPT_SUBPRIORITY    3         // Highest subpriority
 #define TIMER2_INTERRUPT_SUBPRIORITY    1
-#define TIMER3_INTERRUPT_SUBPRIORITY    3         // Highest subpriority
+#define TIMER3_INTERRUPT_SUBPRIORITY    0         // Highest subpriority
 #define TIMER4_INTERRUPT_SUBPRIORITY    2
 #define TIMER5_INTERRUPT_SUBPRIORITY    0         // Lowest subpriority
 //===============================================
@@ -117,20 +117,10 @@
 
 
 //===============================================
-// SPI interrupts priorities and subpriorities
-//===============================================
-#define SPI3_INTERRUPT_PRIORITY         6           // Used in ChinookLib function
-#define S3_INTERRUPT_PRIORITY           ipl6auto    // Used in ISR
-
-#define SPI3_INTERRUPT_SUBPRIORITY      0           // Highest subpriority
-//===============================================
-
-
-//===============================================
 // ADC interrupts priorities and subpriorities
 //===============================================
-#define ADC_INTERRUPT_PRIORITY          6           // Used in ChinookLib function
-#define ADC_INTERRUPT_PRIO              ipl6auto    // Used in ISR
+#define ADC_INTERRUPT_PRIORITY          7           // Used in ChinookLib function
+#define ADC_INTERRUPT_PRIO              ipl7auto    // Used in ISR
 
 #define ADC_INTERRUPT_SUBPRIORITY       3           // Highest subpriority
 //===============================================

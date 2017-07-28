@@ -63,7 +63,8 @@ void TustinZ  (TustinValue_t *input, TustinValue_t *output, float acqTime);
 void HpfZ     (TustinValue_t *input, TustinValue_t *output, float acqTime, float wh);
 void LpfZ     (TustinValue_t *input, TustinValue_t *output, float acqTime, float wl);
 void NpfZ     (TustinValue2_t *input, TustinValue2_t *output, float acqTime, float wn);
-void NpfZ32   (TustinValue32_t *input, TustinValue32_t *output, UINT32 acqTimeInUs, UINT32 wn);
+//void NpfZ32   (TustinValue32_t *input, TustinValue32_t *output, UINT32 acqTimeInUs, UINT32 wn);
+inline INT16 NpfZ32 (INT16 uk0, INT16 uk1, INT16 uk2, INT16 yk1, INT16 yk2);
 void NpfZ32Static (TustinValue32_t *input, TustinValue32_t *output);
 void NpfZ32StaticOptimized (TustinValue32_t *input, TustinValue32_t *output);
 

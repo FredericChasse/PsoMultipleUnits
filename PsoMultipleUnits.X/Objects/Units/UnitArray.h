@@ -21,6 +21,7 @@
 
 typedef void  (*UnitArrayInit_fct)                (void *ctx, UINT8 id);
 typedef void  (*UnitArraySetUnitPos_fct)          (void *ctx, UINT8 idx, float pos);
+typedef void  (*UnitArraySetUnitPosIdx_fct)       (void *ctx, UINT8 idx, UINT8 pos);
 typedef float (*UnitArrayGetUnitPos_fct)          (void *ctx, UINT8 idx);
 typedef float (*UnitArrayGetUnitPower_fct)        (void *ctx, UINT8 idx);
 typedef INT8  (*UnitArrayAddUnitToArray_fct)      (void *ctx, void *unit);
@@ -38,6 +39,7 @@ typedef struct UnitArrayInterface
 {
   void                             *ctx;
   UnitArrayInit_fct                 Init;
+  UnitArraySetUnitPosIdx_fct        SetPosIdx;
   UnitArraySetUnitPos_fct           SetPos;
   UnitArrayGetUnitPos_fct           GetPos;
   UnitArrayGetUnitPower_fct         GetPower;

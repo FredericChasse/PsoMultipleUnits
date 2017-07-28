@@ -64,15 +64,6 @@ void StartInterrupts  (void);
 //==============================================================================
 // Macro definitions
 //==============================================================================
-#define INIT_TIMER          InitTimer()
-#define INIT_PORTS          InitPorts()
-#define INIT_SPI            InitSpi()
-#define INIT_UART           InitUart()
-#define INIT_SKADI          InitSkadi()
-#define INIT_I2C            InitI2c()
-#define INIT_WDT            InitWdt()
-#define INIT_ADC            InitAdc()
-#define START_INTERRUPTS    StartInterrupts()
 
 #define LED1_ON       Port.F.ClearBits  (BIT_0)   
 #define LED2_ON       Port.F.ClearBits  (BIT_1)   
@@ -95,7 +86,7 @@ void StartInterrupts  (void);
 #define ADC_TIMER_PERIOD        (10)
 #define ADC_TIMER_SCALE         (SCALE_US)
 #define ADC_TIMER_SCALE_FLOAT   (TIMER_SCALE_US)
-#define N_SAMPLES_PER_ADC_READ  (130)     // Number of samples / ADC value
+#define N_SAMPLES_PER_ADC_READ  (230)     // Number of samples / ADC value
 #define N_SAMPLES_TO_DROP       (30)      // Ignore n first samples
 #define N_TOTAL_SAMPLES         (N_SAMPLES_PER_ADC_READ - N_SAMPLES_TO_DROP)
 

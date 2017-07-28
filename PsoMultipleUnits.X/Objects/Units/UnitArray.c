@@ -37,6 +37,7 @@ typedef struct
 //==============================================================================
 void  _UnitArray_Init                 (UnitArray_t *array, UINT8 id);
 void  _UnitArray_SetUnitPos           (UnitArray_t *array, UINT8 idx, float pos);
+void  _UnitArray_SetUnitPosIdx        (UnitArray_t *array, UINT8 idx, UINT8 pos);
 float _UnitArray_GetUnitPos           (UnitArray_t *array, UINT8 idx);
 float _UnitArray_GetUnitPower         (UnitArray_t *array, UINT8 idx);
 INT8  _UnitArray_AddUnitToArray       (UnitArray_t *array, UnitInterface_t *unit);
@@ -114,6 +115,15 @@ void _UnitArray_Release (UnitArray_t *array)
 UINT8 _UnitArray_GetNUnits (UnitArray_t *array)
 {
   return array->nUnits;
+}
+
+
+void _UnitArray_SetUnitPosIdx (UnitArray_t *array, UINT8 idx, UINT8 pos)
+{
+  if (idx < array->nUnits)
+  {
+    array->units[idx]->SetPosWithIdx(array->units[idx]->ctx, pos);
+  }
 }
 
 
@@ -267,6 +277,7 @@ const UnitArrayInterface_t * UnitArrayInterface(void)
       _arrays_if[i].GetUnitPosIdx       = (UnitArrayGetUnitPosIdx_fct)        &_UnitArray_GetUnitPosIdx;
       _arrays_if[i].GetUnitId           = (UnitArrayGetUnidId_fct)            &_UnitArray_GetUnitId;
       _arrays_if[i].CreateSubArray      = (UnitArrayCreateSubArray_fct)       &_UnitArray_CreateSubArray;
+      _arrays_if[i].SetPosIdx           = (UnitArraySetUnitPosIdx_fct)        &_UnitArray_SetUnitPosIdx;
       
       // Init the linked list
       _arraysNodes[i].ctx = (void *) &_arrays_if[i];

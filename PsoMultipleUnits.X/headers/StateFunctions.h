@@ -40,7 +40,7 @@ void AssessButtons (void);
 // =======================================
 
 inline float  ComputeCellPower (UINT8 cellIndex, UINT8 potIndex);
-inline void   GetAdcValues (UINT8 *active, UINT8 nActive);
+inline void   GetAdcValues (void);
 inline void   ComputeMeanAdcValues (void);
 
 //==============================================================================

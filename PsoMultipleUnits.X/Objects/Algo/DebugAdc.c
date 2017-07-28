@@ -130,7 +130,8 @@ INT8 _DbgAdc_Run (DbgAdc_t *d)
   {
     for (i = 0; i < d->nUnits; i++)
     {
-      d->unitArray->SetPos(d->unitArray->ctx, i, potRealValues[d->currentPosIdx]);
+      d->unitArray->SetPosIdx(d->unitArray->ctx, i, d->currentPosIdx);
+//      d->unitArray->SetPos(d->unitArray->ctx, i, potRealValues[d->currentPosIdx]);
 //      c->unitArray->SetPos(c->unitArray->ctx, i, potRealValues[1]);
     }
   }

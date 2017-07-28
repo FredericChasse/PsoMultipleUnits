@@ -106,24 +106,24 @@ void NpfZ (TustinValue2_t *input, TustinValue2_t *output, float acqTime, float w
   output->current = ((wn2T2+4)*uk0+(2*wn2T2-8)*uk1+(wn2T2+4)*uk2-(2*wn2T2-8)*yk1-(wn2T2-4*wnT+4)*yk2)/(wn2T2+4*wnT+4);
 }
 
-void NpfZ32 (TustinValue32_t *input, TustinValue32_t *output, UINT32 acqTimeInUs, UINT32 wn)
-{
-  output->oldest = output->previous;
-  output->previous = output->current;
-  
-  UINT64 wn2 = wn*wn;
-  UINT64 wnT = wn*acqTimeInUs;
-  UINT64 wn2T2 = wn2*acqTimeInUs*acqTimeInUs;
-  UINT64 uk0 = input->current;
-  UINT64 uk1 = input->previous;
-  UINT64 uk2 = input->oldest;
-  UINT64 yk1 = output->previous;
-  UINT64 yk2 = output->oldest;
-//  output->current = ((wn2T2+4)*uk0+(2*wn2T2-8)*uk1+(wn2T2+4)*uk2-(2*wn2T2-8)*yk1-(wn2T2-4*wnT+4)*yk2)/(wn2T2+4*wnT+4);
-//  output->current /= 1000000;
-  
-  output->current = (((uk0+2*uk1+uk2-2*yk1-yk2)*wn2T2/1000000+4*wnT*yk2/1000000+4*(uk0-2*uk1+uk2+2*yk1-yk2))/((wn2T2+4*wnT)/1000000+4));
-}
+//void NpfZ32 (TustinValue32_t *input, TustinValue32_t *output, UINT32 acqTimeInUs, UINT32 wn)
+//{
+//  output->oldest = output->previous;
+//  output->previous = output->current;
+//  
+//  UINT64 wn2 = wn*wn;
+//  UINT64 wnT = wn*acqTimeInUs;
+//  UINT64 wn2T2 = wn2*acqTimeInUs*acqTimeInUs;
+//  UINT64 uk0 = input->current;
+//  UINT64 uk1 = input->previous;
+//  UINT64 uk2 = input->oldest;
+//  UINT64 yk1 = output->previous;
+//  UINT64 yk2 = output->oldest;
+////  output->current = ((wn2T2+4)*uk0+(2*wn2T2-8)*uk1+(wn2T2+4)*uk2-(2*wn2T2-8)*yk1-(wn2T2-4*wnT+4)*yk2)/(wn2T2+4*wnT+4);
+////  output->current /= 1000000;
+//  
+//  output->current = (((uk0+2*uk1+uk2-2*yk1-yk2)*wn2T2/1000000+4*wnT*yk2/1000000+4*(uk0-2*uk1+uk2+2*yk1-yk2))/((wn2T2+4*wnT)/1000000+4));
+//}
 
 #define _FREQ (1.0f / (ADC_TIMER_SCALE_FLOAT * (float) ADC_TIMER_PERIOD * (float) N_UNITS_TOTAL))
 #define _WN   (2.0f*PI*1526)
@@ -185,7 +185,7 @@ void NpfZ32Static (TustinValue32_t *input, TustinValue32_t *output)
   output->current = (((uk0+2*uk1+uk2-2*yk1-yk2)*_wn2T2/1000000+4*_wnT*yk2/1000000+4*(uk0-2*uk1+uk2+2*yk1-yk2))/((_wn2T2+4*_wnT)/1000000+4));
 }
 
-void NpfZ32StaticOptimized (TustinValue32_t *input, TustinValue32_t *output)
+inline void NpfZ32StaticOptimized (TustinValue32_t *input, TustinValue32_t *output)
 {
   output->oldest = output->previous;
   output->previous = output->current;
@@ -206,6 +206,23 @@ void NpfZ32StaticOptimized (TustinValue32_t *input, TustinValue32_t *output)
   INT16 add1 = uk2-yk2 + uk0; // max 2046
   INT16 add2 = coeff1 - coeff2; // max 2046, min -1023
   output->current = (  (_f2Times4*(add1 - add2))  // max 5.4560e+11, min 0
+                     + (_fwnTimes4*yk2) // max 2.6153e+11, min 0
+                     + ( (add1 + add2) * _wn2) // max 1.8809e+11, min 0
+                    ) // max 1.1833e+12, min 0
+                    /_divider;
+//                    / (_f2Times4 + _fwnTimes4 + _wn2);  // fix at 525364651
+
+  // total max 2.2524e+03, min 0
+}
+
+
+INT16 NpfZ32 (INT16 uk0, INT16 uk1, INT16 uk2, INT16 yk1, INT16 yk2)
+{
+  INT16 coeff1 = 2*uk1; // max 2046, min 0
+  INT16 coeff2 = 2*yk1; // max 2046, min 0
+  INT16 add1 = uk2-yk2 + uk0; // max 2046
+  INT16 add2 = coeff1 - coeff2; // max 2046, min -1023
+  return (  (_f2Times4*(add1 - add2))  // max 5.4560e+11, min 0
                      + (_fwnTimes4*yk2) // max 2.6153e+11, min 0
                      + ( (add1 + add2) * _wn2) // max 1.8809e+11, min 0
                     ) // max 1.1833e+12, min 0

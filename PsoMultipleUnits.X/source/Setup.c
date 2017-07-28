@@ -105,7 +105,7 @@ void InitSpi(void)
   }
 
   // SPI interrupts not functionnal as of yet
-  Spi.ConfigInterrupt(SPI3, SPI3_INTERRUPT_PRIORITY, SPI3_INTERRUPT_SUBPRIORITY);  // Configure Interrupt for SPI3
+//  Spi.ConfigInterrupt(SPI3, SPI3_INTERRUPT_PRIORITY, SPI3_INTERRUPT_SUBPRIORITY);  // Configure Interrupt for SPI3
 }
 
 
@@ -259,6 +259,7 @@ void InitUart (void)
 
   Uart.Open(UART3, BAUD9600  , oConfigDbg, oFifoMode, oLineControl);   // Open UART 3 as : 9600 BAUD, 1 stop bit, no parity and 8 bits data
   Uart.Open(UART6, BAUD115200, oConfigMatlab, oFifoMode, oLineControl);   // Open UART 6 as : 9600 BAUD, 1 stop bit, no parity and 8 bits data
+//  Uart.Open(UART6, BAUD9600, oConfigMatlab, oFifoMode, oLineControl);   // Open UART 6 as : 9600 BAUD, 1 stop bit, no parity and 8 bits data
 
   Uart.EnableRx(UART3);
   Uart.EnableRx(UART6);
@@ -392,7 +393,7 @@ void StartInterrupts(void)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   Timer.EnableInterrupt(TIMER_1);
 //  Timer.EnableInterrupt(TIMER_2);
-  err = Timer.EnableInterrupt(TIMER_3);
+  err = Timer.DisableInterrupt(TIMER_3);
   if (err < 0)
   {
     LED1_ON;
@@ -451,7 +452,7 @@ void StartInterrupts(void)
   {
     LED1_ON;
   }
-
+  
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // Enable multi-vector interrupts

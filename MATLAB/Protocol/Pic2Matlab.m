@@ -62,6 +62,7 @@ end
 % port.BytesAvailableFcn = {@myCallback};
 
 port.BaudRate = 115200;
+% port.BaudRate = 9600;
 port.DataBits = 8;
 port.Parity = 'none';
 port.StopBits = 1;
@@ -77,9 +78,9 @@ delimiter = PROTOCOL_DELIMITER;
 typeOfMsg = NEW_RNG_SEED;
 % lengthOfPayload = fliplr(typecast(uint16(16), 'uint8'));
 lengthOfPayload = typecast(uint16(16), 'uint8');
-% [seed1, seed2] = GenerateNewSeeds;
-seed1 = uint64(6634093205851280027);
-seed2 = uint64(9627091455319487185);
+[seed1, seed2] = GenerateNewSeeds;
+% seed1 = uint64(6634093205851280027);
+% seed2 = uint64(9627091455319487185);
 seeds = typecast([seed1, seed2], 'uint8');
 
 buf = [delimiter, typeOfMsg, lengthOfPayload, seeds];
@@ -89,17 +90,17 @@ fwrite(port, buf);
 typeOfMsg = START_ACQ;
 startAlgoChar = PROTOCOL_START_ALGO;
 % algo = CHARACTERIZATION;
-% algo = CLASSIC_PSO;
+algo = CLASSIC_PSO;
 % algo = PARALLEL_PSO;
 % algo = PARALLEL_PSO_MULTI_SWARM;
 % algo = MULTI_UNIT;
 % algo = EXTREMUM_SEEKING;
 % algo = PPSO_PNO;
 % algo = PNO;
-algo = DEBUG_ADC;
+% algo = DEBUG_ADC;
 % units = uint8(3:1:10);
 % units = uint8([3:6 11:14]);
-units = uint8(9);
+units = uint8(7:10);
 nUnits = uint8(length(units));
 % lengthOfPayload = fliplr(typecast(uint16(3 + nUnits), 'uint8'));
 lengthOfPayload = typecast(uint16(3 + nUnits), 'uint8');
@@ -119,7 +120,7 @@ elseif algo == PARALLEL_PSO_MULTI_SWARM
 elseif algo == PPSO_PNO
   nIterations = 130;
 elseif algo == PNO
-  nIterations = 100;
+  nIterations = 30;
 elseif algo == DEBUG_ADC
   nIterations = 100;
 else

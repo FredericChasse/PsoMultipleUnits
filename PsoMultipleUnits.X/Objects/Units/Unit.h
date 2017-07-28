@@ -27,6 +27,7 @@ typedef enum
 
 typedef void  (*UnitInit_fct)           (void *ctx);
 typedef INT8  (*UnitSetPos_fct)         (void *ctx, float pos);
+typedef INT8  (*UnitSetPosWithIdx_fct)  (void *ctx, UINT8 idx);
 typedef float (*UnitGetPos_fct)         (void *ctx);
 typedef float (*UnitGetPower_fct)       (void *ctx);
 typedef UINT8 (*UnitGetId_fct)          (void *ctx);
@@ -39,6 +40,7 @@ typedef struct
   void                 *ctx;
   UnitInit_fct          Init;
   UnitSetPos_fct        SetPos;
+  UnitSetPosWithIdx_fct SetPosWithIdx;
   UnitGetPos_fct        GetPos;
   UnitGetPower_fct      GetPower;
   UnitGetId_fct         GetId;
