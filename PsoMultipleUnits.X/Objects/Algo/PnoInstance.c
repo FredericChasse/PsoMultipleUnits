@@ -40,6 +40,8 @@ typedef struct
   float delta;
   float perturbOsc;
   
+  UINT8 podIdx;
+  
   SteadyStatePno_t ss;
   float ssBuf[STEADY_STATE_PNO_MAX_SAMPLES];
 } PnoInstance_t;

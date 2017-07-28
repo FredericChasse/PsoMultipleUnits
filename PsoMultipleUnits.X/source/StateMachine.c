@@ -480,14 +480,14 @@ void StateCompute(void)
   {
     positions[i]  = algoArray->GetPos(algoArray->ctx, i);
     id = algoArray->GetUnitId(algoArray->ctx, i);
-    if (oDbgAdc)
-    {
-      powers[i] = sCellValues.cells[unitAdcs[id]].cellVoltFloat;
-    }
-    else
-    {
+//    if (oDbgAdc)
+//    {
+//      powers[i] = sCellValues.cells[unitAdcs[id]].cellVoltFloat;
+//    }
+//    else
+//    {
       powers[i] = ComputeCellPower(unitAdcs[id], algoArray->GetUnitPosIdx(algoArray->ctx, i));
-    }
+//    }
     algoArray->SetPower(algoArray->ctx, i, powers[i]);
   }
   
@@ -509,6 +509,10 @@ void StateCompute(void)
   }
   
   algo->Run(algo->ctx);
+  
+  // TODO: Check what is the sample at this point
+//  while(oAcqOngoing);
+//  nSamples = 0;
   
   time = Timer.Toc(2000000, coreTickRate);
   if (time < 0)
