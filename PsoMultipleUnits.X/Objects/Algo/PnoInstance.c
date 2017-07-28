@@ -36,11 +36,15 @@ typedef struct
   
   float umin;
   float umax;
-  float k;
+  INT8  k;
   float delta;
   float perturbOsc;
   
-  UINT8 podIdx;
+  INT16 prevPotIdx;
+  INT16 curPotIdx;
+  INT16 delta_int;
+  UINT8 umin_int;
+  UINT8 umax_int;
   
   SteadyStatePno_t ss;
   float ssBuf[STEADY_STATE_PNO_MAX_SAMPLES];
@@ -50,13 +54,15 @@ typedef struct
 // Private prototypes
 //==============================================================================
 
-void  _PnoInstance_Init               (PnoInstance_t *pnoi, UINT8 id, float delta, float pos, float umin, float umax, float perturbOsc);
+void  _PnoInstance_Init               (PnoInstance_t *pnoi, UINT8 id, UINT8 delta, UINT8 pos, UINT8 umin, UINT8 umax, float perturbOsc);
 void  _PnoInstance_SetSteadyState     (PnoInstance_t *pnoi, UINT8 samplesForSs, UINT8 oscAmp);
 BOOL  _PnoInstance_GetSteadyState     (PnoInstance_t *pnoi);
-float _PnoInstance_ComputePosClassic  (PnoInstance_t *pnoi, BOOL *oPerturbed);
+UINT8 _PnoInstance_ComputePosClassic  (PnoInstance_t *pnoi, BOOL *oPerturbed);
 float _PnoInstance_ComputePosSwarm    (PnoInstance_t *pnoi, BOOL *oPerturbed);
 void  _PnoInstance_SetPos             (PnoInstance_t *pnoi, float pos);
 float _PnoInstance_GetPos             (PnoInstance_t *pnoi);
+void  _PnoInstance_SetPosIdx          (PnoInstance_t *pnoi, UINT8 pos);
+UINT8 _PnoInstance_GetPosIdx          (PnoInstance_t *pnoi);
 void  _PnoInstance_SetFitness         (PnoInstance_t *pnoi, float fitness);
 void  _PnoInstance_Release            (PnoInstance_t *pnoi);
 void  _PnoInstance_SetId              (PnoInstance_t *pnoi, UINT8 id);
@@ -78,15 +84,19 @@ static BOOL _oInstanceArrayInitialized = 0;
 // Private functions
 //==============================================================================
 
-void _PnoInstance_Init (PnoInstance_t *pnoi, UINT8 id, float delta, float pos, float umin, float umax, float perturbOsc)
+void _PnoInstance_Init (PnoInstance_t *pnoi, UINT8 id, UINT8 delta, UINT8 pos, UINT8 umin, UINT8 umax, float perturbOsc)
 {
   pnoi->id = id;
-  pnoi->delta = delta;
+  pnoi->delta_int = delta;
+  pnoi->delta = delta*POT_STEP_VALUE;
   Position_Reset(&pnoi->pos);
-  pnoi->pos.curPos = pos;
+  pnoi->prevPotIdx = pnoi->curPotIdx = pos;
+  pnoi->pos.curPos = potRealValues[pos];
   pnoi->k = 1;
-  pnoi->umax = umax;
-  pnoi->umin = umin;
+  pnoi->umax_int = umax;
+  pnoi->umin_int = umin;
+  pnoi->umax = potRealValues[umax];
+  pnoi->umin = potRealValues[umin];
   pnoi->perturbOsc = perturbOsc;
 }
 
@@ -97,7 +107,7 @@ void _PnoInstance_SetId (PnoInstance_t *pnoi, UINT8 id)
 }
 
 
-float _PnoInstance_ComputePosClassic (PnoInstance_t *pnoi, BOOL *oPerturbed)
+UINT8 _PnoInstance_ComputePosClassic (PnoInstance_t *pnoi, BOOL *oPerturbed)
 {
   *oPerturbed = 0;
   
@@ -106,18 +116,21 @@ float _PnoInstance_ComputePosClassic (PnoInstance_t *pnoi, BOOL *oPerturbed)
     pnoi->k = -pnoi->k;
   }
   
-  pnoi->pos.prevPos = pnoi->pos.curPos;
-  pnoi->pos.curPos += pnoi->delta*pnoi->k;
-  if (pnoi->pos.curPos > pnoi->umax)
-  {
-    pnoi->pos.curPos = pnoi->umax;
-  }
-  if (pnoi->pos.curPos < pnoi->umin)
-  {
-    pnoi->pos.curPos = pnoi->umin;
-  }
+  pnoi->prevPotIdx = pnoi->curPotIdx;
+  pnoi->curPotIdx += pnoi->delta_int*pnoi->k;
   
-  return pnoi->pos.curPos;
+  if (pnoi->curPotIdx > pnoi->umax_int)
+  {
+    pnoi->curPotIdx = pnoi->umax_int;
+  }
+  if (pnoi->curPotIdx < pnoi->umin_int)
+  {
+    pnoi->curPotIdx = pnoi->umin_int;
+  }
+  pnoi->pos.prevPos = pnoi->pos.curPos;
+  pnoi->pos.curPos += potRealValues[pnoi->curPotIdx];
+  
+  return pnoi->curPotIdx;
 }
 
 
@@ -168,6 +181,21 @@ float _PnoInstance_ComputePosSwarm (PnoInstance_t *pnoi, BOOL *oPerturbed)
 float _PnoInstance_GetPos (PnoInstance_t *pnoi)
 {
   return pnoi->pos.curPos;
+}
+
+
+UINT8 _PnoInstance_GetPosIdx (PnoInstance_t *pnoi)
+{
+  return pnoi->curPotIdx;
+}
+
+
+void _PnoInstance_SetPosIdx (PnoInstance_t *pnoi, UINT8 pos)
+{
+  pnoi->prevPotIdx = pnoi->curPotIdx;
+  pnoi->curPotIdx = pos;
+  pnoi->pos.prevPos = pnoi->pos.curPos;
+  pnoi->pos.curPos = potRealValues[pos];
 }
 
 
@@ -248,6 +276,8 @@ const PnoInstanceInterface_t * PnoInstanceInterface (PnoType_t type)
       _instances_if[i].ComputePos     = (PnoiComputePos_fct)      &_PnoInstance_ComputePosClassic;
       _instances_if[i].SetPos         = (PnoiSetPos_fct)          &_PnoInstance_SetPos;
       _instances_if[i].GetPos         = (PnoiGetPos_fct)          &_PnoInstance_GetPos;
+      _instances_if[i].SetPosIdx      = (PnoiSetPosIdx_fct)       &_PnoInstance_SetPosIdx;
+      _instances_if[i].GetPosIdx      = (PnoiGetPosIdx_fct)       &_PnoInstance_GetPosIdx;
       _instances_if[i].SetFitness     = (PnoiSetFitness_fct)      &_PnoInstance_SetFitness;
       _instances_if[i].Release        = (PnoiRelease_fct)         &_PnoInstance_Release;
       _instances_if[i].SetSteadyState = (PnoiSetSteadyState_fct)  &_PnoInstance_SetSteadyState;
@@ -273,6 +303,7 @@ const PnoInstanceInterface_t * PnoInstanceInterface (PnoType_t type)
   
   if (_unusedInstances.count == 0)
   {
+    LED1_ON;
     return NULL;
   }
   

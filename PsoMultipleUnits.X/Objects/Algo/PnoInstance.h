@@ -33,10 +33,12 @@ typedef enum
  ,PNO_SWARM
 } PnoType_t;
 
-typedef void  (*PnoiInit_fct)             (void *ctx, UINT8 id, float delta, float pos, float umin, float umax, float perturbOsc);
-typedef float (*PnoiComputePos_fct)       (void *ctx, BOOL *oPerturbed);
+typedef void  (*PnoiInit_fct)             (void *ctx, UINT8 id, UINT8 delta, UINT8 pos, UINT8 umin, UINT8 umax, float perturbOsc);
+typedef UINT8 (*PnoiComputePos_fct)       (void *ctx, BOOL *oPerturbed);
 typedef void  (*PnoiSetPos_fct)           (void *ctx, float pos);
+typedef void  (*PnoiSetPosIdx_fct)        (void *ctx, UINT8 pos);
 typedef float (*PnoiGetPos_fct)           (void *ctx);
+typedef UINT8 (*PnoiGetPosIdx_fct)        (void *ctx);
 typedef void  (*PnoiSetFitness_fct)       (void *ctx, float fitness);
 typedef void  (*PnoiRelease_fct)          (void *ctx);
 typedef void  (*PnoiSetSteadyState_fct)   (void *ctx, UINT8 nSamplesForSs, UINT8 oscAmp);
@@ -49,7 +51,9 @@ typedef struct
   PnoiInit_fct            Init;
   PnoiComputePos_fct      ComputePos;
   PnoiSetPos_fct          SetPos;
+  PnoiSetPosIdx_fct       SetPosIdx;
   PnoiGetPos_fct          GetPos;
+  PnoiGetPosIdx_fct       GetPosIdx;
   PnoiSetFitness_fct      SetFitness;
   PnoiRelease_fct         Release;
   PnoiSetSteadyState_fct  SetSteadyState;

@@ -1,5 +1,5 @@
 clear
-% close all
+close all
 
 % Next 2 lines are to close any open waitbar
 f = findall(0,'tag','TMWWaitbar');
@@ -61,8 +61,8 @@ end
 % port.BytesAvailableFcnMode = 'byte';
 % port.BytesAvailableFcn = {@myCallback};
 
-port.BaudRate = 115200;
-% port.BaudRate = 9600;
+% port.BaudRate = 115200;
+port.BaudRate = 9600;
 port.DataBits = 8;
 port.Parity = 'none';
 port.StopBits = 1;
@@ -100,7 +100,7 @@ algo = PNO;
 % algo = DEBUG_ADC;
 % units = uint8(3:1:10);
 % units = uint8([3:6 11:14]);
-units = uint8(7:10);
+units = uint8(0:2);
 nUnits = uint8(length(units));
 % lengthOfPayload = fliplr(typecast(uint16(3 + nUnits), 'uint8'));
 lengthOfPayload = typecast(uint16(3 + nUnits), 'uint8');

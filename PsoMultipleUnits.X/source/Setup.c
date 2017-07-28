@@ -98,7 +98,7 @@ void InitSpi(void)
                                 | SPI_DATA_ON_CLK_FEDGE
                                 ;
 
-  err = Spi.Open(SPI3, oMasterFlags, 5e6);   // Open the SPI3 as a master at a bitrate of 10 MHz
+  err = Spi.Open(SPI3, oMasterFlags, 1e6);   // Open the SPI3 as a master at a bitrate of 10 MHz
   if (err < 0)                // Check for errors
   {
     LED1_ON;    // Turn on the LED_DEBUG1
@@ -258,8 +258,8 @@ void InitUart (void)
   UartLineCtrlMode_t oLineControl   = UART_DATA_SIZE_8_BITS | UART_PARITY_NONE | UART_STOP_BITS_1;
 
   Uart.Open(UART3, BAUD9600  , oConfigDbg, oFifoMode, oLineControl);   // Open UART 3 as : 9600 BAUD, 1 stop bit, no parity and 8 bits data
-  Uart.Open(UART6, BAUD115200, oConfigMatlab, oFifoMode, oLineControl);   // Open UART 6 as : 9600 BAUD, 1 stop bit, no parity and 8 bits data
-//  Uart.Open(UART6, BAUD9600, oConfigMatlab, oFifoMode, oLineControl);   // Open UART 6 as : 9600 BAUD, 1 stop bit, no parity and 8 bits data
+//  Uart.Open(UART6, BAUD115200, oConfigMatlab, oFifoMode, oLineControl);   // Open UART 6 as : 9600 BAUD, 1 stop bit, no parity and 8 bits data
+  Uart.Open(UART6, BAUD9600, oConfigMatlab, oFifoMode, oLineControl);   // Open UART 6 as : 9600 BAUD, 1 stop bit, no parity and 8 bits data
 
   Uart.EnableRx(UART3);
   Uart.EnableRx(UART6);

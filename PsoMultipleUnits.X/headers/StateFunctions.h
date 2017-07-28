@@ -42,6 +42,7 @@ void AssessButtons (void);
 inline float  ComputeCellPower (UINT8 cellIndex, UINT8 potIndex);
 inline void   GetAdcValues (void);
 inline void   ComputeMeanAdcValues (void);
+inline void   ResetFilterValues (void);
 
 //==============================================================================
 // Macro definitions

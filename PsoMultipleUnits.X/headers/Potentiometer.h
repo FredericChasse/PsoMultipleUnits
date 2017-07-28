@@ -131,6 +131,7 @@ inline INT8 SetPotAllUnits (UINT8 numPot, UINT8 value);
 #define POT_STEP_VALUE  (3.9215686f)
 
 #define VREF            (2.489f)
+#define VREF_MV         (2489u)
 //#define VREF            3.268f
 
 #define CS0             LATDbits.LATD4

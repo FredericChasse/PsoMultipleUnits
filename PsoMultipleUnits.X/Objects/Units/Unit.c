@@ -74,29 +74,29 @@ Unit_t _units[N_UNITS_TOTAL] =
 
 const UnitInterface_t _unit0_if = 
 {
-  .ctx          = (void *)                &_units[0]
- ,.GetId        = (UnitGetId_fct)         &_Unit_GetId 
- ,.GetPos       = (UnitGetPos_fct)        &_Unit_GetPos 
- ,.GetPower     = (UnitGetPower_fct)      &_Unit_GetPower 
- ,.Init         = (UnitInit_fct)          &_Unit_Init 
- ,.SetPos       = (UnitSetPos_fct)        &_Unit_SetPos
- ,.GetPosLimits = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
- ,.SetPower     = (UnitSetPower_fct)      &_Unit_SetPower
- ,.GetPosIdx    = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
- ,.SetPosWithIdx       = (UnitSetPosWithIdx_fct) &_Unit_SetPosWithIdx
+  .ctx            = (void *)                &_units[0]
+ ,.GetId          = (UnitGetId_fct)         &_Unit_GetId 
+ ,.GetPos         = (UnitGetPos_fct)        &_Unit_GetPos 
+ ,.GetPower       = (UnitGetPower_fct)      &_Unit_GetPower 
+ ,.Init           = (UnitInit_fct)          &_Unit_Init 
+ ,.SetPos         = (UnitSetPos_fct)        &_Unit_SetPos
+ ,.GetPosLimits   = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
+ ,.SetPower       = (UnitSetPower_fct)      &_Unit_SetPower
+ ,.GetPosIdx      = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
+ ,.SetPosWithIdx  = (UnitSetPosWithIdx_fct) &_Unit_SetPosWithIdx
 };
 const UnitInterface_t _unit1_if = 
 {
-  .ctx          = (void *)                &_units[1]
- ,.GetId        = (UnitGetId_fct)         &_Unit_GetId 
- ,.GetPos       = (UnitGetPos_fct)        &_Unit_GetPos 
- ,.GetPower     = (UnitGetPower_fct)      &_Unit_GetPower 
- ,.Init         = (UnitInit_fct)          &_Unit_Init 
- ,.SetPos       = (UnitSetPos_fct)        &_Unit_SetPos
- ,.GetPosLimits = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
- ,.SetPower     = (UnitSetPower_fct)      &_Unit_SetPower
- ,.GetPosIdx    = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
- ,.SetPosWithIdx       = (UnitSetPosWithIdx_fct) &_Unit_SetPosWithIdx
+  .ctx            = (void *)                &_units[1]
+ ,.GetId          = (UnitGetId_fct)         &_Unit_GetId 
+ ,.GetPos         = (UnitGetPos_fct)        &_Unit_GetPos 
+ ,.GetPower       = (UnitGetPower_fct)      &_Unit_GetPower 
+ ,.Init           = (UnitInit_fct)          &_Unit_Init 
+ ,.SetPos         = (UnitSetPos_fct)        &_Unit_SetPos
+ ,.GetPosLimits   = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
+ ,.SetPower       = (UnitSetPower_fct)      &_Unit_SetPower
+ ,.GetPosIdx      = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
+ ,.SetPosWithIdx  = (UnitSetPosWithIdx_fct) &_Unit_SetPosWithIdx
 };
 const UnitInterface_t _unit2_if = 
 {
@@ -238,33 +238,33 @@ const UnitInterface_t _unit12_if =
  ,.SetPos       = (UnitSetPos_fct)        &_Unit_SetPos
  ,.GetPosLimits = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
  ,.SetPower     = (UnitSetPower_fct)      &_Unit_SetPower
- ,.GetPosIdx    = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
+ ,.GetPosIdx      = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
  ,.SetPosWithIdx       = (UnitSetPosWithIdx_fct) &_Unit_SetPosWithIdx
 };
 const UnitInterface_t _unit13_if = 
 {
-  .ctx          = (void *)                &_units[13]
- ,.GetId        = (UnitGetId_fct)         &_Unit_GetId 
- ,.GetPos       = (UnitGetPos_fct)        &_Unit_GetPos 
- ,.GetPower     = (UnitGetPower_fct)      &_Unit_GetPower 
- ,.Init         = (UnitInit_fct)          &_Unit_Init 
- ,.SetPos       = (UnitSetPos_fct)        &_Unit_SetPos
- ,.GetPosLimits = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
- ,.SetPower     = (UnitSetPower_fct)      &_Unit_SetPower
- ,.GetPosIdx    = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
+  .ctx            = (void *)                &_units[13]
+ ,.GetId          = (UnitGetId_fct)         &_Unit_GetId 
+ ,.GetPos         = (UnitGetPos_fct)        &_Unit_GetPos 
+ ,.GetPower       = (UnitGetPower_fct)      &_Unit_GetPower 
+ ,.Init           = (UnitInit_fct)          &_Unit_Init 
+ ,.SetPos         = (UnitSetPos_fct)        &_Unit_SetPos
+ ,.GetPosLimits   = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
+ ,.SetPower       = (UnitSetPower_fct)      &_Unit_SetPower
+ ,.GetPosIdx      = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
  ,.SetPosWithIdx       = (UnitSetPosWithIdx_fct) &_Unit_SetPosWithIdx
 };
 const UnitInterface_t _unit14_if = 
 {
-  .ctx          = (void *)                &_units[14]
- ,.GetId        = (UnitGetId_fct)         &_Unit_GetId 
- ,.GetPos       = (UnitGetPos_fct)        &_Unit_GetPos 
- ,.GetPower     = (UnitGetPower_fct)      &_Unit_GetPower 
- ,.Init         = (UnitInit_fct)          &_Unit_Init 
- ,.SetPos       = (UnitSetPos_fct)        &_Unit_SetPos
- ,.GetPosLimits = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
- ,.SetPower     = (UnitSetPower_fct)      &_Unit_SetPower
- ,.GetPosIdx    = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
+  .ctx            = (void *)                &_units[14]
+ ,.GetId          = (UnitGetId_fct)         &_Unit_GetId 
+ ,.GetPos         = (UnitGetPos_fct)        &_Unit_GetPos 
+ ,.GetPower       = (UnitGetPower_fct)      &_Unit_GetPower 
+ ,.Init           = (UnitInit_fct)          &_Unit_Init 
+ ,.SetPos         = (UnitSetPos_fct)        &_Unit_SetPos
+ ,.GetPosLimits   = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
+ ,.SetPower       = (UnitSetPower_fct)      &_Unit_SetPower
+ ,.GetPosIdx      = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
  ,.SetPosWithIdx  = (UnitSetPosWithIdx_fct) &_Unit_SetPosWithIdx
 };
 
@@ -363,7 +363,7 @@ float _Unit_GetPos (Unit_t *unit)
 
 float _Unit_GetPower (Unit_t *unit)
 {
-  unit->power = sCellValues.cells[unit->adcNum].cellPowerFloat;
+//  unit->power = sCellValues.cells[unit->adcNum].cellPowerFloat;
   return unit->power;
 }
 

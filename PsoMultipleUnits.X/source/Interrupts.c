@@ -35,6 +35,7 @@ volatile BOOL  oAdcReady    = 0
 volatile UINT16 adcValues[15];
 
 extern volatile UINT16 nSamples;
+extern volatile UINT16 cellVoltRaw[N_SAMPLES_PER_ADC_READ][15];
 
 
 /*******************************************************************************
@@ -300,13 +301,33 @@ void __ISR(_ADC_VECTOR, ADC_INTERRUPT_PRIO) AdcInterruptHandler(void)
 //    oFirst = 1;
 //  }
   
-  Adc.Read();               // Read the enabled channels and puts them in Adc.Var.adcReadValues[]
+//  Adc.Read();               // Read the enabled channels and puts them in Adc.Var.adcReadValues[]
 //  oAdcReady = 1;
+  oAcqOngoing = 1;
+  cellVoltRaw[nSamples][ 0] = ReadADC10( 0);
+  cellVoltRaw[nSamples][ 1] = ReadADC10( 1);
+  cellVoltRaw[nSamples][ 2] = ReadADC10( 2);
+  cellVoltRaw[nSamples][ 3] = ReadADC10( 3);
+  cellVoltRaw[nSamples][ 4] = ReadADC10( 4);
+  cellVoltRaw[nSamples][ 5] = ReadADC10( 5);
+  cellVoltRaw[nSamples][ 6] = ReadADC10( 6);
+  cellVoltRaw[nSamples][ 7] = ReadADC10( 7);
+  cellVoltRaw[nSamples][ 8] = ReadADC10( 8);
+  cellVoltRaw[nSamples][ 9] = ReadADC10( 9);
+  cellVoltRaw[nSamples][10] = ReadADC10(10);
+  cellVoltRaw[nSamples][11] = ReadADC10(11);
+  cellVoltRaw[nSamples][12] = ReadADC10(12);
+  cellVoltRaw[nSamples][13] = ReadADC10(13);
+  cellVoltRaw[nSamples][14] = ReadADC10(14);
   INTClearFlag(INT_AD1);    // Clear the ADC conversion done interrupt Flag
   
-  oAcqOngoing = 1;
-  GetAdcValues();
+//  GetAdcValues();
+//  memcpy((void *) &cellVoltRaw[nSamples][0], (void *) &Adc.Var.adcReadValues[1], 30);  // sizeof(UINT16) * 15 = 30
   nSamples++;
+//  if (nSamples == N_SAMPLES_TO_START)
+//  {
+//    oAdcReady = 1;
+//  }
   if (nSamples >= N_SAMPLES_PER_ADC_READ)
   {
     nSamples = 0;

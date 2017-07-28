@@ -259,6 +259,7 @@ void StateInit(void)
   
   perturb->Init(perturb->ctx, 500);
   
+  while(oAcqOngoing);
   nSamples = 0;
   
 }

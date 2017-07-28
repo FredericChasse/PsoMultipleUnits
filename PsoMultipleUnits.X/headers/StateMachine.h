@@ -102,6 +102,8 @@ struct sCell
 //  UINT16 cellVoltRaw [N_SAMPLES_PER_ADC_READ];
   float  cellVoltFloat;
   float  cellPowerFloat;
+  UINT16 cellVolt_mV;
+  UINT32 cellPower_uW;
   UINT16 nSamples;
 };
 
