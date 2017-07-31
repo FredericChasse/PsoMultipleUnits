@@ -166,9 +166,13 @@ void InitPorts(void)
                           );
   
   Port.C.CloseBits        ( BIT_12  // OSC_IN
-                          | BIT_13  // GPIO0
-                          | BIT_14  // GPIO1
+//                          | BIT_13  // GPIO0
+//                          | BIT_14  // GPIO1
                           | BIT_15  // OSC_OUT
+                          );
+  
+  Port.C.SetPinsDigitalOut( BIT_13  // GPIO0
+                          | BIT_14  // GPIO1
                           );
   
   Port.D.SetPinsDigitalIn ( BIT_2); // SPI_SDI
@@ -190,7 +194,8 @@ void InitPorts(void)
                           | BIT_2   // SHD_POT2n
                           | BIT_3   // SHD_POT3n
                           );
-  Port.E.CloseBits (BIT_4);         // GPIO2
+//  Port.E.CloseBits (BIT_4);         // GPIO2
+  Port.E.SetPinsDigitalOut( BIT_4);   // GPIO2
   
   Port.E.SetPinsDigitalIn ( BIT_5   // GP_SW1
                           | BIT_6   // GP_SW2
@@ -229,6 +234,10 @@ void InitPorts(void)
   
   LED1_OFF;
   LED2_OFF;
+  
+  DBG0_OFF;
+  DBG1_OFF;
+  DBG2_OFF;
 
 // Device reset
 //=================================================================

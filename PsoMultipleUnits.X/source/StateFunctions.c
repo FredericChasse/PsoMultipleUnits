@@ -138,6 +138,7 @@ inline void ComputeMeanAdcValues (void)
 {
   UINT16 i = 0, j = 0;
   UINT32 meanCellRaw[16] = {0};
+  static INT16 uk0_2 = 0, uk1_2 = 0, uk2_2 = 0, yk0_2 = 0, yk1_2 = 0, yk2_2 = 0;
 //  static TustinValue32_t adcIn[16] = {0}, adcOut[16] = {0};
   
 //  UINT32 coreTickRate = Timer.Tic(200000, SCALE_US);
@@ -152,6 +153,12 @@ inline void ComputeMeanAdcValues (void)
     
     yk0[0] = NpfZ32(uk0[0], uk1[0], uk2[0], yk1[0], yk2[0]);
     yk0[1] = NpfZ32(uk0[1], uk1[1], uk2[1], yk1[1], yk2[1]);
+    uk2_2 = uk1_2;
+    uk1_2 = uk0_2;
+    uk0_2 = yk0[1];
+    yk2_2 = yk1_2;
+    yk1_2 = yk0_2;
+    yk0_2 = NpfZ32(uk0_2,uk1_2,uk2_2, yk1_2, yk2_2);
     yk0[2] = NpfZ32(uk0[2], uk1[2], uk2[2], yk1[2], yk2[2]);
     yk0[3] = NpfZ32(uk0[3], uk1[3], uk2[3], yk1[3], yk2[3]);
     yk0[4] = NpfZ32(uk0[4], uk1[4], uk2[4], yk1[4], yk2[4]);
@@ -177,6 +184,12 @@ inline void ComputeMeanAdcValues (void)
     
     yk0[0] = NpfZ32(uk0[0], uk1[0], uk2[0], yk1[0], yk2[0]);
     yk0[1] = NpfZ32(uk0[1], uk1[1], uk2[1], yk1[1], yk2[1]);
+//    uk2_2 = uk1_2;
+//    uk1_2 = uk0_2;
+//    uk0_2 = yk0[1];
+//    yk2_2 = yk1_2;
+//    yk1_2 = yk0_2;
+//    yk0_2 = NpfZ32(uk0_2,uk1_2,uk2_2, yk1_2, yk2_2);
     yk0[2] = NpfZ32(uk0[2], uk1[2], uk2[2], yk1[2], yk2[2]);
     yk0[3] = NpfZ32(uk0[3], uk1[3], uk2[3], yk1[3], yk2[3]);
     yk0[4] = NpfZ32(uk0[4], uk1[4], uk2[4], yk1[4], yk2[4]);
@@ -192,6 +205,7 @@ inline void ComputeMeanAdcValues (void)
     yk0[14] = NpfZ32(uk0[14], uk1[14], uk2[14], yk1[14], yk2[14]);
     meanCellRaw[1] += yk0[0];
     meanCellRaw[2] += yk0[1];
+//    meanCellRaw[2] += yk0_2;
     meanCellRaw[3] += yk0[2];
     meanCellRaw[4] += yk0[3];
     meanCellRaw[5] += yk0[4];
@@ -300,24 +314,43 @@ inline void ComputeMeanAdcValues (void)
   }
   else
   {
-    meanCellRaw[ 1] = (float) meanCellRaw[ 1] / (float) divider + 0.5;
-    meanCellRaw[ 2] = (float) meanCellRaw[ 2] / (float) divider + 0.5;
-    meanCellRaw[ 3] = (float) meanCellRaw[ 3] / (float) divider + 0.5;
+    meanCellRaw[ 1] = (meanCellRaw[ 1] / divider) & 0b1111111110;
+    meanCellRaw[ 2] = (meanCellRaw[ 2] / divider) & 0b1111111110;
+    meanCellRaw[ 3] = (meanCellRaw[ 3] / divider) & 0b1111111110;
 
-    meanCellRaw[ 4] = (float) meanCellRaw[ 4] / (float) divider + 0.5;
-    meanCellRaw[ 5] = (float) meanCellRaw[ 5] / (float) divider + 0.5;
-    meanCellRaw[ 6] = (float) meanCellRaw[ 6] / (float) divider + 0.5;
-    meanCellRaw[ 7] = (float) meanCellRaw[ 7] / (float) divider + 0.5;
+    meanCellRaw[ 4] = (meanCellRaw[ 4] / divider) & 0b1111111110;
+    meanCellRaw[ 5] = (meanCellRaw[ 5] / divider) & 0b1111111110;
+    meanCellRaw[ 6] = (meanCellRaw[ 6] / divider) & 0b1111111110;
+    meanCellRaw[ 7] = (meanCellRaw[ 7] / divider) & 0b1111111110;
 
-    meanCellRaw[ 8] = (float) meanCellRaw[ 8] / (float) divider + 0.5;
-    meanCellRaw[ 9] = (float) meanCellRaw[ 9] / (float) divider + 0.5;
-    meanCellRaw[10] = (float) meanCellRaw[10] / (float) divider + 0.5;
-    meanCellRaw[11] = (float) meanCellRaw[11] / (float) divider + 0.5;
+    meanCellRaw[ 8] = (meanCellRaw[ 8] / divider) & 0b1111111110;
+    meanCellRaw[ 9] = (meanCellRaw[ 9] / divider) & 0b1111111110;
+    meanCellRaw[10] = (meanCellRaw[10] / divider) & 0b1111111110;
+    meanCellRaw[11] = (meanCellRaw[11] / divider) & 0b1111111110;
 
-    meanCellRaw[12] = (float) meanCellRaw[12] / (float) divider + 0.5;
-    meanCellRaw[13] = (float) meanCellRaw[13] / (float) divider + 0.5;
-    meanCellRaw[14] = (float) meanCellRaw[14] / (float) divider + 0.5;
-    meanCellRaw[15] = (float) meanCellRaw[15] / (float) divider + 0.5;
+    meanCellRaw[12] = (meanCellRaw[12] / divider) & 0b1111111110;
+    meanCellRaw[13] = (meanCellRaw[13] / divider) & 0b1111111110;
+    meanCellRaw[14] = (meanCellRaw[14] / divider) & 0b1111111110;
+    meanCellRaw[15] = (meanCellRaw[15] / divider) & 0b1111111110;
+    
+//    meanCellRaw[ 1] = (float) meanCellRaw[ 1] / (float) divider + 0.5;
+//    meanCellRaw[ 2] = (float) meanCellRaw[ 2] / (float) divider + 0.5;
+//    meanCellRaw[ 3] = (float) meanCellRaw[ 3] / (float) divider + 0.5;
+//
+//    meanCellRaw[ 4] = (float) meanCellRaw[ 4] / (float) divider + 0.5;
+//    meanCellRaw[ 5] = (float) meanCellRaw[ 5] / (float) divider + 0.5;
+//    meanCellRaw[ 6] = (float) meanCellRaw[ 6] / (float) divider + 0.5;
+//    meanCellRaw[ 7] = (float) meanCellRaw[ 7] / (float) divider + 0.5;
+//
+//    meanCellRaw[ 8] = (float) meanCellRaw[ 8] / (float) divider + 0.5;
+//    meanCellRaw[ 9] = (float) meanCellRaw[ 9] / (float) divider + 0.5;
+//    meanCellRaw[10] = (float) meanCellRaw[10] / (float) divider + 0.5;
+//    meanCellRaw[11] = (float) meanCellRaw[11] / (float) divider + 0.5;
+//
+//    meanCellRaw[12] = (float) meanCellRaw[12] / (float) divider + 0.5;
+//    meanCellRaw[13] = (float) meanCellRaw[13] / (float) divider + 0.5;
+//    meanCellRaw[14] = (float) meanCellRaw[14] / (float) divider + 0.5;
+//    meanCellRaw[15] = (float) meanCellRaw[15] / (float) divider + 0.5;
   }
 
   if (oSmoothData)  // Smoothing function

@@ -294,11 +294,13 @@ void StateAcq(void)
 //      buf.length = 6;
 //      Uart.PutTxFifoBuffer(UART6, &buf);
       
+//      DBG2_ON;
       ComputeMeanAdcValues();
+//      DBG2_OFF;
       if (oSessionActive)
       {
-        
-        coreTickRate = Timer.Tic(2000000, SCALE_US);
+//        DBG1_ON;
+//        coreTickRate = Timer.Tic(2000000, SCALE_US);
         oNewSample = 1;   // Go to stateCompute
       }
 //      else
@@ -333,6 +335,7 @@ void StateAcq(void)
     case DECODER_RET_MSG_START_ALGO:
       if (!oSessionActive) // Ensure we are not already started
       {
+        DBG1_ON;
         nUnits = retBuf[1];
         memcpy(units, &retBuf[2], nUnits);
         for (i = 0; i < nUnits; i++)
@@ -436,6 +439,7 @@ void StateAcq(void)
     case DECODER_RET_MSG_STOP_ALGO:
       if (oSessionActive)   // To ensure that we are currently running
       {
+        DBG1_OFF;
         oSessionActive = 0;
         oAlgoIsPso     = 0;
         oDbgAdc        = 0;
@@ -481,14 +485,15 @@ void StateCompute(void)
   {
     positions[i]  = algoArray->GetPos(algoArray->ctx, i);
     id = algoArray->GetUnitId(algoArray->ctx, i);
-//    if (oDbgAdc)
-//    {
+    if (oDbgAdc)
+    {
 //      powers[i] = sCellValues.cells[unitAdcs[id]].cellVoltFloat;
-//    }
-//    else
-//    {
+      powers[i] = (float) sCellValues.cells[unitAdcs[id]].cellVolt_mV / 1000.0f;
+    }
+    else
+    {
       powers[i] = ComputeCellPower(unitAdcs[id], algoArray->GetUnitPosIdx(algoArray->ctx, i));
-//    }
+    }
     algoArray->SetPower(algoArray->ctx, i, powers[i]);
   }
   
@@ -509,17 +514,20 @@ void StateCompute(void)
     codec->CodeNewPsoMsg(codec->ctx, &newPsoPayload);
   }
   
+  DBG2_ON;
   algo->Run(algo->ctx);
+  DBG2_OFF;
   
   // TODO: Check what is the sample at this point
 //  while(oAcqOngoing);
 //  nSamples = 0;
   
-  time = Timer.Toc(2000000, coreTickRate);
-  if (time < 0)
-  {
-    LED1_ON;
-  }
+//  DBG1_OFF;
+//  time = Timer.Toc(2000000, coreTickRate);
+//  if (time < 0)
+//  {
+//    LED1_ON;
+//  }
 }
 
 

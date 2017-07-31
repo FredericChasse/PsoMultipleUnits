@@ -1,5 +1,5 @@
 clear
-close all
+% close all
 
 % Next 2 lines are to close any open waitbar
 f = findall(0,'tag','TMWWaitbar');
@@ -96,11 +96,11 @@ startAlgoChar = PROTOCOL_START_ALGO;
 % algo = MULTI_UNIT;
 % algo = EXTREMUM_SEEKING;
 % algo = PPSO_PNO;
-% algo = PNO;
-algo = DEBUG_ADC;
+algo = PNO;
+% algo = DEBUG_ADC;
 % units = uint8(3:1:10);
 % units = uint8([3:6 11:14]);
-units = uint8(0:2);
+units = uint8(1);
 nUnits = uint8(length(units));
 % lengthOfPayload = fliplr(typecast(uint16(3 + nUnits), 'uint8'));
 lengthOfPayload = typecast(uint16(3 + nUnits), 'uint8');
@@ -120,7 +120,7 @@ elseif algo == PARALLEL_PSO_MULTI_SWARM
 elseif algo == PPSO_PNO
   nIterations = 130;
 elseif algo == PNO
-  nIterations = 30;
+  nIterations = 50;
 elseif algo == DEBUG_ADC
   nIterations = 100;
 else

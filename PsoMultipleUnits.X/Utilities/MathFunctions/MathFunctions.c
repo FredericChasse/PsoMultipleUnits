@@ -154,20 +154,13 @@ const double _fWn2 = 4.0*PI*PI*1526.0*1526.0 + 0.5;
 const INT64 _fwnTimes4 = 255683754;
 const INT64 _wn2 = 91932444;
 const INT64 _f2Times4 = 177777778;
-//const INT64 _fwnTimes4 = (double) (8.0*PI*1526.0/0.00015 + 0.5);
-//const INT64 _wn2 = (double) (4.0*PI*PI*1526.0*1526.0 + 0.5);
-//const INT64 _f2Times4 = (double) (4.0 / (0.00015*0.00015) + 0.5);
-//const INT64 _divider = (double) (4.0 / (0.00015*0.00015) + PI*8.0*1526.0/(0.00015) + PI*PI*4.0*1526.0*1526.0 + 0.5);
 const INT32 _divider = 525393975;
-//                    / (_f2Times4 + _fwnTimes4 + _wn2);  // fix at 525364651
 //const INT64 _divider = _FREQ*_FREQ*4.0f + _FREQ*_WN*4.0f + _WN*_WN + 0.5f;
-//const INT64 _divider = ((1.0f / (ADC_TIMER_SCALE_FLOAT * ADC_TIMER_PERIOD * N_UNITS_TOTAL)) + 0.5f)
-//                      *((1.0f / (ADC_TIMER_SCALE_FLOAT * ADC_TIMER_PERIOD * N_UNITS_TOTAL)) + 0.5f)
-//                      *4
-//                    + (1526*2*PI)
-//                      *((1.0f / (ADC_TIMER_SCALE_FLOAT * ADC_TIMER_PERIOD * N_UNITS_TOTAL)) + 0.5f)
-//                      *4
-//                    + (1526*1526*2*2*PI*PI);
+
+//const INT64 _fwnTimes4 = 268414358;
+//const INT64 _wn2 = 103351497;
+//const INT64 _f2Times4 = 174274853;
+//const INT32 _divider = 546040709;
 
 void NpfZ32Static (TustinValue32_t *input, TustinValue32_t *output)
 {
