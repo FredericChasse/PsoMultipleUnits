@@ -261,6 +261,7 @@ void StateInit(void)
   
   while(oAcqOngoing);
   nSamples = 0;
+  ResetFilterValues();
   
 }
 
@@ -295,7 +296,9 @@ void StateAcq(void)
 //      Uart.PutTxFifoBuffer(UART6, &buf);
       
 //      DBG2_ON;
+      Adc.DisableInterrupts();
       ComputeMeanAdcValues();
+      Adc.EnableInterrupts();
 //      DBG2_OFF;
       if (oSessionActive)
       {
@@ -350,6 +353,7 @@ void StateAcq(void)
             oSessionActive  = 1;
             while(oAcqOngoing);
             nSamples        = 0;  // Reset the samples
+            ResetFilterValues();
             algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PSO_1D);
             algo->Init(algo->ctx, algoArray);
             break;
@@ -360,6 +364,7 @@ void StateAcq(void)
             oSessionActive  = 1;
             while(oAcqOngoing);
             nSamples        = 0;  // Reset the samples
+            ResetFilterValues();
             algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PARALLEL_PSO_MULTI_SWARM);
             algo->Init(algo->ctx, algoArray);
             break;
@@ -370,6 +375,7 @@ void StateAcq(void)
             oSessionActive  = 1;
             while(oAcqOngoing);
             nSamples        = 0;  // Reset the samples
+            ResetFilterValues();
             algo = (AlgoInterface_t *) CharacterizationInterface();
             algo->Init(algo->ctx, algoArray);
             break;
@@ -380,6 +386,7 @@ void StateAcq(void)
             oSessionActive  = 1;
             while(oAcqOngoing);
             nSamples        = 0;  // Reset the samples
+            ResetFilterValues();
             algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PARALLEL_PSO);
             algo->Init(algo->ctx, algoArray);
             break;
@@ -390,6 +397,7 @@ void StateAcq(void)
             oSessionActive  = 1;
             while(oAcqOngoing);
             nSamples        = 0;  // Reset the samples
+            ResetFilterValues();
             algo = (AlgoInterface_t *) ExtremumSeekingInterface();
             algo->Init(algo->ctx, algoArray);
             break;
@@ -400,6 +408,7 @@ void StateAcq(void)
             oSessionActive  = 1;
             while(oAcqOngoing);
             nSamples        = 0;  // Reset the samples
+            ResetFilterValues();
             algo = (AlgoInterface_t *) PpsoPnoInterface();
             algo->Init(algo->ctx, algoArray);
             break;
@@ -409,9 +418,11 @@ void StateAcq(void)
             oDbgAdc         = 0;
             oSessionActive  = 1;
             while(oAcqOngoing);
-            nSamples        = 0;  // Reset the samples
+//            nSamples        = 0;  // Reset the samples
+//            ResetFilterValues();
             algo = (AlgoInterface_t *) PnoInterface();
             algo->Init(algo->ctx, algoArray);
+            ResetFilterValues();
             break;
             
           case DEBUG_ADC:
@@ -420,6 +431,7 @@ void StateAcq(void)
             oSessionActive  = 1;
             while(oAcqOngoing);
             nSamples        = 0;  // Reset the samples
+            ResetFilterValues();
             algo = (AlgoInterface_t *) DebugAdcInterface();
             algo->Init(algo->ctx, algoArray);
             break;
@@ -485,22 +497,19 @@ void StateCompute(void)
   {
     positions[i]  = algoArray->GetPos(algoArray->ctx, i);
     id = algoArray->GetUnitId(algoArray->ctx, i);
-    if (oDbgAdc)
-    {
-//      powers[i] = sCellValues.cells[unitAdcs[id]].cellVoltFloat;
-      powers[i] = (float) sCellValues.cells[unitAdcs[id]].cellVolt_mV / 1000.0f;
-    }
-    else
-    {
-      powers[i] = ComputeCellPower(unitAdcs[id], algoArray->GetUnitPosIdx(algoArray->ctx, i));
-    }
+    powers[i] = ComputeCellPower(unitAdcs[id], algoArray->GetUnitPosIdx(algoArray->ctx, i));
     algoArray->SetPower(algoArray->ctx, i, powers[i]);
-  }
+//    if (oDbgAdc)
+//    {
+//      powers[i] = (float) sCellValues.cells[unitAdcs[id]].cellVolt_mV / 1000.0f;
+//    } 
+ }
   
   newUnitsPayload.timestamp_ms = algo->GetTimeElapsed(algo->ctx);
   newUnitsPayload.nData        = 1;
   newUnitsPayload.nUnits       = nUnits;
   newUnitsPayload.positions    = positions;
+//  newUnitsPayload.powers       = powers;
   newUnitsPayload.powers       = powers;
   
   codec->CodeNewUnitsMsg(codec->ctx, &newUnitsPayload);
@@ -516,6 +525,8 @@ void StateCompute(void)
   
   DBG2_ON;
   algo->Run(algo->ctx);
+  ResetFilterValues();
+//  Adc.EnableInterrupts();
   DBG2_OFF;
   
   // TODO: Check what is the sample at this point

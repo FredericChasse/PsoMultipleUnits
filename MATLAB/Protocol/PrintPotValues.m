@@ -1,6 +1,7 @@
 pot = 50:1000/255:1050;
 potInv = 1./pot;
-potInv1000 = 1000.*potInv;
+% potInv1000 = potInv ./ 1000;
+potInv1000 = potInv;
 
 for i = 1 : 32
   str = [];

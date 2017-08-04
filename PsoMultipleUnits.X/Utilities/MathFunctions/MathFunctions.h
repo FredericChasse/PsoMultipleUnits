@@ -62,6 +62,8 @@ typedef struct
 void TustinZ  (TustinValue_t *input, TustinValue_t *output, float acqTime);
 void HpfZ     (TustinValue_t *input, TustinValue_t *output, float acqTime, float wh);
 void LpfZ     (TustinValue_t *input, TustinValue_t *output, float acqTime, float wl);
+INT16 LpfZStatic (INT16 uk0, INT16 uk1, INT16 yk1);
+INT16 Lpf2ZStatic (INT64 uk0, INT64 uk1, INT64 uk2, INT64 yk1, INT64 yk2);
 void NpfZ     (TustinValue2_t *input, TustinValue2_t *output, float acqTime, float wn);
 //void NpfZ32   (TustinValue32_t *input, TustinValue32_t *output, UINT32 acqTimeInUs, UINT32 wn);
 inline INT16 NpfZ32 (INT16 uk0, INT16 uk1, INT16 uk2, INT16 yk1, INT16 yk2);

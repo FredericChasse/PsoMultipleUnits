@@ -66,9 +66,11 @@ float sinus[2][15] = { {1 , 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ,12 ,13, 14, 15} ,
 
 inline float ComputeCellPower (UINT8 cellIndex, UINT8 potIndex)
 {
+  float volt = (float) sCellValues.cells[cellIndex].cellVolt_mV / 1000;
+  sCellValues.cells[cellIndex].cellPowerFloat = volt * volt * potRealValuesInverse[potIndex];
 //  sCellValues.cells[cellIndex].cellPowerFloat = sCellValues.cells[cellIndex].cellVoltFloat * sCellValues.cells[cellIndex].cellVoltFloat / potRealValues[potIndexValue];
 //  sCellValues.cells[cellIndex].cellPowerFloat = sCellValues.cells[cellIndex].cellVoltFloat * sCellValues.cells[cellIndex].cellVoltFloat * potRealValuesInverse[potIndex];
-  sCellValues.cells[cellIndex].cellPowerFloat = (sCellValues.cells[cellIndex].cellVolt_mV * sCellValues.cells[cellIndex].cellVolt_mV) * potRealValuesInverse[potIndex];
+//  sCellValues.cells[cellIndex].cellPowerFloat = (sCellValues.cells[cellIndex].cellVolt_mV * sCellValues.cells[cellIndex].cellVolt_mV) * potRealValuesInverse[potIndex];
   return sCellValues.cells[cellIndex].cellPowerFloat;
 }
 
@@ -120,6 +122,8 @@ inline void GetAdcValues (void)
 extern volatile BOOL oAdcReady;
 extern volatile BOOL oAcqOngoing;
 INT16 uk0[15] = {0}, uk1[15] = {0}, uk2[15] = {0}, yk0[15] = {0}, yk1[15] = {0}, yk2[15] = {0};
+INT16 uk0_2 = 0, uk1_2 = 0, uk2_2 = 0, yk0_2 = 0, yk1_2 = 0, yk2_2 = 0;
+INT16 uk0_3 = 0, uk1_3 = 0, uk2_3 = 0, yk0_3 = 0, yk1_3 = 0, yk2_3 = 0;
 
 void ResetFilterValues (void)
 {
@@ -130,6 +134,8 @@ void ResetFilterValues (void)
   memset(yk1, 0, 30);
   memset(yk2, 0, 30);
   
+  uk0_2 = uk0_3 = uk1_2 = uk1_3 = uk2_2 = uk2_3 = yk0_2 = yk0_3 = yk2_2 = yk2_3 = yk1_2 = yk1_3 = 0;
+  
   while (oAcqOngoing);
   nSamples = 0;
 }
@@ -138,157 +144,208 @@ inline void ComputeMeanAdcValues (void)
 {
   UINT16 i = 0, j = 0;
   UINT32 meanCellRaw[16] = {0};
-  static INT16 uk0_2 = 0, uk1_2 = 0, uk2_2 = 0, yk0_2 = 0, yk1_2 = 0, yk2_2 = 0;
-//  static TustinValue32_t adcIn[16] = {0}, adcOut[16] = {0};
-  
-//  UINT32 coreTickRate = Timer.Tic(200000, SCALE_US);
-  
-  for (i = 0; i < N_SAMPLES_TO_DROP; i++)
-  {
-    memcpy(&uk2[0], &uk1[0], 30);
-    memcpy(&uk1[0], &uk0[0], 30);
-    memcpy(&uk0[0], (void *) &cellVoltRaw[i][0], 30);
-    memcpy(&yk2[0], &yk1[0], 30);
-    memcpy(&yk1[0], &yk0[0], 30);
-    
-    yk0[0] = NpfZ32(uk0[0], uk1[0], uk2[0], yk1[0], yk2[0]);
-    yk0[1] = NpfZ32(uk0[1], uk1[1], uk2[1], yk1[1], yk2[1]);
-    uk2_2 = uk1_2;
-    uk1_2 = uk0_2;
-    uk0_2 = yk0[1];
-    yk2_2 = yk1_2;
-    yk1_2 = yk0_2;
-    yk0_2 = NpfZ32(uk0_2,uk1_2,uk2_2, yk1_2, yk2_2);
-    yk0[2] = NpfZ32(uk0[2], uk1[2], uk2[2], yk1[2], yk2[2]);
-    yk0[3] = NpfZ32(uk0[3], uk1[3], uk2[3], yk1[3], yk2[3]);
-    yk0[4] = NpfZ32(uk0[4], uk1[4], uk2[4], yk1[4], yk2[4]);
-    yk0[5] = NpfZ32(uk0[5], uk1[5], uk2[5], yk1[5], yk2[5]);
-    yk0[6] = NpfZ32(uk0[6], uk1[6], uk2[6], yk1[6], yk2[6]);
-    yk0[7] = NpfZ32(uk0[7], uk1[7], uk2[7], yk1[7], yk2[7]);
-    yk0[8] = NpfZ32(uk0[8], uk1[8], uk2[8], yk1[8], yk2[8]);
-    yk0[9] = NpfZ32(uk0[9], uk1[9], uk2[9], yk1[9], yk2[9]);
-    yk0[10] = NpfZ32(uk0[10], uk1[10], uk2[10], yk1[10], yk2[10]);
-    yk0[11] = NpfZ32(uk0[11], uk1[11], uk2[11], yk1[11], yk2[11]);
-    yk0[12] = NpfZ32(uk0[12], uk1[12], uk2[12], yk1[12], yk2[12]);
-    yk0[13] = NpfZ32(uk0[13], uk1[13], uk2[13], yk1[13], yk2[13]);
-    yk0[14] = NpfZ32(uk0[14], uk1[14], uk2[14], yk1[14], yk2[14]);
-  }
-  
-  for (i = N_SAMPLES_TO_DROP; i < N_SAMPLES_PER_ADC_READ; i++)
-  {
-    memcpy(&uk2[0], &uk1[0], 30);
-    memcpy(&uk1[0], &uk0[0], 30);
-    memcpy(&uk0[0], (void *) &cellVoltRaw[i][0], 30);
-    memcpy(&yk2[0], &yk1[0], 30);
-    memcpy(&yk1[0], &yk0[0], 30);
-    
-    yk0[0] = NpfZ32(uk0[0], uk1[0], uk2[0], yk1[0], yk2[0]);
-    yk0[1] = NpfZ32(uk0[1], uk1[1], uk2[1], yk1[1], yk2[1]);
-//    uk2_2 = uk1_2;
-//    uk1_2 = uk0_2;
-//    uk0_2 = yk0[1];
-//    yk2_2 = yk1_2;
-//    yk1_2 = yk0_2;
-//    yk0_2 = NpfZ32(uk0_2,uk1_2,uk2_2, yk1_2, yk2_2);
-    yk0[2] = NpfZ32(uk0[2], uk1[2], uk2[2], yk1[2], yk2[2]);
-    yk0[3] = NpfZ32(uk0[3], uk1[3], uk2[3], yk1[3], yk2[3]);
-    yk0[4] = NpfZ32(uk0[4], uk1[4], uk2[4], yk1[4], yk2[4]);
-    yk0[5] = NpfZ32(uk0[5], uk1[5], uk2[5], yk1[5], yk2[5]);
-    yk0[6] = NpfZ32(uk0[6], uk1[6], uk2[6], yk1[6], yk2[6]);
-    yk0[7] = NpfZ32(uk0[7], uk1[7], uk2[7], yk1[7], yk2[7]);
-    yk0[8] = NpfZ32(uk0[8], uk1[8], uk2[8], yk1[8], yk2[8]);
-    yk0[9] = NpfZ32(uk0[9], uk1[9], uk2[9], yk1[9], yk2[9]);
-    yk0[10] = NpfZ32(uk0[10], uk1[10], uk2[10], yk1[10], yk2[10]);
-    yk0[11] = NpfZ32(uk0[11], uk1[11], uk2[11], yk1[11], yk2[11]);
-    yk0[12] = NpfZ32(uk0[12], uk1[12], uk2[12], yk1[12], yk2[12]);
-    yk0[13] = NpfZ32(uk0[13], uk1[13], uk2[13], yk1[13], yk2[13]);
-    yk0[14] = NpfZ32(uk0[14], uk1[14], uk2[14], yk1[14], yk2[14]);
-    meanCellRaw[1] += yk0[0];
-    meanCellRaw[2] += yk0[1];
-//    meanCellRaw[2] += yk0_2;
-    meanCellRaw[3] += yk0[2];
-    meanCellRaw[4] += yk0[3];
-    meanCellRaw[5] += yk0[4];
-    meanCellRaw[6] += yk0[5];
-    meanCellRaw[7] += yk0[6];
-    meanCellRaw[8] += yk0[7];
-    meanCellRaw[9] += yk0[8];
-    meanCellRaw[10] += yk0[9];
-    meanCellRaw[11] += yk0[10];
-    meanCellRaw[12] += yk0[11];
-    meanCellRaw[13] += yk0[12];
-    meanCellRaw[14] += yk0[13];
-    meanCellRaw[15] += yk0[14];
-    
-//    meanCellRaw[1] += cellVoltRaw[i][0];
-//    meanCellRaw[2] += cellVoltRaw[i][1];
-//    meanCellRaw[3] += cellVoltRaw[i][2];
-//    meanCellRaw[4] += cellVoltRaw[i][3];
-//    meanCellRaw[5] += cellVoltRaw[i][4];
-//    meanCellRaw[6] += cellVoltRaw[i][5];
-//    meanCellRaw[7] += cellVoltRaw[i][6];
-//    meanCellRaw[8] += cellVoltRaw[i][7];
-//    meanCellRaw[9] += cellVoltRaw[i][8];
-//    meanCellRaw[10] += cellVoltRaw[i][9];
-//    meanCellRaw[11] += cellVoltRaw[i][10];
-//    meanCellRaw[12] += cellVoltRaw[i][11];
-//    meanCellRaw[13] += cellVoltRaw[i][12];
-//    meanCellRaw[14] += cellVoltRaw[i][13];
-//    meanCellRaw[15] += cellVoltRaw[i][14];
-  }
   
 //  for (i = 0; i < N_SAMPLES_TO_DROP; i++)
 //  {
-//    for (j = 1; j < 16; j++)
-//    {
-//      adcIn[j].oldest = adcIn[j].previous;
-//      adcIn[j].previous = adcIn[j].current;
-//      adcIn[j].current = sCellValues.cells[j].cellVoltRaw[i];
-//      NpfZ32StaticOptimized(&adcIn[j], &adcOut[j]);
-//    }
+////    memcpy(&uk2[0], &uk1[0], 30);
+////    memcpy(&uk1[0], &uk0[0], 30);
+////    memcpy(&uk0[0], (void *) &cellVoltRaw[i][0], 30);
+////    memcpy(&yk2[0], &yk1[0], 30);
+////    memcpy(&yk1[0], &yk0[0], 30);
+////    
+////    yk0[0] = NpfZ32(uk0[0], uk1[0], uk2[0], yk1[0], yk2[0]);
+////    yk0[1] = NpfZ32(uk0[1], uk1[1], uk2[1], yk1[1], yk2[1]);
+////    yk0[2] = NpfZ32(uk0[2], uk1[2], uk2[2], yk1[2], yk2[2]);
+////    yk0[3] = NpfZ32(uk0[3], uk1[3], uk2[3], yk1[3], yk2[3]);
+////    yk0[4] = NpfZ32(uk0[4], uk1[4], uk2[4], yk1[4], yk2[4]);
+////    yk0[5] = NpfZ32(uk0[5], uk1[5], uk2[5], yk1[5], yk2[5]);
+////    yk0[6] = NpfZ32(uk0[6], uk1[6], uk2[6], yk1[6], yk2[6]);
+////    yk0[7] = NpfZ32(uk0[7], uk1[7], uk2[7], yk1[7], yk2[7]);
+////    yk0[8] = NpfZ32(uk0[8], uk1[8], uk2[8], yk1[8], yk2[8]);
+////    yk0[9] = NpfZ32(uk0[9], uk1[9], uk2[9], yk1[9], yk2[9]);
+////    yk0[10] = NpfZ32(uk0[10], uk1[10], uk2[10], yk1[10], yk2[10]);
+////    yk0[11] = NpfZ32(uk0[11], uk1[11], uk2[11], yk1[11], yk2[11]);
+////    yk0[12] = NpfZ32(uk0[12], uk1[12], uk2[12], yk1[12], yk2[12]);
+////    yk0[13] = NpfZ32(uk0[13], uk1[13], uk2[13], yk1[13], yk2[13]);
+////    yk0[14] = NpfZ32(uk0[14], uk1[14], uk2[14], yk1[14], yk2[14]);
+//    
+////    memcpy(&uk1[0], &uk0[0], 30);
+////    memcpy(&uk0[0], (void *) &cellVoltRaw[i][0], 30);
+////    memcpy(&yk1[0], &yk0[0], 30);
+////    
+////    yk0[0] = LpfZStatic(uk0[0], uk1[0], yk1[0]);
+////    yk0[1] = LpfZStatic(uk0[1], uk1[1], yk1[1]);
+////    yk0[2] = LpfZStatic(uk0[2], uk1[2], yk1[2]);
+////    yk0[3] = LpfZStatic(uk0[3], uk1[3], yk1[3]);
+////    yk0[4] = LpfZStatic(uk0[4], uk1[4], yk1[4]);
+////    yk0[5] = LpfZStatic(uk0[5], uk1[5], yk1[5]);
+////    yk0[6] = LpfZStatic(uk0[6], uk1[6], yk1[6]);
+////    yk0[7] = LpfZStatic(uk0[7], uk1[7], yk1[7]);
+////    yk0[8] = LpfZStatic(uk0[8], uk1[8], yk1[8]);
+////    yk0[9] = LpfZStatic(uk0[9], uk1[9], yk1[9]);
+////    yk0[10] = LpfZStatic(uk0[10], uk1[10], yk1[10]);
+////    yk0[11] = LpfZStatic(uk0[11], uk1[11], yk1[11]);
+////    yk0[12] = LpfZStatic(uk0[12], uk1[12], yk1[12]);
+////    yk0[13] = LpfZStatic(uk0[13], uk1[13], yk1[13]);
+////    yk0[14] = LpfZStatic(uk0[14], uk1[14], yk1[14]);
+//    
+//    
+//    memcpy(&uk2[0], &uk1[0], 30);
+//    memcpy(&uk1[0], &uk0[0], 30);
+//    memcpy(&uk0[0], (void *) &cellVoltRaw[i][0], 30);
+//    memcpy(&yk2[0], &yk1[0], 30);
+//    memcpy(&yk1[0], &yk0[0], 30);
+//    
+//    yk0[0] = Lpf2ZStatic(uk0[0], uk1[0], uk2[0], yk1[0], yk2[0]);
+//    yk0[1] = Lpf2ZStatic(uk0[1], uk1[1], uk2[1], yk1[1], yk2[1]);
+//    uk2_2 = uk1_2; uk1_2 = uk0_2; uk0_2 = yk0[1]; yk2_2 = yk1_2; yk1_2 = yk0_2;
+//    yk0_2 = Lpf2ZStatic(uk0_2, uk1_2, uk2_2, yk1_2, yk2_2);
+//    uk2_3 = uk1_3; uk1_3 = uk0_3; uk0_3 = yk0_2; yk2_3 = yk1_3; yk1_3 = yk0_3;
+//    yk0_3 = Lpf2ZStatic(uk0_3, uk1_3, uk2_3, yk1_3, yk2_3);
+//    yk0[2] = Lpf2ZStatic(uk0[2], uk1[2], uk2[2], yk1[2], yk2[2]);
+//    yk0[3] = Lpf2ZStatic(uk0[3], uk1[3], uk2[3], yk1[3], yk2[3]);
+//    yk0[4] = Lpf2ZStatic(uk0[4], uk1[4], uk2[4], yk1[4], yk2[4]);
+//    yk0[5] = Lpf2ZStatic(uk0[5], uk1[5], uk2[5], yk1[5], yk2[5]);
+//    yk0[6] = Lpf2ZStatic(uk0[6], uk1[6], uk2[6], yk1[6], yk2[6]);
+//    yk0[7] = Lpf2ZStatic(uk0[7], uk1[7], uk2[7], yk1[7], yk2[7]);
+//    yk0[8] = Lpf2ZStatic(uk0[8], uk1[8], uk2[8], yk1[8], yk2[8]);
+//    yk0[9] = Lpf2ZStatic(uk0[9], uk1[9], uk2[9], yk1[9], yk2[9]);
+//    yk0[10] = Lpf2ZStatic(uk0[10], uk1[10], uk2[10], yk1[10], yk2[10]);
+//    yk0[11] = Lpf2ZStatic(uk0[11], uk1[11], uk2[11], yk1[11], yk2[11]);
+//    yk0[12] = Lpf2ZStatic(uk0[12], uk1[12], uk2[12], yk1[12], yk2[12]);
+//    yk0[13] = Lpf2ZStatic(uk0[13], uk1[13], uk2[13], yk1[13], yk2[13]);
+//    yk0[14] = Lpf2ZStatic(uk0[14], uk1[14], uk2[14], yk1[14], yk2[14]);
 //  }
-//  
-//  for (i = N_SAMPLES_TO_DROP; i < N_SAMPLES_PER_ADC_READ; i++)
+  
+  UINT16 finalRead = N_SAMPLES_PER_ADC_READ;
+  UINT16 completeCycle = N_SAMPLES_TO_DROP + 43;
+  UINT16 startRead = N_SAMPLES_TO_DROP;
+//  for (i = N_SAMPLES_TO_DROP; i < completeCycle; i++)
 //  {
-//    for (j = 1; j < 16; j++)
+//    if (cellVoltRaw[i][1] == 0)
 //    {
-//      adcIn[j].oldest = adcIn[j].previous;
-//      adcIn[j].previous = adcIn[j].current;
-//      adcIn[j].current = sCellValues.cells[j].cellVoltRaw[i];
-//      NpfZ32StaticOptimized(&adcIn[j], &adcOut[j]);
-//      meanCellRaw[j] += adcOut[j].current;
+//      startRead = i;
+//      break;
 //    }
 //  }
-//  INT32 time = Timer.Toc(200000, coreTickRate);
+//  for (i = N_SAMPLES_PER_ADC_READ - 1; i > N_SAMPLES_TO_DROP; i--)
+//  {
+//    if ((cellVoltRaw[i][1] == 0) && (cellVoltRaw[i-1][1] != 0) )
+//    {
+//      finalRead = i+1;
+//      break;
+//    }
+//  }
+//  for (i = startRead; i < finalRead; i++)
+  for (i = N_SAMPLES_TO_DROP; i < N_SAMPLES_PER_ADC_READ; i++)
+  {
+//    memcpy(&uk2[0], &uk1[0], 30);
+//    memcpy(&uk1[0], &uk0[0], 30);
+//    memcpy(&uk0[0], (void *) &cellVoltRaw[i][0], 30);
+//    memcpy(&yk2[0], &yk1[0], 30);
+//    memcpy(&yk1[0], &yk0[0], 30);
+//    
+//    yk0[0] = NpfZ32(uk0[0], uk1[0], uk2[0], yk1[0], yk2[0]);
+//    yk0[1] = NpfZ32(uk0[1], uk1[1], uk2[1], yk1[1], yk2[1]);
+//    yk0[2] = NpfZ32(uk0[2], uk1[2], uk2[2], yk1[2], yk2[2]);
+//    yk0[3] = NpfZ32(uk0[3], uk1[3], uk2[3], yk1[3], yk2[3]);
+//    yk0[4] = NpfZ32(uk0[4], uk1[4], uk2[4], yk1[4], yk2[4]);
+//    yk0[5] = NpfZ32(uk0[5], uk1[5], uk2[5], yk1[5], yk2[5]);
+//    yk0[6] = NpfZ32(uk0[6], uk1[6], uk2[6], yk1[6], yk2[6]);
+//    yk0[7] = NpfZ32(uk0[7], uk1[7], uk2[7], yk1[7], yk2[7]);
+//    yk0[8] = NpfZ32(uk0[8], uk1[8], uk2[8], yk1[8], yk2[8]);
+//    yk0[9] = NpfZ32(uk0[9], uk1[9], uk2[9], yk1[9], yk2[9]);
+//    yk0[10] = NpfZ32(uk0[10], uk1[10], uk2[10], yk1[10], yk2[10]);
+//    yk0[11] = NpfZ32(uk0[11], uk1[11], uk2[11], yk1[11], yk2[11]);
+//    yk0[12] = NpfZ32(uk0[12], uk1[12], uk2[12], yk1[12], yk2[12]);
+//    yk0[13] = NpfZ32(uk0[13], uk1[13], uk2[13], yk1[13], yk2[13]);
+//    yk0[14] = NpfZ32(uk0[14], uk1[14], uk2[14], yk1[14], yk2[14]);
+    
+//    memcpy(&uk2[0], &uk1[0], 30);
+//    memcpy(&uk1[0], &uk0[0], 30);
+//    memcpy(&uk0[0], (void *) &cellVoltRaw[i][0], 30);
+//    memcpy(&yk2[0], &yk1[0], 30);
+//    memcpy(&yk1[0], &yk0[0], 30);
+//    
+//    yk0[0] = Lpf2ZStatic(uk0[0], uk1[0], uk2[0], yk1[0], yk2[0]);
+//    yk0[1] = Lpf2ZStatic(uk0[1], uk1[1], uk2[1], yk1[1], yk2[1]);
+//    uk2_2 = uk1_2; uk1_2 = uk0_2; uk0_2 = yk0[1]; yk2_2 = yk1_2; yk1_2 = yk0_2;
+//    yk0_2 = Lpf2ZStatic(uk0_2, uk1_2, uk2_2, yk1_2, yk2_2);
+//    uk2_3 = uk1_3; uk1_3 = uk0_3; uk0_3 = yk0_2; yk2_3 = yk1_3; yk1_3 = yk0_3;
+//    yk0_3 = Lpf2ZStatic(uk0_3, uk1_3, uk2_3, yk1_3, yk2_3);
+//    yk0[2] = Lpf2ZStatic(uk0[2], uk1[2], uk2[2], yk1[2], yk2[2]);
+//    yk0[3] = Lpf2ZStatic(uk0[3], uk1[3], uk2[3], yk1[3], yk2[3]);
+//    yk0[4] = Lpf2ZStatic(uk0[4], uk1[4], uk2[4], yk1[4], yk2[4]);
+//    yk0[5] = Lpf2ZStatic(uk0[5], uk1[5], uk2[5], yk1[5], yk2[5]);
+//    yk0[6] = Lpf2ZStatic(uk0[6], uk1[6], uk2[6], yk1[6], yk2[6]);
+//    yk0[7] = Lpf2ZStatic(uk0[7], uk1[7], uk2[7], yk1[7], yk2[7]);
+//    yk0[8] = Lpf2ZStatic(uk0[8], uk1[8], uk2[8], yk1[8], yk2[8]);
+//    yk0[9] = Lpf2ZStatic(uk0[9], uk1[9], uk2[9], yk1[9], yk2[9]);
+//    yk0[10] = Lpf2ZStatic(uk0[10], uk1[10], uk2[10], yk1[10], yk2[10]);
+//    yk0[11] = Lpf2ZStatic(uk0[11], uk1[11], uk2[11], yk1[11], yk2[11]);
+//    yk0[12] = Lpf2ZStatic(uk0[12], uk1[12], uk2[12], yk1[12], yk2[12]);
+//    yk0[13] = Lpf2ZStatic(uk0[13], uk1[13], uk2[13], yk1[13], yk2[13]);
+//    yk0[14] = Lpf2ZStatic(uk0[14], uk1[14], uk2[14], yk1[14], yk2[14]);
+    
+//    memcpy(&uk1[0], &uk0[0], 30);
+//    memcpy(&uk0[0], (void *) &cellVoltRaw[i][0], 30);
+//    memcpy(&yk1[0], &yk0[0], 30);
+//    
+//    yk0[0] = LpfZStatic(uk0[0], uk1[0], yk1[0]);
+//    yk0[1] = LpfZStatic(uk0[1], uk1[1], yk1[1]);
+//    yk0[2] = LpfZStatic(uk0[2], uk1[2], yk1[2]);
+//    yk0[3] = LpfZStatic(uk0[3], uk1[3], yk1[3]);
+//    yk0[4] = LpfZStatic(uk0[4], uk1[4], yk1[4]);
+//    yk0[5] = LpfZStatic(uk0[5], uk1[5], yk1[5]);
+//    yk0[6] = LpfZStatic(uk0[6], uk1[6], yk1[6]);
+//    yk0[7] = LpfZStatic(uk0[7], uk1[7], yk1[7]);
+//    yk0[8] = LpfZStatic(uk0[8], uk1[8], yk1[8]);
+//    yk0[9] = LpfZStatic(uk0[9], uk1[9], yk1[9]);
+//    yk0[10] = LpfZStatic(uk0[10], uk1[10], yk1[10]);
+//    yk0[11] = LpfZStatic(uk0[11], uk1[11], yk1[11]);
+//    yk0[12] = LpfZStatic(uk0[12], uk1[12], yk1[12]);
+//    yk0[13] = LpfZStatic(uk0[13], uk1[13], yk1[13]);
+//    yk0[14] = LpfZStatic(uk0[14], uk1[14], yk1[14]);
+    
+//    meanCellRaw[1] += yk0[0];
+////    meanCellRaw[2] += yk0[1];
+//    meanCellRaw[2] += yk0_3;
+//    meanCellRaw[3] += yk0[2];
+//    meanCellRaw[4] += yk0[3];
+//    meanCellRaw[5] += yk0[4];
+//    meanCellRaw[6] += yk0[5];
+//    meanCellRaw[7] += yk0[6];
+//    meanCellRaw[8] += yk0[7];
+//    meanCellRaw[9] += yk0[8];
+//    meanCellRaw[10] += yk0[9];
+//    meanCellRaw[11] += yk0[10];
+//    meanCellRaw[12] += yk0[11];
+//    meanCellRaw[13] += yk0[12];
+//    meanCellRaw[14] += yk0[13];
+//    meanCellRaw[15] += yk0[14];
+    
+    meanCellRaw[1] += cellVoltRaw[i][0];
+//    meanCellRaw[2] += cellVoltRaw[i][1];
+    meanCellRaw[2] = MAX(cellVoltRaw[i][1], meanCellRaw[2]);
+    meanCellRaw[3] += cellVoltRaw[i][2];
+    meanCellRaw[4] += cellVoltRaw[i][3];
+    meanCellRaw[5] += cellVoltRaw[i][4];
+    meanCellRaw[6] += cellVoltRaw[i][5];
+    meanCellRaw[7] += cellVoltRaw[i][6];
+    meanCellRaw[8] += cellVoltRaw[i][7];
+    meanCellRaw[9] += cellVoltRaw[i][8];
+    meanCellRaw[10] += cellVoltRaw[i][9];
+    meanCellRaw[11] += cellVoltRaw[i][10];
+    meanCellRaw[12] += cellVoltRaw[i][11];
+    meanCellRaw[13] += cellVoltRaw[i][12];
+    meanCellRaw[14] += cellVoltRaw[i][13];
+    meanCellRaw[15] += cellVoltRaw[i][14];
+  }
+  
   if (oAdcReady)
   {
     LED1_ON;
   }
-  
-//  for (i = N_SAMPLES_TO_DROP; i < N_SAMPLES_PER_ADC_READ; i++)
-//  {
-////    meanCellRaw[ 0] += sCellValues.cells[ 0].cellVoltRaw[i];
-//    meanCellRaw[ 1] += sCellValues.cells[ 1].cellVoltRaw[i];
-//    meanCellRaw[ 2] += sCellValues.cells[ 2].cellVoltRaw[i];
-//    meanCellRaw[ 3] += sCellValues.cells[ 3].cellVoltRaw[i];
-//    
-//    meanCellRaw[ 4] += sCellValues.cells[ 4].cellVoltRaw[i];
-//    meanCellRaw[ 5] += sCellValues.cells[ 5].cellVoltRaw[i];
-//    meanCellRaw[ 6] += sCellValues.cells[ 6].cellVoltRaw[i];
-//    meanCellRaw[ 7] += sCellValues.cells[ 7].cellVoltRaw[i];
-//    
-//    meanCellRaw[ 8] += sCellValues.cells[ 8].cellVoltRaw[i];
-//    meanCellRaw[ 9] += sCellValues.cells[ 9].cellVoltRaw[i];
-//    meanCellRaw[10] += sCellValues.cells[10].cellVoltRaw[i];
-//    meanCellRaw[11] += sCellValues.cells[11].cellVoltRaw[i];
-//    
-//    meanCellRaw[12] += sCellValues.cells[12].cellVoltRaw[i];
-//    meanCellRaw[13] += sCellValues.cells[13].cellVoltRaw[i];
-//    meanCellRaw[14] += sCellValues.cells[14].cellVoltRaw[i];
-//    meanCellRaw[15] += sCellValues.cells[15].cellVoltRaw[i];
-//  }
-
-//  meanCellRaw[ 0] = (float) meanCellRaw[ 0] / (float) N_TOTAL_SAMPLES + 0.5;
   
   UINT16 divider = N_TOTAL_SAMPLES;
   if (divider == 256)
@@ -314,24 +371,25 @@ inline void ComputeMeanAdcValues (void)
   }
   else
   {
-    meanCellRaw[ 1] = (meanCellRaw[ 1] / divider) & 0b1111111110;
-    meanCellRaw[ 2] = (meanCellRaw[ 2] / divider) & 0b1111111110;
-    meanCellRaw[ 3] = (meanCellRaw[ 3] / divider) & 0b1111111110;
+    meanCellRaw[ 1] = (meanCellRaw[ 1] / divider);
+//    meanCellRaw[ 2] = (meanCellRaw[ 2] / divider);
+    meanCellRaw[ 2] /= 2;
+    meanCellRaw[ 3] = (meanCellRaw[ 3] / divider);
 
-    meanCellRaw[ 4] = (meanCellRaw[ 4] / divider) & 0b1111111110;
-    meanCellRaw[ 5] = (meanCellRaw[ 5] / divider) & 0b1111111110;
-    meanCellRaw[ 6] = (meanCellRaw[ 6] / divider) & 0b1111111110;
-    meanCellRaw[ 7] = (meanCellRaw[ 7] / divider) & 0b1111111110;
+    meanCellRaw[ 4] = (meanCellRaw[ 4] / divider);
+    meanCellRaw[ 5] = (meanCellRaw[ 5] / divider);
+    meanCellRaw[ 6] = (meanCellRaw[ 6] / divider);
+    meanCellRaw[ 7] = (meanCellRaw[ 7] / divider);
 
-    meanCellRaw[ 8] = (meanCellRaw[ 8] / divider) & 0b1111111110;
-    meanCellRaw[ 9] = (meanCellRaw[ 9] / divider) & 0b1111111110;
-    meanCellRaw[10] = (meanCellRaw[10] / divider) & 0b1111111110;
-    meanCellRaw[11] = (meanCellRaw[11] / divider) & 0b1111111110;
+    meanCellRaw[ 8] = (meanCellRaw[ 8] / divider);
+    meanCellRaw[ 9] = (meanCellRaw[ 9] / divider);
+    meanCellRaw[10] = (meanCellRaw[10] / divider);
+    meanCellRaw[11] = (meanCellRaw[11] / divider);
 
-    meanCellRaw[12] = (meanCellRaw[12] / divider) & 0b1111111110;
-    meanCellRaw[13] = (meanCellRaw[13] / divider) & 0b1111111110;
-    meanCellRaw[14] = (meanCellRaw[14] / divider) & 0b1111111110;
-    meanCellRaw[15] = (meanCellRaw[15] / divider) & 0b1111111110;
+    meanCellRaw[12] = (meanCellRaw[12] / divider);
+    meanCellRaw[13] = (meanCellRaw[13] / divider);
+    meanCellRaw[14] = (meanCellRaw[14] / divider);
+    meanCellRaw[15] = (meanCellRaw[15] / divider);
     
 //    meanCellRaw[ 1] = (float) meanCellRaw[ 1] / (float) divider + 0.5;
 //    meanCellRaw[ 2] = (float) meanCellRaw[ 2] / (float) divider + 0.5;

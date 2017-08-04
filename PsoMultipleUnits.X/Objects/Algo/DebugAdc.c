@@ -115,16 +115,16 @@ INT8 _DbgAdc_Run (DbgAdc_t *d)
   d->iteration++;
   d->timeElapsed += d->sampleTime;
   
-//  if (oToggle)
-//  {
-//    oToggle = 0;
-//    d->currentPosIdx -= 2;
-//  }
-//  else
-//  {
-//    oToggle = 1;
-//    d->currentPosIdx += 2;
-//  }
+  if (oToggle)
+  {
+    oToggle = 0;
+    d->currentPosIdx = 50;
+  }
+  else
+  {
+    oToggle = 1;
+    d->currentPosIdx = 200;
+  }
 //  
 ////  if (d->iteration < 10)
 ////  {
@@ -139,15 +139,15 @@ INT8 _DbgAdc_Run (DbgAdc_t *d)
 ////    d->currentPosIdx = 255 >> 1;
 ////  }
 //  
-//  if (d->currentPosIdx <= 255)
-//  {
-//    for (i = 0; i < d->nUnits; i++)
-//    {
-//      d->unitArray->SetPosIdx(d->unitArray->ctx, i, d->currentPosIdx);
-////      d->unitArray->SetPos(d->unitArray->ctx, i, potRealValues[d->currentPosIdx]);
-////      c->unitArray->SetPos(c->unitArray->ctx, i, potRealValues[1]);
-//    }
-//  }
+  if (d->currentPosIdx <= 255)
+  {
+    for (i = 0; i < d->nUnits; i++)
+    {
+      d->unitArray->SetPosIdx(d->unitArray->ctx, i, d->currentPosIdx);
+//      d->unitArray->SetPos(d->unitArray->ctx, i, potRealValues[d->currentPosIdx]);
+//      c->unitArray->SetPos(c->unitArray->ctx, i, potRealValues[1]);
+    }
+  }
   
   return 0;
 }

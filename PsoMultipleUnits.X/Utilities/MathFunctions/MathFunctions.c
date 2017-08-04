@@ -82,6 +82,81 @@ void LpfZ (TustinValue_t *input, TustinValue_t *output, float acqTime, float wl)
 }
 
 
+///*  
+// * Second order Low Pass Filter
+// *
+// *  Y(s)          wl^2
+// * ------ == --------------
+// *  U(s)       (s + wl)^2
+// */
+//INT16 Lpf2Z (INT16 uk0, INT16 uk1, INT16 uk2, INT16 yk1, INT16 yk2)
+//{
+//  
+//}
+
+
+//const INT32 _wl = 189;
+//const INT32 _fTimes2 = 13333;
+//const INT16 _fTimes2PlusWl = 13522;
+const INT32 _wl = 400;
+const INT32 _fTimes2 = 13333;
+const INT16 _fTimes2PlusWl = 13333 + 400;
+/*  
+ * First order Low Pass Filter
+ *
+ *  Y(s)         wl
+ * ------ == ----------
+ *  U(s)       s + wl
+ * 
+ * y(k) = [ (u(k) + u(k-1))*w*T - y(k-1)*(w*T-2) ] / (w*T + 2)
+ */
+INT16 LpfZStatic (INT16 uk0, INT16 uk1, INT16 yk1)
+{
+  return ( (uk0+uk1-yk1)*_wl + _fTimes2*yk1 ) / _fTimes2PlusWl;
+}
+
+//const INT64 __divider = 4*f^(2)+4*f*wl+wl^(2);
+//const INT64 __f2Times4 = 177777778;
+//const INT64 __wl = 400;
+//const INT64 __fwlTimes4 = 10666667;
+//const INT64 __wl2 = 160000;
+//const INT64 __divider = 188604444;
+
+//const INT64 __wl = 500;
+//const INT64 __fwlTimes4 = 13333333;
+//const INT64 __wl2 = 250000;
+//const INT64 __divider = 191361111;
+
+//const INT64 __wl = 650;
+//const INT64 __fwlTimes4 = 17333333;
+//const INT64 __wl2 = 422500;
+//const INT64 __divider = 195533611;
+
+//const INT64 __wl = 800;
+//const INT64 __fwlTimes4 = 21333333;
+//const INT64 __wl2 = 640000;
+//const INT64 __divider = 199751111;
+
+//const INT64 __f2Times4 = 177777778;
+//const INT64 __wl = 1200;
+//const INT64 __fwlTimes4 = 32000000;
+//const INT64 __wl2 = 1440000;
+//const INT64 __divider = 211217778;
+
+const INT64 __f2Times4 = 17777777778;
+const INT64 __wl = 628;
+const INT64 __fwlTimes4 = 167466667;
+const INT64 __wl2 = 394384;
+//const INT64 __divider = 4*f^(2)+4*f*wl+wl^(2);
+const INT64 __divider = 17945638828;
+
+INT16 Lpf2ZStatic (INT64 uk0, INT64 uk1, INT64 uk2, INT64 yk1, INT64 yk2)
+{
+  INT64 coeff1 = 2*yk1;
+  return (__f2Times4*(coeff1-yk2)+__fwlTimes4*yk2+(uk0+2*uk1+uk2-coeff1-yk2)*__wl2)/__divider;
+}
+
+
 /*  
  * Second order Notch Pass Filter
  *
@@ -157,6 +232,7 @@ const INT64 _f2Times4 = 177777778;
 const INT32 _divider = 525393975;
 //const INT64 _divider = _FREQ*_FREQ*4.0f + _FREQ*_WN*4.0f + _WN*_WN + 0.5f;
 
+// Measured with logic analyzer
 //const INT64 _fwnTimes4 = 268414358;
 //const INT64 _wn2 = 103351497;
 //const INT64 _f2Times4 = 174274853;
