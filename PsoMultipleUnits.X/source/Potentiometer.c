@@ -227,35 +227,6 @@ inline INT8 SetPot (UINT8 numPot, UINT8 value)
 }
 
 
-///**************************************************************
-// * Function name  : SetPot
-// * Purpose        : Set the value of a potentiometer.
-// * Arguments      : UINT8 numPot : the number of the pot (0-3)
-// *                  UINT8 index : pot index (0 - 3)
-// *                  UINT8 value : pot increment (0 - 255)
-// * Returns        : 0 on success, -1 on failure.
-// *************************************************************/
-//inline INT8 SetPot (UINT8 numPot, UINT16 index, UINT8 value)
-//{
-//  if (numPot >= 4)
-//  {
-//    return -1;
-//  }
-//  if (index >= 4)
-//  {
-//    return -1;
-//  }
-//  
-//  while(Spi.IsSpiBusy(SPI3));
-//  Port.D.ClearBits(1 << (numPot + 4));
-//  Spi.SendCharacter( SPI3, ( (index << 8) | value ) );
-//  while(Spi.IsSpiBusy(SPI3));
-//  Port.D.SetBits(1 << (numPot + 4));
-//
-//  return 0;
-//}
-
-
 /**************************************************************
  * Function name  : InitPot
  * Purpose        : Initialize a potentiometer.

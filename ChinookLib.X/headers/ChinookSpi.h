@@ -181,21 +181,21 @@ struct sChinookSpiVar
    *                interrupts. One for each SPI (spiTxFifo[SPI1] is for SPI1,
    *                spiTxFifo[SPI2] is for SPI2 and so on).
    */
-  volatile sSpiFifoBuffer_t spiTxFifo[4];
+  volatile sSpiFifoBuffer_t spiTxFifo[1];
 
   /**
    * @Description   DO NOT USE. This is the user's RX FIFO buffer. It is used in
    *                interrupts. One for each SPI (spiRxFifo[SPI1] is for SPI1,
    *                spiRxFifo[SPI2] is for SPI2 and so on).
    */
-  volatile sSpiFifoBuffer_t spiRxFifo[4];
+  volatile sSpiFifoBuffer_t spiRxFifo[1];
 
   /**
    * @Description   Flag that tells if there is Received data in the RX FIFO. One
    *                for each SPI (oIsRxDataAvailable[SPI1] is for SPI1,
    *                oIsRxDataAvailable[SPI2] is for SPI2 and so on.
    */
-  volatile BOOL oIsRxDataAvailable[4];
+  volatile BOOL oIsRxDataAvailable[1];
 };
 //=============================================
 

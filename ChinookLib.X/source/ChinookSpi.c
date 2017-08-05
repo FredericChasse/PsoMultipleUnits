@@ -251,52 +251,52 @@ static inline INT8 SpiOpen(SpiNum_t numSpi, SpiOpenFlags_t oOpenFlags, UINT32 bi
 #endif
   
   // Init FIFO buffers
-  Spi.Var.oIsRxDataAvailable[numSpi]            = 0;
+  Spi.Var.oIsRxDataAvailable[0]            = 0;
 
-  Spi.Var.spiRxFifo[numSpi].bufEmpty            = 1;
-  Spi.Var.spiRxFifo[numSpi].bufFull             = 0;
-  Spi.Var.spiRxFifo[numSpi].inIdx               = 0;
-  Spi.Var.spiRxFifo[numSpi].outIdx              = 0;
-  Spi.Var.spiRxFifo[numSpi].lineBuffer.length   = 0;
+  Spi.Var.spiRxFifo[0].bufEmpty            = 1;
+  Spi.Var.spiRxFifo[0].bufFull             = 0;
+  Spi.Var.spiRxFifo[0].inIdx               = 0;
+  Spi.Var.spiRxFifo[0].outIdx              = 0;
+  Spi.Var.spiRxFifo[0].lineBuffer.length   = 0;
 
-  Spi.Var.spiTxFifo[numSpi].bufEmpty            = 1;
-  Spi.Var.spiTxFifo[numSpi].bufFull             = 0;
-  Spi.Var.spiTxFifo[numSpi].inIdx               = 0;
-  Spi.Var.spiTxFifo[numSpi].outIdx              = 0;
-  Spi.Var.spiTxFifo[numSpi].lineBuffer.length   = 0;
+  Spi.Var.spiTxFifo[0].bufEmpty            = 1;
+  Spi.Var.spiTxFifo[0].bufFull             = 0;
+  Spi.Var.spiTxFifo[0].inIdx               = 0;
+  Spi.Var.spiTxFifo[0].outIdx              = 0;
+  Spi.Var.spiTxFifo[0].lineBuffer.length   = 0;
   
   if      (mode16)    // 16 bits words
   {
-    Spi.Var.spiRxFifo[numSpi].maxBufSize        = SPI_LINE_BUFFER_LENGTH / 2;
-    Spi.Var.spiTxFifo[numSpi].maxBufSize        = SPI_LINE_BUFFER_LENGTH / 2;
-    Spi.Var.spiRxFifo[numSpi].lenghtOfData      = sizeof(UINT16);
-    Spi.Var.spiTxFifo[numSpi].lenghtOfData      = sizeof(UINT16);
-    Spi.Var.spiRxFifo[numSpi].lineBuffer.buffer = &userEnhancedRxBuffer.fifo16Bits;
-    Spi.Var.spiTxFifo[numSpi].lineBuffer.buffer = &userEnhancedTxBuffer.fifo16Bits;
-    Spi.Var.spiRxFifo[numSpi].maxWordsPerInt    = 8;
-    Spi.Var.spiTxFifo[numSpi].maxWordsPerInt    = 8;
+    Spi.Var.spiRxFifo[0].maxBufSize        = SPI_LINE_BUFFER_LENGTH / 2;
+    Spi.Var.spiTxFifo[0].maxBufSize        = SPI_LINE_BUFFER_LENGTH / 2;
+    Spi.Var.spiRxFifo[0].lenghtOfData      = sizeof(UINT16);
+    Spi.Var.spiTxFifo[0].lenghtOfData      = sizeof(UINT16);
+    Spi.Var.spiRxFifo[0].lineBuffer.buffer = &userEnhancedRxBuffer.fifo16Bits;
+    Spi.Var.spiTxFifo[0].lineBuffer.buffer = &userEnhancedTxBuffer.fifo16Bits;
+    Spi.Var.spiRxFifo[0].maxWordsPerInt    = 8;
+    Spi.Var.spiTxFifo[0].maxWordsPerInt    = 8;
   }
   else if (mode32)    // 32 bits words
   {
-    Spi.Var.spiRxFifo[numSpi].maxBufSize        = SPI_LINE_BUFFER_LENGTH / 4;
-    Spi.Var.spiTxFifo[numSpi].maxBufSize        = SPI_LINE_BUFFER_LENGTH / 4;
-    Spi.Var.spiRxFifo[numSpi].lenghtOfData      = sizeof(UINT32);
-    Spi.Var.spiTxFifo[numSpi].lenghtOfData      = sizeof(UINT32);
-    Spi.Var.spiRxFifo[numSpi].lineBuffer.buffer = &userEnhancedRxBuffer.fifo32Bits;
-    Spi.Var.spiTxFifo[numSpi].lineBuffer.buffer = &userEnhancedTxBuffer.fifo32Bits;
-    Spi.Var.spiRxFifo[numSpi].maxWordsPerInt    = 4;
-    Spi.Var.spiTxFifo[numSpi].maxWordsPerInt    = 4;
+    Spi.Var.spiRxFifo[0].maxBufSize        = SPI_LINE_BUFFER_LENGTH / 4;
+    Spi.Var.spiTxFifo[0].maxBufSize        = SPI_LINE_BUFFER_LENGTH / 4;
+    Spi.Var.spiRxFifo[0].lenghtOfData      = sizeof(UINT32);
+    Spi.Var.spiTxFifo[0].lenghtOfData      = sizeof(UINT32);
+    Spi.Var.spiRxFifo[0].lineBuffer.buffer = &userEnhancedRxBuffer.fifo32Bits;
+    Spi.Var.spiTxFifo[0].lineBuffer.buffer = &userEnhancedTxBuffer.fifo32Bits;
+    Spi.Var.spiRxFifo[0].maxWordsPerInt    = 4;
+    Spi.Var.spiTxFifo[0].maxWordsPerInt    = 4;
   }
   else                            // 8 bits words
   {
-    Spi.Var.spiRxFifo[numSpi].maxBufSize        = SPI_LINE_BUFFER_LENGTH;
-    Spi.Var.spiTxFifo[numSpi].maxBufSize        = SPI_LINE_BUFFER_LENGTH;
-    Spi.Var.spiRxFifo[numSpi].lenghtOfData      = sizeof(UINT8);
-    Spi.Var.spiTxFifo[numSpi].lenghtOfData      = sizeof(UINT8);
-    Spi.Var.spiRxFifo[numSpi].lineBuffer.buffer = &userEnhancedRxBuffer.fifo8Bits;
-    Spi.Var.spiTxFifo[numSpi].lineBuffer.buffer = &userEnhancedTxBuffer.fifo8Bits;
-    Spi.Var.spiRxFifo[numSpi].maxWordsPerInt    = 16;
-    Spi.Var.spiTxFifo[numSpi].maxWordsPerInt    = 16;
+    Spi.Var.spiRxFifo[0].maxBufSize        = SPI_LINE_BUFFER_LENGTH;
+    Spi.Var.spiTxFifo[0].maxBufSize        = SPI_LINE_BUFFER_LENGTH;
+    Spi.Var.spiRxFifo[0].lenghtOfData      = sizeof(UINT8);
+    Spi.Var.spiTxFifo[0].lenghtOfData      = sizeof(UINT8);
+    Spi.Var.spiRxFifo[0].lineBuffer.buffer = &userEnhancedRxBuffer.fifo8Bits;
+    Spi.Var.spiTxFifo[0].lineBuffer.buffer = &userEnhancedTxBuffer.fifo8Bits;
+    Spi.Var.spiRxFifo[0].maxWordsPerInt    = 16;
+    Spi.Var.spiTxFifo[0].maxWordsPerInt    = 16;
   }
 
   return err;   // EXIT SUCCESS
@@ -323,20 +323,20 @@ static inline INT32 SpiGetRxFifoBuffer (SpiNum_t numSpi, sSpiLineBuffer_t * buff
 
   INT8 err;
 
-  if (Spi.Var.spiRxFifo[numSpi].bufEmpty)
+  if (Spi.Var.spiRxFifo[0].bufEmpty)
   {
     return -1;
   }
   
-  size_t sizeOfData = Spi.Var.spiRxFifo[numSpi].lenghtOfData;
+  size_t sizeOfData = Spi.Var.spiRxFifo[0].lenghtOfData;
 
   Spi.DisableRxInterrupts(numSpi);
 
-  nDataAvailable = Spi.Var.spiRxFifo[numSpi].lineBuffer.length;
+  nDataAvailable = Spi.Var.spiRxFifo[0].lineBuffer.length;
 
   for (i = 0; i < nDataAvailable; i++)
   {
-    err = SpiFifoRead((void *) &Spi.Var.spiRxFifo[numSpi], &data);
+    err = SpiFifoRead((void *) &Spi.Var.spiRxFifo[0], &data);
     if (err < 0)
     {
       break;
@@ -345,7 +345,7 @@ static inline INT32 SpiGetRxFifoBuffer (SpiNum_t numSpi, sSpiLineBuffer_t * buff
     err = i + 1;
   }
 
-  Spi.Var.oIsRxDataAvailable[numSpi] = 0;
+  Spi.Var.oIsRxDataAvailable[0] = 0;
 
   Spi.EnableRxInterrupts(numSpi);
 
@@ -376,19 +376,19 @@ static inline INT32 SpiPutTxFifoBuffer (SpiNum_t numSpi, sSpiLineBuffer_t * buff
 
   Spi.DisableTxInterrupts(numSpi);
 
-  if (Spi.Var.spiTxFifo[numSpi].bufFull)
+  if (Spi.Var.spiTxFifo[0].bufFull)
   {
     Spi.EnableTxInterrupts(numSpi);
     return -1;
   }
   
-  size_t sizeOfData = Spi.Var.spiRxFifo[numSpi].lenghtOfData;
+  size_t sizeOfData = Spi.Var.spiRxFifo[0].lenghtOfData;
 
-  nSpaceAvailable = Spi.Var.spiTxFifo[numSpi].maxBufSize - Spi.Var.spiTxFifo[numSpi].lineBuffer.length;
+  nSpaceAvailable = Spi.Var.spiTxFifo[0].maxBufSize - Spi.Var.spiTxFifo[0].lineBuffer.length;
 
   if (nSpaceAvailable < buffer->length)
   {
-    if (!Spi.Var.spiTxFifo[numSpi].bufEmpty)
+    if (!Spi.Var.spiTxFifo[0].bufEmpty)
     {
       Spi.EnableTxInterrupts(numSpi);
     }
@@ -397,7 +397,7 @@ static inline INT32 SpiPutTxFifoBuffer (SpiNum_t numSpi, sSpiLineBuffer_t * buff
 
   for (i = 0; i < buffer->length; i++)
   {
-    err = SpiFifoWrite((void *) &Spi.Var.spiTxFifo[numSpi], Spi.Var.spiTxFifo[numSpi].lineBuffer.buffer + (i * sizeOfData));
+    err = SpiFifoWrite((void *) &Spi.Var.spiTxFifo[0], Spi.Var.spiTxFifo[0].lineBuffer.buffer + (i * sizeOfData));
     if (err < 0)
     {
       break;
