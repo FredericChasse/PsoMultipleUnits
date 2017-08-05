@@ -259,7 +259,7 @@ void StateInit(void)
   
   StartInterrupts();
   
-  perturb->Init(perturb->ctx, 500);
+  perturb->Init(perturb->ctx, 250);
 //  perturb->SetUnitIntensity(perturb->ctx, 0, 1000);
 //  perturb->SetUnitIntensity(perturb->ctx, 1, 1000);
 //  perturb->SetUnitIntensity(perturb->ctx, 2, 1000);

@@ -90,10 +90,10 @@ void StartInterrupts  (void);
 
 #define N_UNITS_TOTAL (15u)
 
-#define ADC_TIMER_PERIOD        (4)
+#define ADC_TIMER_PERIOD        (1)
 #define ADC_TIMER_SCALE         (SCALE_US)
 #define ADC_TIMER_SCALE_FLOAT   (TIMER_SCALE_US)
-#define N_SAMPLES_PER_ADC_READ  (1600)     // Number of samples / ADC value
+#define N_SAMPLES_PER_ADC_READ  (2000)     // Number of samples / ADC value
 #define N_SAMPLES_TO_START      (N_SAMPLES_PER_ADC_READ)
 #define N_SAMPLES_TO_DROP       (20)      // Ignore n first samples
 #define N_TOTAL_SAMPLES         (N_SAMPLES_PER_ADC_READ - N_SAMPLES_TO_DROP)
