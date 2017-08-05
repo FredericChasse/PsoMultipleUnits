@@ -66,6 +66,7 @@ sUartFifoBuffer_t matlabData =
 //BOOL oSmoothData = 1;
 BOOL oSmoothData = 0;
 BOOL oDbgAdc = 0;
+BOOL oSendAdcData = 0;
 
 volatile UINT16 nSamples = 0;
 
@@ -259,7 +260,7 @@ void StateInit(void)
   
   StartInterrupts();
   
-  perturb->Init(perturb->ctx, 250);
+  perturb->Init(perturb->ctx, 500);
 //  perturb->SetUnitIntensity(perturb->ctx, 0, 1000);
 //  perturb->SetUnitIntensity(perturb->ctx, 1, 1000);
 //  perturb->SetUnitIntensity(perturb->ctx, 2, 1000);
@@ -530,7 +531,7 @@ void StateCompute(void)
     codec->CodeNewPsoMsg(codec->ctx, &newPsoPayload);
   }
   
-  if ((nUnits==1) && oDbgAdc)
+  if ((nUnits==1) && oDbgAdc && oSendAdcData)
   {
     newAdcPayload.oNewPacket = 0;
     newAdcPayload.nUnits = nUnits;
@@ -543,19 +544,8 @@ void StateCompute(void)
   algo->Run(algo->ctx);
   ResetFilterValues();
   Adc.EnableInterrupts();
-//  Adc.EnableInterrupts();
   DBG2_OFF;
   
-  // TODO: Check what is the sample at this point
-//  while(oAcqOngoing);
-//  nSamples = 0;
-  
-//  DBG1_OFF;
-//  time = Timer.Toc(2000000, coreTickRate);
-//  if (time < 0)
-//  {
-//    LED1_ON;
-//  }
 }
 
 

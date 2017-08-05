@@ -129,11 +129,11 @@ void __ISR(_UART_3_VECTOR, U3_INTERRUPT_PRIORITY) Uart3InterruptHandler(void)
   {
     if ( INTGetFlag ( INT_SOURCE_UART_TX(UART3) ) )               // If TX interrupt occured
     {
-      if ( UARTTransmitterIsReady(UART3) && !Uart.Var.uartTxFifo[UART3].bufEmpty )  // If TX buffer is ready to receive data and the user's TX buffer is not empty
+      if ( UARTTransmitterIsReady(UART3) && !Uart.Var.uartTxFifo[0].bufEmpty )  // If TX buffer is ready to receive data and the user's TX buffer is not empty
       {
-        if (Uart.Var.uartTxFifo[UART3].lineBuffer.length < 8)     // Write max 8 bytes/interrupt
+        if (Uart.Var.uartTxFifo[0].lineBuffer.length < 8)     // Write max 8 bytes/interrupt
         {
-          iMax = Uart.Var.uartTxFifo[UART3].lineBuffer.length;
+          iMax = Uart.Var.uartTxFifo[0].lineBuffer.length;
         }
         else
         {
@@ -142,12 +142,12 @@ void __ISR(_UART_3_VECTOR, U3_INTERRUPT_PRIORITY) Uart3InterruptHandler(void)
 
         for (i = 0; i < iMax; i++)
         {
-          UartFifoRead((void *) &Uart.Var.uartTxFifo[UART3], &data);  // Copy from user
+          UartFifoRead((void *) &Uart.Var.uartTxFifo[0], &data);  // Copy from user
           U3TXREG = data;                                         // Put data in PIC32's TX buffer
         }
       }
 
-      if (Uart.Var.uartTxFifo[UART3].bufEmpty)                    // If User's TX buffer is empty
+      if (Uart.Var.uartTxFifo[0].bufEmpty)                    // If User's TX buffer is empty
       {
         Uart.DisableTxInterrupts(UART3);                          // Disable TX interrupts
       }
@@ -167,21 +167,21 @@ void __ISR(_UART_3_VECTOR, U3_INTERRUPT_PRIORITY) Uart3InterruptHandler(void)
       i = 0;
       iMax = 8;                                                   // Read max 8 bytes/interrupt
       while (   UARTReceivedDataIsAvailable(UART3)                // While RX data available
-            && !Uart.Var.uartRxFifo[UART3].bufFull                // and user's RX buffer not full
+            && !Uart.Var.uartRxFifo[0].bufFull                // and user's RX buffer not full
             && (i < iMax)                                         // and under 8 bytes read
             )
       { // while ^
         data = UARTGetDataByte(UART3);                            // Get data for PIC32's RX FIFO buffer and copy it to user (next line)
-        if ( UartFifoWrite((void *) &Uart.Var.uartRxFifo[UART3], &data) < 0 ) // If copy to user did not work
+        if ( UartFifoWrite((void *) &Uart.Var.uartRxFifo[0], &data) < 0 ) // If copy to user did not work
         {
           break;                                                  // Exit while loop
         }
         i++;
       } // end while
 
-      if (!Uart.Var.uartRxFifo[UART3].bufEmpty)                   // If there is data in the user's RX buffer
+      if (!Uart.Var.uartRxFifo[0].bufEmpty)                   // If there is data in the user's RX buffer
       {
-        Uart.Var.oIsRxDataAvailable[UART3] = 1;                   // Set according flag
+        Uart.Var.oIsRxDataAvailable[0] = 1;                   // Set according flag
       }
 
       INTClearFlag (INT_SOURCE_UART_RX(UART3) );                  // Clear the RX interrupt Flag
@@ -211,11 +211,11 @@ void __ISR(_UART_6_VECTOR, U6_INTERRUPT_PRIORITY) Uart6InterruptHandler(void)
   {
     if ( INTGetFlag ( INT_SOURCE_UART_TX(UART6) ) )               // If TX interrupt occured
     {
-      if ( UARTTransmitterIsReady(UART6) && !Uart.Var.uartTxFifo[UART6].bufEmpty )  // If TX buffer is ready to receive data and the user's TX buffer is not empty
+      if ( UARTTransmitterIsReady(UART6) && !Uart.Var.uartTxFifo[1].bufEmpty )  // If TX buffer is ready to receive data and the user's TX buffer is not empty
       {
-        if (Uart.Var.uartTxFifo[UART6].lineBuffer.length < 8)     // Write max 8 bytes/interrupt
+        if (Uart.Var.uartTxFifo[1].lineBuffer.length < 8)     // Write max 8 bytes/interrupt
         {
-          iMax = Uart.Var.uartTxFifo[UART6].lineBuffer.length;
+          iMax = Uart.Var.uartTxFifo[1].lineBuffer.length;
         }
         else
         {
@@ -224,12 +224,12 @@ void __ISR(_UART_6_VECTOR, U6_INTERRUPT_PRIORITY) Uart6InterruptHandler(void)
 
         for (i = 0; i < iMax; i++)
         {
-          UartFifoRead((void *) &Uart.Var.uartTxFifo[UART6], &data);  // Copy from user
+          UartFifoRead((void *) &Uart.Var.uartTxFifo[1], &data);  // Copy from user
           U6TXREG = data;                                         // Put data in PIC32's TX buffer
         }
       }
 
-      if (Uart.Var.uartTxFifo[UART6].bufEmpty)                    // If User's TX buffer is empty
+      if (Uart.Var.uartTxFifo[1].bufEmpty)                    // If User's TX buffer is empty
       {
         Uart.DisableTxInterrupts(UART6);                          // Disable TX interrupts
       }
@@ -249,21 +249,21 @@ void __ISR(_UART_6_VECTOR, U6_INTERRUPT_PRIORITY) Uart6InterruptHandler(void)
       i = 0;
       iMax = 8;                                                   // Read max 8 bytes/interrupt
       while (   UARTReceivedDataIsAvailable(UART6)                // While RX data available
-            && !Uart.Var.uartRxFifo[UART6].bufFull                // and user's RX buffer not full
+            && !Uart.Var.uartRxFifo[1].bufFull                // and user's RX buffer not full
             && (i < iMax)                                         // and under 8 bytes read
             )
       { // while ^
         data = UARTGetDataByte(UART6);                            // Get data for PIC32's RX FIFO buffer and copy it to user (next line)
-        if ( UartFifoWrite((void *) &Uart.Var.uartRxFifo[UART6], &data) < 0 ) // If copy to user did not work
+        if ( UartFifoWrite((void *) &Uart.Var.uartRxFifo[1], &data) < 0 ) // If copy to user did not work
         {
           break;                                                  // Exit while loop
         }
         i++;
       } // end while
 
-      if (!Uart.Var.uartRxFifo[UART6].bufEmpty)                   // If there is data in the user's RX buffer
+      if (!Uart.Var.uartRxFifo[1].bufEmpty)                   // If there is data in the user's RX buffer
       {
-        Uart.Var.oIsRxDataAvailable[UART6] = 1;                   // Set according flag
+        Uart.Var.oIsRxDataAvailable[1] = 1;                   // Set according flag
       }
 
       INTClearFlag (INT_SOURCE_UART_RX(UART6) );                  // Clear the RX interrupt Flag

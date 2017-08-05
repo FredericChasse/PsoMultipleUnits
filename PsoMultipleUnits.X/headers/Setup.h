@@ -82,6 +82,11 @@ void StartInterrupts  (void);
 #define U_MATLAB      UART6
 #define U_DBG         UART3
 
+#ifdef ONLY_2_UART_BUFFERS
+#define U_MATLAB_IDX  (1)
+#define U_DBG_IDX     (0)
+#endif
+
 #define SW1           PORTEbits.RE5
 #define SW2           PORTEbits.RE6
 #define SW3           PORTEbits.RE7

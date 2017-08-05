@@ -45,6 +45,9 @@ typedef struct
 {
   Decoder_t      *decoder;
   UartModule_t    uartChannel;
+#ifdef ONLY_2_UART_BUFFERS
+  UINT8           uartBufIdx;
+#endif
 } Codec_t;
 
 // Private prototypes
@@ -81,6 +84,16 @@ const CodecInterface_t _codec_if =
 UINT8 _Codec_Init (Codec_t *c, UartModule_t uartChannel)
 {
   c->uartChannel      = uartChannel;
+#ifdef ONLY_2_UART_BUFFERS
+  if (uartChannel == U_MATLAB)
+  {
+    c->uartBufIdx = U_MATLAB_IDX;
+  }
+  else
+  {
+    c->uartBufIdx = U_DBG_IDX;
+  }
+#endif
   c->decoder          = &_decoder;
   c->decoder->buffer  = &_decoderBuf;
   c->decoder->state   = S_DECODER_STANDBY;
@@ -139,7 +152,11 @@ UINT8 _Codec_CodeNewAdcMsg (Codec_t *c, ProtocolAdcDataPayload_t *newMsg)
     buf.length += tmpLen;
     ptr+=nData;
 
+#ifdef ONLY_2_UART_BUFFERS
+    while(!Uart.Var.uartTxFifo[c->uartBufIdx].bufEmpty);
+#else
     while(!Uart.Var.uartTxFifo[c->uartChannel].bufEmpty);
+#endif
     while(Uart.PutTxFifoBuffer(c->uartChannel, &buf) < 0);
     
     left -= tmpLen;
@@ -181,8 +198,6 @@ UINT8 _Codec_CodeNewPsoMsg (Codec_t *c, ProtocolPsoDataPayload_t *newMsg)
   buf.length += length;
   
   while(Uart.PutTxFifoBuffer(c->uartChannel, &buf) < 0);
-  
-//  Uart.SendDataBuffer(U_MATLAB, buf.buffer, buf.length);
   
   return 0;
 }
@@ -232,7 +247,12 @@ DecoderReturnMsg_t _Codec_DecoderFsmStep (Codec_t *c, UINT8 *rxMsg)
   static UINT32 dbgCount = 0;
   // Get new characters pending
   //-------------------------------------------------------------
+  
+#ifdef ONLY_2_UART_BUFFERS
+  if (Uart.Var.oIsRxDataAvailable[c->uartBufIdx])
+#else
   if (Uart.Var.oIsRxDataAvailable[c->uartChannel])
+#endif
   {
     err = Uart.GetRxFifoBuffer(c->uartChannel, &buffer, FALSE);
     if (err >= 0)
