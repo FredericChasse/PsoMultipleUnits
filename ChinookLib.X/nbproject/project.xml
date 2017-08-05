@@ -3,17 +3,15 @@
     <type>com.microchip.mplab.nbide.embedded.makeproject</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/make-project/1">
-            <name>PsoMultipleUnits</name>
-            <creation-uuid>774b00fa-c23d-42c3-8a6d-fcbe24c1ee58</creation-uuid>
+            <name>ChinookLib</name>
+            <creation-uuid>ab0cfb43-0149-4890-89e8-35897451c700</creation-uuid>
             <make-project-type>0</make-project-type>
             <c-extensions>c</c-extensions>
             <cpp-extensions/>
             <header-extensions>h</header-extensions>
             <asminc-extensions/>
             <sourceEncoding>ISO-8859-1</sourceEncoding>
-            <make-dep-projects>
-                <make-dep-project>../ChinookLib.X</make-dep-project>
-            </make-dep-projects>
+            <make-dep-projects/>
         </data>
     </configuration>
 </project>

@@ -1,118 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configurationDescriptor version="62">
   <logicalFolder name="root" displayName="root" projectFiles="true">
-    <logicalFolder name="f1" displayName="Algo" projectFiles="true">
-      <logicalFolder name="f2" displayName="Characterization" projectFiles="true">
-        <itemPath>Objects/Algo/Characterization.c</itemPath>
-        <itemPath>Objects/Algo/Characterization.h</itemPath>
-      </logicalFolder>
-      <logicalFolder name="f6" displayName="DebugAdc" projectFiles="true">
-        <itemPath>Objects/Algo/DebugAdc.c</itemPath>
-        <itemPath>Objects/Algo/DebugAdc.h</itemPath>
-      </logicalFolder>
-      <logicalFolder name="f3" displayName="ExtremumSeeking" projectFiles="true">
-        <itemPath>Objects/Algo/ExtremumSeeking.c</itemPath>
-        <itemPath>Objects/Algo/ExtremumSeeking.h</itemPath>
-      </logicalFolder>
-      <logicalFolder name="f4" displayName="PNO" projectFiles="true">
-        <itemPath>Objects/Algo/Pno.c</itemPath>
-        <itemPath>Objects/Algo/Pno.h</itemPath>
-        <itemPath>Objects/Algo/PnoInstance.c</itemPath>
-        <itemPath>Objects/Algo/PnoInstance.h</itemPath>
-        <itemPath>Objects/Algo/SteadyStatePno.c</itemPath>
-        <itemPath>Objects/Algo/SteadyStatePno.h</itemPath>
-        <itemPath>Objects/Algo/PnoSwarm.c</itemPath>
-        <itemPath>Objects/Algo/PnoSwarm.h</itemPath>
-      </logicalFolder>
-      <logicalFolder name="f5" displayName="PpsoPno" projectFiles="true">
-        <itemPath>Objects/Algo/PpsoPno.c</itemPath>
-        <itemPath>Objects/Algo/PpsoPno.h</itemPath>
-        <itemPath>Objects/Algo/Classifier.c</itemPath>
-        <itemPath>Objects/Algo/Classifier.h</itemPath>
-      </logicalFolder>
-      <logicalFolder name="f1" displayName="PSO" projectFiles="true">
-        <itemPath>Objects/Algo/Pso.c</itemPath>
-        <itemPath>Objects/Algo/Pso.h</itemPath>
-        <itemPath>Objects/Algo/PsoParticle.c</itemPath>
-        <itemPath>Objects/Algo/PsoParticle.h</itemPath>
-        <itemPath>Objects/Algo/PsoSwarm.c</itemPath>
-        <itemPath>Objects/Algo/PsoSwarm.h</itemPath>
-      </logicalFolder>
-      <itemPath>Objects/Algo/AlgoInterface.h</itemPath>
-      <itemPath>Objects/Algo/SteadyState.c</itemPath>
-      <itemPath>Objects/Algo/SteadyState.h</itemPath>
-      <itemPath>Objects/Algo/Position.h</itemPath>
-      <itemPath>Objects/Algo/Position.c</itemPath>
-    </logicalFolder>
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>headers/StateMachine.h</itemPath>
-      <itemPath>headers/Setup.h</itemPath>
-      <itemPath>headers/Interrupts.h</itemPath>
-      <itemPath>headers/StateFunctions.h</itemPath>
-      <itemPath>headers/HardwareProfile.h</itemPath>
-      <itemPath>headers/SkadiFunctions.h</itemPath>
+      <itemPath>headers/ChinookHardwareProfile.h</itemPath>
+      <itemPath>headers/ChinookLib.h</itemPath>
+      <itemPath>headers/ChinookPorts.h</itemPath>
+      <itemPath>headers/ChinookTimer.h</itemPath>
+      <itemPath>headers/ChinookUart.h</itemPath>
+      <itemPath>headers/ChinookAdc.h</itemPath>
+      <itemPath>headers/ChinookWdt.h</itemPath>
+      <itemPath>headers/ChinookSkadi.h</itemPath>
+      <itemPath>headers/ChinookI2c.h</itemPath>
+      <itemPath>headers/ChinookSpi.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
                    projectFiles="true">
     </logicalFolder>
-    <logicalFolder name="f3" displayName="Perturb" projectFiles="true">
-      <itemPath>Objects/Perturb/Perturb.c</itemPath>
-      <itemPath>Objects/Perturb/Perturb.h</itemPath>
-      <itemPath>source/LedDriver.c</itemPath>
-      <itemPath>headers/LedDriver.h</itemPath>
-    </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <logicalFolder name="f1" displayName="Codec" projectFiles="true">
-        <itemPath>source/Codec/Codec.c</itemPath>
-        <itemPath>source/Codec/Codec.h</itemPath>
-        <itemPath>source/Codec/Protocol.h</itemPath>
-        <itemPath>source/Codec/Protocol.c</itemPath>
-      </logicalFolder>
-      <itemPath>source/main.c</itemPath>
-      <itemPath>source/StateMachine.c</itemPath>
-      <itemPath>source/Interrupts.c</itemPath>
-      <itemPath>source/Setup.c</itemPath>
-      <itemPath>source/StateFunctions.c</itemPath>
-      <itemPath>source/SkadiFunctions.c</itemPath>
-    </logicalFolder>
-    <logicalFolder name="f2" displayName="Units" projectFiles="true">
-      <itemPath>source/Potentiometer.c</itemPath>
-      <itemPath>Objects/Units/Unit.c</itemPath>
-      <itemPath>Objects/Units/UnitArray.c</itemPath>
-      <itemPath>headers/Potentiometer.h</itemPath>
-      <itemPath>Objects/Units/Unit.h</itemPath>
-      <itemPath>Objects/Units/UnitArray.h</itemPath>
-      <itemPath>Objects/Units/UnitMapping.c</itemPath>
-      <itemPath>Objects/Units/UnitMapping.h</itemPath>
-    </logicalFolder>
-    <logicalFolder name="f4" displayName="Utilities" projectFiles="true">
-      <logicalFolder name="f1" displayName="BipBuffer" projectFiles="true">
-        <itemPath>Utilities/BipBuffer/BipBuffer.c</itemPath>
-        <itemPath>Utilities/BipBuffer/BipBuffer.h</itemPath>
-      </logicalFolder>
-      <logicalFolder name="f4" displayName="ByteBuffer" projectFiles="true">
-        <itemPath>Utilities/ByteBuffer/ByteBuffer.c</itemPath>
-        <itemPath>Utilities/ByteBuffer/ByteBuffer.h</itemPath>
-      </logicalFolder>
-      <logicalFolder name="f2" displayName="LinkedList" projectFiles="true">
-        <itemPath>Utilities/ChainedList/LinkedList.c</itemPath>
-        <itemPath>Utilities/ChainedList/LinkedList.h</itemPath>
-      </logicalFolder>
-      <logicalFolder name="f5" displayName="MathFunctions" projectFiles="true">
-        <itemPath>Utilities/MathFunctions/MathFunctions.c</itemPath>
-        <itemPath>Utilities/MathFunctions/MathFunctions.h</itemPath>
-      </logicalFolder>
-      <logicalFolder name="f3" displayName="PcgRng" projectFiles="true">
-        <itemPath>Utilities/PcgRng/pcg_basic.c</itemPath>
-        <itemPath>Utilities/PcgRng/pcg_basic.h</itemPath>
-        <itemPath>Utilities/PcgRng/Rng.c</itemPath>
-        <itemPath>Utilities/PcgRng/Rng.h</itemPath>
-      </logicalFolder>
+      <itemPath>source/ChinookPorts.c</itemPath>
+      <itemPath>source/ChinookTimer.c</itemPath>
+      <itemPath>source/ChinookUart.c</itemPath>
+      <itemPath>source/ChinookSpi.c</itemPath>
+      <itemPath>source/ChinookAdc.c</itemPath>
+      <itemPath>source/ChinookWdt.c</itemPath>
+      <itemPath>source/ChinookSkadi.c</itemPath>
+      <itemPath>source/ChinookI2c.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -121,29 +38,19 @@
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
-    <Elem>source</Elem>
     <Elem>headers</Elem>
-    <Elem>../../ChinookLib/ChinookLib.X/headers</Elem>
-    <Elem>../../ChinookLib/ChinookLibs.X/headers</Elem>
-    <Elem>Objects/Algo</Elem>
-    <Elem>Objects/Units</Elem>
-    <Elem>BipBuffer</Elem>
-    <Elem>Utilities/BipBuffer</Elem>
-    <Elem>Utilities/ChainedList</Elem>
-    <Elem>Utilities/PcgRng</Elem>
-    <Elem>Utilities/ByteBuffer</Elem>
-    <Elem>Objects/Perturb</Elem>
-    <Elem>Utilities/MathFunctions</Elem>
+    <Elem>source</Elem>
+    <Elem>../Development/ChinookLib_dev.X/headers</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
-    <conf name="default" type="2">
+    <conf name="default" type="3">
       <toolsSet>
         <developmentServer>localhost</developmentServer>
         <targetDevice>PIC32MX795F512H</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
-        <platformTool>PICkit3PlatformTool</platformTool>
+        <platformTool>ICD3PlatformTool</platformTool>
         <languageToolchain>XC32</languageToolchain>
         <languageToolchainVersion>1.43</languageToolchainVersion>
         <platform>3</platform>
@@ -151,23 +58,6 @@
       <compileType>
         <linkerTool>
           <linkerLibItems>
-            <linkerLibProjectItem>
-              <makeArtifact PL="../ChinookLib.X"
-                            CT="3"
-                            CN="default"
-                            AC="true"
-                            BL="true"
-                            WD="../ChinookLib.X"
-                            BC="${MAKE}  -f Makefile CONF=default"
-                            DBC="${MAKE}  -f Makefile CONF=default TYPE_IMAGE=DEBUG_RUN"
-                            CC="rm -rf &quot;build/default&quot; &quot;dist/default&quot;"
-                            OP="dist/default/production/ChinookLib.X.a"
-                            DOP="dist/default/debug/ChinookLib.X.a"
-                            FL="dist/default/production/ChinookLib.X.a"
-                            PD="dist/default/production/ChinookLib.X."
-                            DD="dist/default/debug/ChinookLib.X.">
-              </makeArtifact>
-            </linkerLibProjectItem>
           </linkerLibItems>
         </linkerTool>
         <archiverTool>
@@ -197,8 +87,7 @@
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="true"/>
         <property key="exclude-floating-point" value="false"/>
-        <property key="extra-include-directories"
-                  value="source;headers;Objects\Algo;Objects\Units;Utilities\BipBuffer;Utilities\ChainedList;Utilities\PcgRng;Utilities\ByteBuffer;Objects\Perturb;Utilities\MathFunctions;source\Codec"/>
+        <property key="extra-include-directories" value="headers;source"/>
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="false"/>
@@ -257,7 +146,7 @@
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-cross-reference-file" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
-        <property key="heap-size" value="1024"/>
+        <property key="heap-size" value=""/>
         <property key="input-libraries" value=""/>
         <property key="kseg-length" value=""/>
         <property key="kseg-origin" value=""/>
@@ -265,7 +154,7 @@
         <property key="map-file" value="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map"/>
         <property key="no-startup-files" value="false"/>
         <property key="oXC32ld-extra-opts" value=""/>
-        <property key="optimization-level" value="-O1"/>
+        <property key="optimization-level" value=""/>
         <property key="preprocessor-macros" value=""/>
         <property key="remove-unused-sections" value="false"/>
         <property key="report-memory-usage" value="false"/>
@@ -357,6 +246,7 @@
         <property key="UART4" value="true"/>
         <property key="UART5" value="true"/>
         <property key="UART6" value="true"/>
+        <property key="USB" value="true"/>
         <property key="debugoptions.useswbreakpoints" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
@@ -367,22 +257,20 @@
         <property key="memories.eeprom" value="true"/>
         <property key="memories.flashdata" value="true"/>
         <property key="memories.id" value="true"/>
+        <property key="memories.instruction.ram" value="true"/>
+        <property key="memories.instruction.ram.ranges"
+                  value="${memories.instruction.ram.ranges}"/>
         <property key="memories.programmemory" value="true"/>
-        <property key="memories.programmemory.end" value="0x1d07ffff"/>
-        <property key="memories.programmemory.partition2" value="true"/>
-        <property key="memories.programmemory.partition2.end"
-                  value="${memories.programmemory.partition2.end.value}"/>
-        <property key="memories.programmemory.partition2.start"
-                  value="${memories.programmemory.partition2.start.value}"/>
-        <property key="memories.programmemory.start" value="0x1d000000"/>
+        <property key="memories.programmemory.ranges" value="1d000000-1d07ffff"/>
         <property key="poweroptions.powerenable" value="false"/>
         <property key="programoptions.donoteraseauxmem" value="false"/>
         <property key="programoptions.eraseb4program" value="true"/>
         <property key="programoptions.preservedataflash" value="false"/>
+        <property key="programoptions.preservedataflash.ranges" value=""/>
         <property key="programoptions.preserveeeprom" value="false"/>
+        <property key="programoptions.preserveeeprom.ranges" value=""/>
+        <property key="programoptions.preserveprogram.ranges" value=""/>
         <property key="programoptions.preserveprogramrange" value="false"/>
-        <property key="programoptions.preserveprogramrange.end" value="0x1d07ffff"/>
-        <property key="programoptions.preserveprogramrange.start" value="0x1d000000"/>
         <property key="programoptions.preserveuserid" value="false"/>
         <property key="programoptions.programcalmem" value="false"/>
         <property key="programoptions.programuserotp" value="false"/>
@@ -436,8 +324,6 @@
         <property key="UART4" value="true"/>
         <property key="UART5" value="true"/>
         <property key="UART6" value="true"/>
-        <property key="USB" value="true"/>
-        <property key="firmware.download.all" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="true"/>
@@ -447,23 +333,24 @@
         <property key="memories.eeprom" value="true"/>
         <property key="memories.flashdata" value="true"/>
         <property key="memories.id" value="true"/>
-        <property key="memories.instruction.ram" value="true"/>
-        <property key="memories.instruction.ram.ranges"
-                  value="${memories.instruction.ram.ranges}"/>
         <property key="memories.programmemory" value="true"/>
-        <property key="memories.programmemory.ranges" value="1d000000-1d07ffff"/>
+        <property key="memories.programmemory.end" value="0x1d07ffff"/>
+        <property key="memories.programmemory.partition2" value="true"/>
+        <property key="memories.programmemory.partition2.end"
+                  value="${memories.programmemory.partition2.end.value}"/>
+        <property key="memories.programmemory.partition2.start"
+                  value="${memories.programmemory.partition2.start.value}"/>
+        <property key="memories.programmemory.start" value="0x1d000000"/>
         <property key="poweroptions.powerenable" value="false"/>
         <property key="programmertogo.imagename" value=""/>
         <property key="programoptions.donoteraseauxmem" value="false"/>
         <property key="programoptions.eraseb4program" value="true"/>
         <property key="programoptions.pgmspeed" value="2"/>
         <property key="programoptions.preservedataflash" value="false"/>
-        <property key="programoptions.preservedataflash.ranges"
-                  value="${programoptions.preservedataflash.ranges}"/>
         <property key="programoptions.preserveeeprom" value="false"/>
-        <property key="programoptions.preserveeeprom.ranges" value=""/>
-        <property key="programoptions.preserveprogram.ranges" value=""/>
         <property key="programoptions.preserveprogramrange" value="false"/>
+        <property key="programoptions.preserveprogramrange.end" value="0x1d07ffff"/>
+        <property key="programoptions.preserveprogramrange.start" value="0x1d000000"/>
         <property key="programoptions.preserveuserid" value="false"/>
         <property key="programoptions.programcalmem" value="false"/>
         <property key="programoptions.programuserotp" value="false"/>
