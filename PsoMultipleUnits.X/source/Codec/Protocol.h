@@ -37,6 +37,7 @@ typedef enum
   
  ,UNITS_DATA    = 0x03
  ,PSO_DATA      = 0x04
+ ,ADC_DATA      = 0x05
 } ProtocolMsgType_t;
 
 typedef struct
@@ -106,9 +107,22 @@ extern const size_t sizeOfUnitsDataPayloadBase;
 
 typedef struct
 {
+  UINT8   oNewPacket;
+  UINT8   nUnits;
+  UINT16  nData;
+  UINT16 *data;
+} ProtocolAdcDataPayload_t;
+extern const size_t sizeOfAdcONewPacket;
+extern const size_t sizeOfAdcNUnits;
+extern const size_t sizeOfAdcNData;
+extern const size_t sizeOfAdcOneData;
+extern const size_t sizeOfAdcDataPayloadBase;
+
+typedef struct
+{
   UINT16  iteration;
   UINT8   nParticles;
-  UINT8   nData;
+  UINT16  nData;
   float   *speed;
   float   *pos;
   float   *fitness;

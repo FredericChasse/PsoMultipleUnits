@@ -1,5 +1,5 @@
 clear
-close all
+% close all
 
 % Next 2 lines are to close any open waitbar
 f = findall(0,'tag','TMWWaitbar');
@@ -15,6 +15,7 @@ START_ACQ = uint8(1);
 STOP_ACQ = uint8(2);
 UNITS_DATA = uint8(3);
 PSO_DATA = uint8(4);
+ADC_DATA = uint8(5);
 
 CLASSIC_PSO = uint8(0);
 PARALLEL_PSO = uint8(1);
@@ -61,8 +62,8 @@ end
 % port.BytesAvailableFcnMode = 'byte';
 % port.BytesAvailableFcn = {@myCallback};
 
-% port.BaudRate = 115200;
-port.BaudRate = 9600;
+port.BaudRate = 115200;
+% port.BaudRate = 9600;
 port.DataBits = 8;
 port.Parity = 'none';
 port.StopBits = 1;
@@ -96,11 +97,11 @@ startAlgoChar = PROTOCOL_START_ALGO;
 % algo = MULTI_UNIT;
 % algo = EXTREMUM_SEEKING;
 % algo = PPSO_PNO;
-% algo = PNO;
-algo = DEBUG_ADC;
+algo = PNO;
+% algo = DEBUG_ADC;
 % units = uint8(3:1:10);
 % units = uint8([3:6 11:14]);
-units = uint8(0:1:2);
+units = uint8(1);
 nUnits = uint8(length(units));
 % lengthOfPayload = fliplr(typecast(uint16(3 + nUnits), 'uint8'));
 lengthOfPayload = typecast(uint16(3 + nUnits), 'uint8');
@@ -120,9 +121,9 @@ elseif algo == PARALLEL_PSO_MULTI_SWARM
 elseif algo == PPSO_PNO
   nIterations = 130;
 elseif algo == PNO
-  nIterations = 100;
+  nIterations = 24;
 elseif algo == DEBUG_ADC
-  nIterations = 100;
+  nIterations = 2*25;
 else
   nIterations = 20;
 end
@@ -144,6 +145,8 @@ sIteration = [];
 pSpeedMem = [];
 pPosMem = [];
 pPowMem = [];
+
+adcMem = [];
 
 tic
 wbh = waitbar(0, ['Iteration : ' num2str(0) '/' num2str(nIterations)]);  % Waitbar handle
@@ -182,8 +185,32 @@ for iIteration = 1 : nIterations
     pSpeedMem = [pSpeedMem; particlesSpeed];
     pPosMem = [pPosMem; particlesPos];
     pPowMem = [pPowMem; particlesPow];
+    
+  elseif typeOfMsg == ADC_DATA
+    oNewPacket = buf(1);
+    nUnits = buf(2);
+    nData = typecast(uint8(buf(3:4)'), 'uint16');
+    adcPacketLength = nData;
+    data = typecast(uint8(buf(5:end)'), 'uint16');
+    adcMem = [adcMem data];
+    while(oNewPacket == uint8(1))
+      buf = fread(port, SIZE_OF_PROTOCOL_HEADER);
+      delimiter = buf(1);
+      typeOfMsg = buf(2);
+      lengthOfPayload = double(typecast(uint8(buf(3:4)'), 'uint16'));
+  
+      %payload
+      buf = fread(port, lengthOfPayload, 'uint8');
+      oNewPacket = buf(1);
+      nUnits = buf(2);
+      nData = typecast(uint8(buf(3:4)'), 'uint16');
+      adcPacketLength = nData;
+      data = typecast(uint8(buf(5:end)'), 'uint16');
+      adcMem = [adcMem data];
+    end
+    
   end
-    waitbar(iIteration/nIterations, wbh, ['Iteration: ' num2str(iIteration) '/' num2str(nIterations)])
+  waitbar(iIteration/nIterations, wbh, ['Iteration: ' num2str(iIteration) '/' num2str(nIterations)])
 end
 toc
 close(wbh)
@@ -235,4 +262,9 @@ for i = 1 : nUnits
   plot(tsMem, posMem(i:nUnits:end));
   subplot(2,nUnits,i+nUnits)
   plot(tsMem, powMem(i:nUnits:end));
+end
+
+if ~isempty(adcMem)
+  figure
+  plot(adcMem)
 end

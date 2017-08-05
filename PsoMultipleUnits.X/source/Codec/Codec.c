@@ -21,6 +21,7 @@
 
 #include "Codec.h"
 #include "ByteBuffer.h"
+#include "MathFunctions.h"
 
 
 // Private definitions
@@ -53,6 +54,7 @@ UINT8               _Codec_Init             (Codec_t *c, UartModule_t uartChanne
 DecoderReturnMsg_t  _Codec_DecoderFsmStep   (Codec_t *c, UINT8 *rxMsg);
 UINT8               _Codec_CodeNewUnitsMsg  (Codec_t *c, ProtocolUnitsDataPayload_t *newMsg);
 UINT8               _Codec_CodeNewPsoMsg    (Codec_t *c, ProtocolPsoDataPayload_t *newMsg);
+UINT8               _Codec_CodeNewAdcMsg    (Codec_t *c, ProtocolAdcDataPayload_t *newMsg);
 
 // Private variables
 //==============================================================================
@@ -70,6 +72,7 @@ const CodecInterface_t _codec_if =
  ,.DecoderFsmStep   = (CodecDecoderFsmStep_fct)   &_Codec_DecoderFsmStep
  ,.CodeNewUnitsMsg  = (CodecCodeNewUnitsMsg_fct)  &_Codec_CodeNewUnitsMsg
  ,.CodeNewPsoMsg    = (CodecCodeNewPsoMsg_fct)    &_Codec_CodeNewPsoMsg
+ ,.CodeNewAdcMsg    = (CodecCodeNewAdcMsg_fct)    &_Codec_CodeNewAdcMsg
 };
 
 // Private functions
@@ -83,6 +86,66 @@ UINT8 _Codec_Init (Codec_t *c, UartModule_t uartChannel)
   c->decoder->state   = S_DECODER_STANDBY;
   
   ByteBufferInit(c->decoder->buffer, _decoderArray, MAX_DECODER_LENGTH);
+}
+
+UINT8 _Codec_CodeNewAdcMsg (Codec_t *c, ProtocolAdcDataPayload_t *newMsg)
+{
+  sUartLineBuffer_t buf = {0};
+  size_t length = newMsg->nUnits * newMsg->nData * sizeOfAdcOneData;
+  size_t tmpLen = length + sizeOfAdcDataPayloadBase;
+  size_t left = length + sizeOfAdcDataPayloadBase + sizeOfProtocolHeader;
+  UINT16 nData = newMsg->nData;
+  UINT16 ptr = 0;
+  
+  ProtocolHeader_t header = 
+  {
+    .delimiter        = PROTOCOL_DELIMITER
+   ,.type             = ADC_DATA
+   ,.lengthOfPayload  = sizeOfAdcDataPayloadBase + length
+  };
+  
+  while(left > (sizeOfAdcDataPayloadBase + sizeOfProtocolHeader))
+  {
+    buf.length = 0;
+    tmpLen = MIN(left, UART_LINE_BUFFER_LENGTH);
+    if (tmpLen < UART_LINE_BUFFER_LENGTH)
+    {
+      newMsg->oNewPacket = 0;
+    }
+    else
+    {
+      newMsg->oNewPacket = 1;
+    }
+    tmpLen -= sizeOfAdcDataPayloadBase + sizeOfProtocolHeader;
+    tmpLen &= ~1;
+    
+    header.lengthOfPayload = tmpLen + sizeOfAdcDataPayloadBase;
+    
+    memcpy(&buf.buffer[0], &header, sizeOfProtocolHeader);
+    buf.length += sizeOfProtocolHeader;
+  
+    memcpy(&buf.buffer[buf.length], &newMsg->oNewPacket, sizeOfAdcONewPacket);
+    buf.length += sizeOfAdcONewPacket;
+  
+    memcpy(&buf.buffer[buf.length], &newMsg->nUnits, sizeOfAdcNUnits);
+    buf.length += sizeOfAdcNUnits;
+    
+    nData = tmpLen / newMsg->nUnits / sizeOfAdcOneData;
+
+    memcpy(&buf.buffer[buf.length], &nData, sizeOfAdcNData);
+    buf.length += sizeOfAdcNData;
+
+    memcpy(&buf.buffer[buf.length], &newMsg->data[ptr], tmpLen);
+    buf.length += tmpLen;
+    ptr+=nData;
+
+    while(!Uart.Var.uartTxFifo[c->uartChannel].bufEmpty);
+    while(Uart.PutTxFifoBuffer(c->uartChannel, &buf) < 0);
+    
+    left -= tmpLen;
+  }
+  
+  return 0;
 }
 
 UINT8 _Codec_CodeNewPsoMsg (Codec_t *c, ProtocolPsoDataPayload_t *newMsg)

@@ -95,6 +95,8 @@ extern volatile BOOL oAcqOngoing;
 UINT32 coreTickRate;
 INT32 time;
 
+extern UINT16 dbgAdcData[N_TOTAL_SAMPLES];
+
 
 //==============================================================================
 //	STATES OF STATE MACHINE
@@ -244,7 +246,7 @@ void StateInit(void)
   algoArray = (UnitArrayInterface_t *)  UnitArrayInterface();
   perturb   = (PerturbInterface_t   *)  PerturbInterface  ();
   codec     = (CodecInterface_t     *)  CodecInterface    ();
-  algo      = NULL;
+  algo      = (AlgoInterface_t      *)  NULL;
   
   codec->Init(codec->ctx, U_MATLAB);
   
@@ -258,6 +260,10 @@ void StateInit(void)
   StartInterrupts();
   
   perturb->Init(perturb->ctx, 500);
+//  perturb->SetUnitIntensity(perturb->ctx, 0, 1000);
+//  perturb->SetUnitIntensity(perturb->ctx, 1, 1000);
+//  perturb->SetUnitIntensity(perturb->ctx, 2, 1000);
+//  SetPot(4, 0);
   
   while(oAcqOngoing);
   nSamples = 0;
@@ -298,7 +304,6 @@ void StateAcq(void)
 //      DBG2_ON;
       Adc.DisableInterrupts();
       ComputeMeanAdcValues();
-      Adc.EnableInterrupts();
 //      DBG2_OFF;
       if (oSessionActive)
       {
@@ -306,10 +311,10 @@ void StateAcq(void)
 //        coreTickRate = Timer.Tic(2000000, SCALE_US);
         oNewSample = 1;   // Go to stateCompute
       }
-//      else
-//      {
-//        ComputeMeanAdcValues();
-//      }
+      else
+      {
+        Adc.EnableInterrupts();
+      }
 //    }
   }
   
@@ -430,10 +435,11 @@ void StateAcq(void)
             oDbgAdc         = 1;
             oSessionActive  = 1;
             while(oAcqOngoing);
-            nSamples        = 0;  // Reset the samples
-            ResetFilterValues();
+//            nSamples        = 0;  // Reset the samples
+//            ResetFilterValues();
             algo = (AlgoInterface_t *) DebugAdcInterface();
             algo->Init(algo->ctx, algoArray);
+            ResetFilterValues();
             break;
             
           default:
@@ -492,6 +498,7 @@ void StateCompute(void)
   
   ProtocolUnitsDataPayload_t newUnitsPayload = {0};
   ProtocolPsoDataPayload_t   newPsoPayload   = {0};
+  ProtocolAdcDataPayload_t   newAdcPayload   = {0};
   
   for (i = 0; i < nUnits; i++)
   {
@@ -499,10 +506,10 @@ void StateCompute(void)
     id = algoArray->GetUnitId(algoArray->ctx, i);
     powers[i] = ComputeCellPower(unitAdcs[id], algoArray->GetUnitPosIdx(algoArray->ctx, i));
     algoArray->SetPower(algoArray->ctx, i, powers[i]);
-//    if (oDbgAdc)
-//    {
-//      powers[i] = (float) sCellValues.cells[unitAdcs[id]].cellVolt_mV / 1000.0f;
-//    } 
+    if (oDbgAdc)
+    {
+      powers[i] = (float) sCellValues.cells[unitAdcs[id]].cellVolt_mV / 1000.0f;
+    } 
  }
   
   newUnitsPayload.timestamp_ms = algo->GetTimeElapsed(algo->ctx);
@@ -523,9 +530,19 @@ void StateCompute(void)
     codec->CodeNewPsoMsg(codec->ctx, &newPsoPayload);
   }
   
+  if ((nUnits==1) && oDbgAdc)
+  {
+    newAdcPayload.oNewPacket = 0;
+    newAdcPayload.nUnits = nUnits;
+    newAdcPayload.nData = N_TOTAL_SAMPLES * nUnits;
+    newAdcPayload.data = dbgAdcData;
+    codec->CodeNewAdcMsg(codec->ctx, &newAdcPayload);
+  }
+  
   DBG2_ON;
   algo->Run(algo->ctx);
   ResetFilterValues();
+  Adc.EnableInterrupts();
 //  Adc.EnableInterrupts();
   DBG2_OFF;
   

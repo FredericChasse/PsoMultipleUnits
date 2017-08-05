@@ -368,24 +368,24 @@ void __ISR(_I2C_5_VECTOR, I2C5_INT_PRIORITY) I2c5InterruptHandler(void)
   {
     INTClearFlag(INT_I2C5M);
 
-    if (I2c.Var.oReadDataInNextInterrupt[I2C5])     // If a read was started last interrupt
+    if (I2c.Var.oReadDataInNextInterrupt[0])     // If a read was started last interrupt
     {
       masterData.data  = I2C5RCV;                   // Read from I2C buffer
       masterData.state = I2C_MASTER_RECEIVE_DATA;   // Dummy write
-      I2cFifoWrite((void *) &I2c.Var.i2cUserFifo[I2C5], &masterData);   // Copy to user
-      I2c.Var.oRxDataAvailable[I2C5] = 1;
-      I2c.Var.oReadDataInNextInterrupt[I2C5] = 0;
+      I2cFifoWrite((void *) &I2c.Var.i2cUserFifo[0], &masterData);   // Copy to user
+      I2c.Var.oRxDataAvailable[0] = 1;
+      I2c.Var.oReadDataInNextInterrupt[0] = 0;
     }
     
-    if (I2c.Var.oI2cWriteIsRunning[I2C5])   // Writing procedure
+    if (I2c.Var.oI2cWriteIsRunning[0])   // Writing procedure
     {
-      I2cFifoRead((void *) &I2c.Var.i2cWriteQueue[I2C5], &masterData);  // Get current state
+      I2cFifoRead((void *) &I2c.Var.i2cWriteQueue[0], &masterData);  // Get current state
       switch (masterData.state)
       {
       //======================================================  
         case I2C_MASTER_RECEIVE_DATA : 
           I2C5CONbits.RCEN = 1;                         // Receive byte sequence
-          I2c.Var.oReadDataInNextInterrupt[I2C5] = 1;   // Flag for the next interrupt to read the RX buffer
+          I2c.Var.oReadDataInNextInterrupt[0] = 1;   // Flag for the next interrupt to read the RX buffer
           break;
       //====================================================== 
 
@@ -399,39 +399,39 @@ void __ISR(_I2C_5_VECTOR, I2C5_INT_PRIORITY) I2c5InterruptHandler(void)
         case I2C_MASTER_STOP_CONDITION : 
           I2C5CONbits.PEN = 1;                          // Stop condition sequence
           
-          if (I2c.Var.oPoolSlaveAcknowledge[I2C5])      // If the user wanted to poll
+          if (I2c.Var.oPoolSlaveAcknowledge[0])      // If the user wanted to poll
           {
-            if (!I2c.Var.oSecondStopAfterPooling[I2C5]) // If this is the first stop after writing all the data
+            if (!I2c.Var.oSecondStopAfterPooling[0]) // If this is the first stop after writing all the data
             {                                           // Add the next three states required for polling
               masterData.state = I2C_MASTER_START_CONDITION;
-              I2cFifoWrite((void *) &I2c.Var.i2cWriteQueue[I2C5], &masterData);
+              I2cFifoWrite((void *) &I2c.Var.i2cWriteQueue[0], &masterData);
               
               masterData.state = I2C_MASTER_TRANSMIT_DATA;
-              I2cFifoWrite((void *) &I2c.Var.i2cWriteQueue[I2C5], &masterData);
+              I2cFifoWrite((void *) &I2c.Var.i2cWriteQueue[0], &masterData);
               
               masterData.state = I2C_MASTER_STOP_CONDITION;
-              I2cFifoWrite((void *) &I2c.Var.i2cWriteQueue[I2C5], &masterData);
+              I2cFifoWrite((void *) &I2c.Var.i2cWriteQueue[0], &masterData);
               
-              I2c.Var.oSecondStopAfterPooling[I2C5] = 1;
+              I2c.Var.oSecondStopAfterPooling[0] = 1;
             }
             else                                        // If the first stop has passed
             {
-              if (!I2CByteWasAcknowledged(I2C5))        // If slave sent NACK
+              if (!I2CByteWasAcknowledged(0))        // If slave sent NACK
               {                                         // Redo the 3 states for the polling
                 masterData.state = I2C_MASTER_START_CONDITION;
-                I2cFifoWrite((void *) &I2c.Var.i2cWriteQueue[I2C5], &masterData);
+                I2cFifoWrite((void *) &I2c.Var.i2cWriteQueue[0], &masterData);
 
                 masterData.state = I2C_MASTER_TRANSMIT_DATA;
-                I2cFifoWrite((void *) &I2c.Var.i2cWriteQueue[I2C5], &masterData);
+                I2cFifoWrite((void *) &I2c.Var.i2cWriteQueue[0], &masterData);
 
                 masterData.state = I2C_MASTER_STOP_CONDITION;
-                I2cFifoWrite((void *) &I2c.Var.i2cWriteQueue[I2C5], &masterData);
+                I2cFifoWrite((void *) &I2c.Var.i2cWriteQueue[0], &masterData);
               }
               else                                      // If slave sent ACK
               {                                         // End the communication with the slave
                 masterData.state = I2C_MASTER_DONE;
-                I2cFifoWrite((void *) &I2c.Var.i2cWriteQueue[I2C5], &masterData);
-                I2c.Var.oSecondStopAfterPooling[I2C5] = 0;
+                I2cFifoWrite((void *) &I2c.Var.i2cWriteQueue[0], &masterData);
+                I2c.Var.oSecondStopAfterPooling[0] = 0;
               }
             }
           }
@@ -446,9 +446,9 @@ void __ISR(_I2C_5_VECTOR, I2C5_INT_PRIORITY) I2c5InterruptHandler(void)
 
       //======================================================  
         case I2C_MASTER_DONE : 
-          if (I2c.Var.i2cWriteQueue[I2C5].bufEmpty)     // If there is nothing more to send
+          if (I2c.Var.i2cWriteQueue[0].bufEmpty)     // If there is nothing more to send
           {
-            I2c.Var.oI2cWriteIsRunning[I2C5] = 0;       // Turn off writing process
+            I2c.Var.oI2cWriteIsRunning[0] = 0;       // Turn off writing process
           }
           else                                          // If there is still data in the WriteQueue
           {
@@ -498,15 +498,15 @@ void __ISR(_I2C_5_VECTOR, I2C5_INT_PRIORITY) I2c5InterruptHandler(void)
     
     
 
-    if (I2c.Var.oI2cReadIsRunning[I2C5])    // Reading procedure
+    if (I2c.Var.oI2cReadIsRunning[0])    // Reading procedure
     {
-      I2cFifoRead((void *) &I2c.Var.i2cReadQueue[I2C5], &masterData);   // Get current state
+      I2cFifoRead((void *) &I2c.Var.i2cReadQueue[0], &masterData);   // Get current state
       switch (masterData.state)
       {
       //======================================================  
         case I2C_MASTER_RECEIVE_DATA : 
           I2C5CONbits.RCEN = 1;             // Receive byte sequence
-          I2c.Var.oReadDataInNextInterrupt[I2C5] = 1;
+          I2c.Var.oReadDataInNextInterrupt[0] = 1;
           break;
       //====================================================== 
 
@@ -536,9 +536,9 @@ void __ISR(_I2C_5_VECTOR, I2C5_INT_PRIORITY) I2c5InterruptHandler(void)
 
       //======================================================  
         case I2C_MASTER_DONE : 
-          if (I2c.Var.i2cReadQueue[I2C5].bufEmpty)    // If there is nothing more to send
+          if (I2c.Var.i2cReadQueue[0].bufEmpty)    // If there is nothing more to send
           {
-            I2c.Var.oI2cReadIsRunning[I2C5] = 0;      // Turn off reading process
+            I2c.Var.oI2cReadIsRunning[0] = 0;      // Turn off reading process
           }
           else                                        // If there is still data in the ReadQueue
           {

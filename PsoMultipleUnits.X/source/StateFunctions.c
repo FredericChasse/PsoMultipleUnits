@@ -35,6 +35,7 @@ extern UINT16 cellVoltageRaw[16];
 extern volatile UINT16 nSamples;
 extern BOOL oSmoothData;
 const float kFilter = 0.1;
+UINT16 dbgAdcData[N_TOTAL_SAMPLES] = {0};
 
 // All the buttons used. 3 on the steering wheel, 3 on the board
 sButtonStates_t buttons =
@@ -222,7 +223,7 @@ inline void ComputeMeanAdcValues (void)
   UINT16 startRead = N_SAMPLES_TO_DROP;
 //  for (i = N_SAMPLES_TO_DROP; i < completeCycle; i++)
 //  {
-//    if (cellVoltRaw[i][1] == 0)
+//    if ((cellVoltRaw[i][1] == 0) && (cellVoltRaw[i-1][1] != 0) )
 //    {
 //      startRead = i;
 //      break;
@@ -232,12 +233,12 @@ inline void ComputeMeanAdcValues (void)
 //  {
 //    if ((cellVoltRaw[i][1] == 0) && (cellVoltRaw[i-1][1] != 0) )
 //    {
-//      finalRead = i+1;
+//      finalRead = i;
 //      break;
 //    }
 //  }
 //  for (i = startRead; i < finalRead; i++)
-  for (i = N_SAMPLES_TO_DROP; i < N_SAMPLES_PER_ADC_READ; i++)
+  for (i = N_SAMPLES_TO_DROP, j = 0; i < N_SAMPLES_PER_ADC_READ; i++, j++)
   {
 //    memcpy(&uk2[0], &uk1[0], 30);
 //    memcpy(&uk1[0], &uk0[0], 30);
@@ -325,8 +326,9 @@ inline void ComputeMeanAdcValues (void)
 //    meanCellRaw[15] += yk0[14];
     
     meanCellRaw[1] += cellVoltRaw[i][0];
-//    meanCellRaw[2] += cellVoltRaw[i][1];
-    meanCellRaw[2] = MAX(cellVoltRaw[i][1], meanCellRaw[2]);
+    meanCellRaw[2] += cellVoltRaw[i][1];
+    dbgAdcData[j] = cellVoltRaw[i][1];
+//    meanCellRaw[2] = MAX(cellVoltRaw[i][1], meanCellRaw[2]);
     meanCellRaw[3] += cellVoltRaw[i][2];
     meanCellRaw[4] += cellVoltRaw[i][3];
     meanCellRaw[5] += cellVoltRaw[i][4];

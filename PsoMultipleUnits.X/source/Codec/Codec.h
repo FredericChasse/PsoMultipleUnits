@@ -42,6 +42,7 @@ typedef UINT8               (*CodecInit_fct)            (void *ctx, UartModule_t
 typedef DecoderReturnMsg_t  (*CodecDecoderFsmStep_fct)  (void *ctx, UINT8 *rxMsg);
 typedef UINT8               (*CodecCodeNewUnitsMsg_fct) (void *ctx, ProtocolUnitsDataPayload_t *newMsg);
 typedef UINT8               (*CodecCodeNewPsoMsg_fct)   (void *ctx, ProtocolPsoDataPayload_t *newMsg);
+typedef UINT8               (*CodecCodeNewAdcMsg_fct)   (void *ctx, ProtocolAdcDataPayload_t *newMsg);
 
 typedef struct
 {
@@ -50,6 +51,7 @@ typedef struct
   CodecDecoderFsmStep_fct   DecoderFsmStep;
   CodecCodeNewUnitsMsg_fct  CodeNewUnitsMsg;
   CodecCodeNewPsoMsg_fct    CodeNewPsoMsg;
+  CodecCodeNewAdcMsg_fct    CodeNewAdcMsg;
 } CodecInterface_t;
 
 // Public functions

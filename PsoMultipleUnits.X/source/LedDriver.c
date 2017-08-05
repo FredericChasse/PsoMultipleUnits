@@ -158,9 +158,9 @@ inline void InitLedDriver (void)
   dataBuffer[2] = mode1Reg.data.word; 
   dataBuffer[3] = mode2Reg.data.word; 
   
-  while(I2c.Var.oI2cReadIsRunning[I2C5]);   // Wait for any I2C5 read sequence to end 
+  while(I2c.Var.oI2cReadIsRunning[0]);   // Wait for any I2C5 read sequence to end 
   I2c.AddDataToFifoWriteQueue(I2C5, &dataBuffer[0], 4, TRUE);
-  while(I2c.Var.oI2cWriteIsRunning[I2C5]);  // Wait for any I2C5 write sequence to end 
+  while(I2c.Var.oI2cWriteIsRunning[0]);  // Wait for any I2C5 write sequence to end 
   
   // Write OFF to all LEDs
   allLedOnReg .bytes.data.dataHigh.bits.fullOn   = 0;
@@ -172,8 +172,8 @@ inline void InitLedDriver (void)
   dataBuffer[4] = allLedOffReg.bytes.data.dataLow;
   dataBuffer[5] = allLedOffReg.bytes.data.dataHigh.word;
   
-  while(I2c.Var.oI2cReadIsRunning[I2C5]);   // Wait for any I2C5 read sequence to end 
-  while(I2c.Var.oI2cWriteIsRunning[I2C5]);  // Wait for any I2C5 write sequence to end 
+  while(I2c.Var.oI2cReadIsRunning[0]);   // Wait for any I2C5 read sequence to end 
+  while(I2c.Var.oI2cWriteIsRunning[0]);  // Wait for any I2C5 write sequence to end 
   I2c.AddDataToFifoWriteQueue(I2C5, &dataBuffer[0], 6, TRUE);
   
   
@@ -182,30 +182,30 @@ inline void InitLedDriver (void)
   dataBuffer[1] = mode1Reg.regAdd;
   dataBuffer[2] = mode1Reg.data.word;
   
-  while(I2c.Var.oI2cReadIsRunning[I2C5]);   // Wait for any I2C5 read sequence to end 
-  while(I2c.Var.oI2cWriteIsRunning[I2C5]);  // Wait for any I2C5 write sequence to end 
+  while(I2c.Var.oI2cReadIsRunning[0]);   // Wait for any I2C5 read sequence to end 
+  while(I2c.Var.oI2cWriteIsRunning[0]);  // Wait for any I2C5 write sequence to end 
   I2c.AddDataToFifoWriteQueue(I2C5, &dataBuffer[0], 3, TRUE);
   
-  prescaleReg.value = 3;                // PWM frequency of 1526 Hz
+//  prescaleReg.value = 3;                // PWM frequency of 1526 Hz
 //  prescaleReg.value = 5;                // PWM frequency of 1017.25 Hz
-//  prescaleReg.value = 60;                // PWM frequency of 100 Hz
+  prescaleReg.value = 60;                // PWM frequency of 100 Hz
 //  prescaleReg.value = 30;                // PWM frequency of 200 Hz
   dataBuffer[1] = prescaleReg.regAdd;
   dataBuffer[2] = prescaleReg.value;    
   
-  while(I2c.Var.oI2cReadIsRunning[I2C5]);   // Wait for any I2C5 read sequence to end 
-  while(I2c.Var.oI2cWriteIsRunning[I2C5]);  // Wait for any I2C5 write sequence to end 
+  while(I2c.Var.oI2cReadIsRunning[0]);   // Wait for any I2C5 read sequence to end 
+  while(I2c.Var.oI2cWriteIsRunning[0]);  // Wait for any I2C5 write sequence to end 
   I2c.AddDataToFifoWriteQueue(I2C5, &dataBuffer[0], 3, TRUE);
   
   mode1Reg.data.bits.sleep = 0;
   dataBuffer[1] = mode1Reg.regAdd;
   dataBuffer[2] = mode1Reg.data.word;
   
-  while(I2c.Var.oI2cReadIsRunning[I2C5]);   // Wait for any I2C5 read sequence to end 
-  while(I2c.Var.oI2cWriteIsRunning[I2C5]);  // Wait for any I2C5 write sequence to end 
+  while(I2c.Var.oI2cReadIsRunning[0]);   // Wait for any I2C5 read sequence to end 
+  while(I2c.Var.oI2cWriteIsRunning[0]);  // Wait for any I2C5 write sequence to end 
   I2c.AddDataToFifoWriteQueue(I2C5, &dataBuffer[0], 3, TRUE);
   
-  while(I2c.Var.oI2cWriteIsRunning[I2C5]);  // Wait for any I2C5 write sequence to end
+  while(I2c.Var.oI2cWriteIsRunning[0]);  // Wait for any I2C5 write sequence to end
   TurnOnLedDriver();
 }
 
@@ -227,7 +227,7 @@ inline INT8 SetLedDutyCycle (UINT8 numLed, UINT16 dutyCycle)
   {
     return -1;    // Max 15
   }
-  if (dutyCycle >= 1000)
+  if (dutyCycle > 1000)
   {
     return -1;    // Max 100.0%
   }
@@ -252,8 +252,8 @@ inline INT8 SetLedDutyCycle (UINT8 numLed, UINT16 dutyCycle)
   dataBuffer[4] = ledOffReg[numLed].bytes.data.dataLow;
   dataBuffer[5] = ledOffReg[numLed].bytes.data.dataHigh.word;
   
-  while(I2c.Var.oI2cReadIsRunning[I2C5]);   // Wait for any I2C5 read sequence to end 
-  while(I2c.Var.oI2cWriteIsRunning[I2C5]);  // Wait for any I2C5 write sequence to end 
+  while(I2c.Var.oI2cReadIsRunning[0]);   // Wait for any I2C5 read sequence to end 
+  while(I2c.Var.oI2cWriteIsRunning[0]);  // Wait for any I2C5 write sequence to end 
   I2c.AddDataToFifoWriteQueue(I2C5, &dataBuffer[0], 6, TRUE);
   
   return 0;

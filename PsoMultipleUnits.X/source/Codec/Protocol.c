@@ -44,3 +44,9 @@ const size_t sizeOfPsoOneParticleFitness  = 4;
 const size_t sizeOfPsoDataPayloadBase     = 4;
 
 const size_t sizeOfProtocolHeader         = 4;
+
+const size_t sizeOfAdcONewPacket = 1;
+const size_t sizeOfAdcNUnits = 1;
+const size_t sizeOfAdcNData = 2;
+const size_t sizeOfAdcOneData = 2;
+const size_t sizeOfAdcDataPayloadBase = 4;
