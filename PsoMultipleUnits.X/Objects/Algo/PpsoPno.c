@@ -162,10 +162,14 @@ INT8 _PpsoPno_Init (PpsoPno_t *pso, UnitArrayInterface_t *unitArray)
   
   const PnoSwarmParam_t _pnoParam = 
   {
-    .delta          = POT_STEP_VALUE
-   ,.uinit          = potRealValues[POT_MAX_INDEX/2]
-   ,.umax           = maxPos
-   ,.umin           = minPos
+    .delta_int      = 1
+   ,.delta          = _pnoParam.delta_int * POT_STEP_VALUE
+   ,.uinit_int      = POT_MAX_INDEX/2
+   ,.uinit          = potRealValues[_pnoParam.uinit_int]
+   ,.umax_int       = POT_MAX_INDEX
+   ,.umax           = potRealValues[_pnoParam.umax_int]
+   ,.umin_int       = POT_MIN_INDEX
+   ,.umin           = potRealValues[_pnoParam.umin_int]
    ,.nSamplesForSs  = 6
    ,.oscAmp         = 2
    ,.perturbOsc     = 0.05

@@ -101,7 +101,7 @@ INT8 _Pno_Init (Pno_t *pno, UnitArrayInterface_t *unitArray)
   for (i = 0; i < pno->nInstances; i++)
   {
     pno->instances[i] = (PnoInstanceInterface_t *) PnoInstanceInterface(PNO_CLASSIC);
-    pno->param[i].delta_int = 2;
+    pno->param[i].delta_int = 1;
     pno->param[i].delta = pno->param[i].delta_int*POT_STEP_VALUE;
     pno->param[i].uinit_int = 50;
     pno->param[i].uinit = potRealValues[pno->param[i].uinit_int];

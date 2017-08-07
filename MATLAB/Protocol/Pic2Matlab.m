@@ -1,5 +1,5 @@
 clear
-% close all
+close all
 
 % Next 2 lines are to close any open waitbar
 f = findall(0,'tag','TMWWaitbar');
@@ -90,8 +90,8 @@ fwrite(port, buf);
 % Start algo
 typeOfMsg = START_ACQ;
 startAlgoChar = PROTOCOL_START_ALGO;
-algo = CHARACTERIZATION;
-% algo = CLASSIC_PSO;
+% algo = CHARACTERIZATION;
+algo = CLASSIC_PSO;
 % algo = PARALLEL_PSO;
 % algo = PARALLEL_PSO_MULTI_SWARM;
 % algo = MULTI_UNIT;
@@ -121,14 +121,14 @@ elseif algo == PARALLEL_PSO_MULTI_SWARM
 elseif algo == PPSO_PNO
   nIterations = 130;
 elseif algo == PNO
-  nIterations = 24;
+  nIterations = 40;
 elseif algo == DEBUG_ADC
   nIterations = 2*25;
 else
   nIterations = 20;
 end
 
-%% Figures init
+%% Algo run
 
 nSolarCells = double(nUnits);
 
@@ -253,15 +253,32 @@ delete(port);
 %   fig(i).Position = [figPos(1)+figWidth, 1, figWidth, figHeigth];
 % end
 
-fig = figure;
-set(gcf, 'Position', get(0,'Screensize'));
-lengthOfData = length(posMem) / nData;
-for i = 1 : nUnits
-%   fig(i) = figure(i);
-  subplot(2,nUnits,i)
-  plot(tsMem, posMem(i:nUnits:end));
-  subplot(2,nUnits,i+nUnits)
-  plot(tsMem, powMem(i:nUnits:end));
+curUnit = 1;
+unitsLeft = nUnits;
+while unitsLeft >0
+  nFigs = min(unitsLeft, 4);
+  units = curUnit:1:nFigs+curUnit-1;
+  fig = figure;
+  set(gcf, 'Position', get(0,'Screensize'));
+  lengthOfData = length(posMem) / nData;
+  for i = 1 : nFigs
+    subplot(2,nFigs,i)
+    plot(posMem(i+curUnit-1:nUnits:end));
+    titleStr = ['Load [\Omega] - Unit ' num2str(curUnit+i-1)]; 
+    title(titleStr);
+    axes = axis;
+    axes(3) = 0;
+    axis(axes);
+    subplot(2,nFigs,i+nFigs)
+    plot(powMem(i+curUnit-1:nUnits:end));
+    titleStr = ['Power [W] - Unit ' num2str(curUnit+i-1)]; 
+    title(titleStr);
+    axes = axis;
+    axes(3) = 0;
+    axis(axes);
+  end
+  curUnit = curUnit + nFigs;
+  unitsLeft = unitsLeft - nFigs;
 end
 
 if ~isempty(adcMem)

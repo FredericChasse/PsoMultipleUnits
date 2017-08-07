@@ -54,6 +54,8 @@ extern const UINT8 unitAdcs[N_UNITS_TOTAL];
 #define UNIT_13_POT   (14)
 #define UNIT_14_POT   (15)
 
+extern const UINT8 unitsPwms[N_UNITS_TOTAL];
+
 #define UNIT_0_PWM    (1)
 #define UNIT_1_PWM    (2)
 #define UNIT_2_PWM    (3)

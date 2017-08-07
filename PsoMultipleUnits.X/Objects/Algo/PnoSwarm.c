@@ -98,7 +98,7 @@ INT8 _PnoSwarm_Init (PnoSwarm_t *pno, UnitArrayInterface_t *unitArray, PnoSwarmP
 //    pno->param[i].oscAmp = 2;
 //    pno->param[i].perturbOsc = 0.05;
     
-    pno->instances[i]->Init(pno->instances[i]->ctx, i, pno->param[i].delta, pno->param[i].uinit, pno->param[i].umin, pno->param[i].umax, pno->param[i].perturbOsc);
+    pno->instances[i]->Init(pno->instances[i]->ctx, i, pno->param[i].delta_int, pno->param[i].uinit_int, pno->param[i].umin_int, pno->param[i].umax_int, pno->param[i].perturbOsc);
     pno->instances[i]->SetSteadyState(pno->instances[i]->ctx, pno->param[i].nSamplesForSs, pno->param[i].oscAmp);
   }
 }
@@ -114,8 +114,8 @@ void _PnoSwarm_Release (PnoSwarm_t *pno)
   }
   pno->nInstances     = 0;
   pno->unitArray      = NULL;
-  pno->id = 0;
-  pno->iteration = 0;
+  pno->id             = 0;
+  pno->iteration      = 0;
 }
 
 

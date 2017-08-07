@@ -31,9 +31,13 @@
 typedef struct
 {
   float         delta;
+  INT16         delta_int;
   float         umin;
+  INT16         umin_int;
   float         umax;
+  INT16         umax_int;
   float         uinit;
+  INT16         uinit_int;
   UINT8         nSamplesForSs;
   UINT8         oscAmp;
   float         perturbOsc;
