@@ -39,7 +39,8 @@ typedef struct
 typedef struct
 {
   UINT32  iteration;
-  UINT16  intensities[N_UNITS_TOTAL];
+  INT16   intensities[N_UNITS_TOTAL];
+  INT16   initVal    [N_UNITS_TOTAL];
   UINT8   leds       [N_UNITS_TOTAL];
   UINT8   nLeds;
   UINT8               nPerturbs;
@@ -72,6 +73,7 @@ PerturbInstance_t _perturbs[N_PERTURB_TOTAL] =
 Perturb_t _perturb = 
 {
   .intensities  = {0}
+ ,.initVal      = {0}
  ,.iteration    = 0
  ,.nLeds        = N_UNITS_TOTAL
  ,.leds         = {0}
@@ -86,7 +88,7 @@ const PerturbInterface_t _perturb_if =
  ,.SetUnitIntensity   = (PerturbSetUnitIntensity_fct)   &_Perturb_SetUnitIntensity
  ,.GetUnitIntensity   = (PerturbGetUnitIntensity_fct)   &_Perturb_GetUnitIntensity
  ,.SetNewPerturb      = (PerturbSetNewPerturb_fct)      &_Perturb_SetNewPerturb
- ,.RemoveAllPerturbs  = (PerturbRemoveAllPerturbs_fct)  &_Perturb_RemoveAllPerturbs
+ ,.Reset              = (PerturbReset_fct)              &_Perturb_Reset
  ,.Run                = (PerturbRun_ftc)                &_Perturb_Run
 };
 
@@ -108,12 +110,14 @@ void _Perturb_Init (Perturb_t *p, UINT16 intensityInit)
     p->leds[i] = unitsPwms[i];
     SetLedDutyCycle(p->leds[i], intensityInit);
     p->intensities[i] = intensityInit;
+    p->initVal[i] = intensityInit;
   }
 }
 
 
 void _Perturb_SetUnitIntensity (Perturb_t *p, UINT8 unit, UINT16 intensity)
 {
+  intensity = MIN(intensity, MAX_LED_INTENSITY);
   p->intensities[unit] = intensity;
   SetLedDutyCycle(p->leds[unit], intensity);
 }
@@ -132,10 +136,10 @@ INT8 _Perturb_SetNewPerturb (Perturb_t *p, UINT8 *units, UINT8 nUnits, INT16 amp
     return -1;
   }
   
-  memcpy(p->perturbs[p->nPerturbs]->units, units, nUnits);
-  p->perturbs[p->nPerturbs]->nUnits = nUnits;
-  p->perturbs[p->nPerturbs]->amplitude = amplitude;
-  p->perturbs[p->nPerturbs]->iteration = iteration;
+  memcpy(p->perturbs[p->nPerturbs].units, units, nUnits);
+  p->perturbs[p->nPerturbs].nUnits = nUnits;
+  p->perturbs[p->nPerturbs].amplitude = amplitude;
+  p->perturbs[p->nPerturbs].iteration = iteration;
   p->nPerturbs++;
   
   return 0;
@@ -144,8 +148,15 @@ INT8 _Perturb_SetNewPerturb (Perturb_t *p, UINT8 *units, UINT8 nUnits, INT16 amp
 
 void _Perturb_Reset (Perturb_t *p)
 {
+  UINT8 i;
   p->nPerturbs = 0;
   p->iteration = 0;
+  
+  for (i = 0; i < p->nLeds; i++)
+  {
+    p->intensities[i] = p->initVal[i];
+    SetLedDutyCycle(p->leds[i], p->intensities[i]);
+  }
 }
 
 

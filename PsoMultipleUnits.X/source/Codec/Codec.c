@@ -376,6 +376,19 @@ DecoderReturnMsg_t _Codec_DecoderFsmStep (Codec_t *c, UINT8 *rxMsg)
             return DECODER_RET_MSG_NO_MSG;
           }
           
+        case SET_PERTURB:
+          c->decoder->state = S_DECODER_STANDBY;
+          if (sizeOfSetPerturbPayloadBase < sizeOfPayload) // Valid payload
+          {
+            if ((sizeOfPayload - sizeOfSetPerturbPayloadBase) == rxBuf[sizeOfSetPerturbPayloadBase-1])  // Valid payload
+            memcpy(rxMsg, rxBuf, sizeOfPayload);
+            return DECODER_RET_MSG_NEW_PERTURB;
+          }
+          else
+          {
+            return DECODER_RET_MSG_NO_MSG;
+          }
+          
         default:
           c->decoder->state = S_DECODER_STANDBY;
           return DECODER_RET_MSG_NO_MSG;

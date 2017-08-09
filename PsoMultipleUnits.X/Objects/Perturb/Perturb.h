@@ -24,7 +24,7 @@ typedef void    (*PerturbInit_fct)              (void *ctx, UINT16 intensityInit
 typedef void    (*PerturbSetUnitIntensity_fct)  (void *ctx, UINT8 unit, UINT16 intensity);
 typedef UINT16  (*PerturbGetUnitIntensity_fct)  (void *ctx, UINT8 unit);
 typedef INT8    (*PerturbSetNewPerturb_fct)     (void *ctx, UINT8 *units, UINT8 nUnits, INT16 amplitude, UINT32 iteration);
-typedef void    (*PerturbRemoveAllPerturbs_fct) (void *ctx);
+typedef void    (*PerturbReset_fct)             (void *ctx);
 typedef void    (*PerturbRun_ftc)               (void *ctx);
 
 typedef struct
@@ -34,7 +34,7 @@ typedef struct
   PerturbSetUnitIntensity_fct   SetUnitIntensity;
   PerturbGetUnitIntensity_fct   GetUnitIntensity;
   PerturbSetNewPerturb_fct      SetNewPerturb;
-  PerturbRemoveAllPerturbs_fct  RemoveAllPerturbs;
+  PerturbReset_fct              Reset;
   PerturbRun_ftc                Run;
 } PerturbInterface_t;
 

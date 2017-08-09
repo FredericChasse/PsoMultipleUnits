@@ -13,9 +13,10 @@ PROTOCOL_DELIMITER = uint8(126);
 NEW_RNG_SEED = uint8(0);
 START_ACQ = uint8(1);
 STOP_ACQ = uint8(2);
-UNITS_DATA = uint8(3);
-PSO_DATA = uint8(4);
-ADC_DATA = uint8(5);
+SET_PERTURB = uint8(3);
+UNITS_DATA = uint8(4);
+PSO_DATA = uint8(5);
+ADC_DATA = uint8(6);
 
 CLASSIC_PSO = uint8(0);
 PARALLEL_PSO = uint8(1);
@@ -86,6 +87,26 @@ seeds = typecast([seed1, seed2], 'uint8');
 
 buf = [delimiter, typeOfMsg, lengthOfPayload, seeds];
 fwrite(port, buf);
+
+% Perturb
+nPerturbs = 1;
+perturbAmps = [-100];
+perturbUnits = {0:1:15};
+perturbIterations = [25];
+
+perturbPayloadBaseLength = 4 + 2 + 1;
+delimiter = PROTOCOL_DELIMITER;
+typeOfMsg = SET_PERTURB;
+for i = 1 : nPerturb
+  iteration = typecast(uint32(perturbIterations(i)), 'uint8');
+  amplitude = typecast(uint16(perturbAmps(i)), 'uint8');
+  nUnits = uint8(length(perturbUnits{i}));
+  units = uint8(perturbUnits{i});
+  
+  lengthOfPayload = typecast(uint16(perturbPayloadBaseLength + length(perturbUnits{i})), 'uint8');
+  buf = [delimiter, typeOfMsg, lengthOfPayload, iteration, amplitude, nUnits, units];
+  fwrite(port, buf)
+end
 
 % Start algo
 typeOfMsg = START_ACQ;

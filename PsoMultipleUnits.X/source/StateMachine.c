@@ -330,8 +330,10 @@ void StateAcq(void)
   UINT8 retBuf[MAX_DECODER_LENGTH];
   DecoderReturnMsg_t ret;
   UINT8 nUnits;
-  UINT8 i;
+  UINT32 iteration;
+  INT16 amplitude;
   UINT8 units[N_UNITS_TOTAL];
+  UINT8 i;
   ret = codec->DecoderFsmStep(codec->ctx, retBuf);
   switch (ret)
   {
@@ -339,6 +341,14 @@ void StateAcq(void)
       memcpy(&seed1, &retBuf[0], 8);
       memcpy(&seed2, &retBuf[8], 8);
       Rng_InitSeed(seed1, seed2);
+      break;
+      
+    case DECODER_RET_MSG_NEW_PERTURB:
+      memcpy(&iteration , &retBuf[0], 4);       // UINT32
+      memcpy(&amplitude , &retBuf[4], 2);       // INT16
+      memcpy(&nUnits    , &retBuf[6], 1);       // UINT8
+      memcpy(&units[0]  , &retBuf[7], nUnits);  // UINT8 buffer
+      perturb->SetNewPerturb(perturb->ctx, units, nUnits, amplitude, iteration);
       break;
       
     case DECODER_RET_MSG_START_ALGO:
@@ -468,6 +478,7 @@ void StateAcq(void)
         {
           algoArray->RemoveUnitFromArray(algoArray->ctx, 0);
         }
+        perturb->Reset(perturb->ctx);
       }
       break;
       
@@ -542,6 +553,7 @@ void StateCompute(void)
   
   DBG2_ON;
   algo->Run(algo->ctx);
+  perturb->Run(perturb->ctx);
   ResetFilterValues();
   Adc.EnableInterrupts();
   DBG2_OFF;

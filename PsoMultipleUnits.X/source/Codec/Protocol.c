@@ -24,6 +24,8 @@
 
 const size_t sizeOfNewRngSeedPayload      = 16;
 
+const size_t sizeOfSetPerturbPayloadBase  = 7;
+
 const size_t sizeOfStartAcqPayloadBase    = 3;
 
 const size_t sizeOfStopAcqPayload         = 1;
