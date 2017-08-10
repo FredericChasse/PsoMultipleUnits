@@ -100,7 +100,7 @@ void _Perturb_Init (Perturb_t *p, UINT16 intensityInit)
 {
   UINT8 i;
   InitLedDriver();
-  for (i = 0; i < 16; i++)
+  for (i = 0; i < N_LED_TOTAL; i++)
   {
     SetLedDutyCycle(i, 0);
   }
@@ -165,7 +165,7 @@ void _Perturb_Run (Perturb_t *p)
   UINT8 i, j;
   PerturbInstance_t *pb;
   p->iteration++;
-  UINT16 intensity;
+  INT16 intensity;
   
   for (i = 0; i < p->nPerturbs; i++)
   {

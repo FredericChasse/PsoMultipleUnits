@@ -68,6 +68,7 @@ inline INT8 SetLedDutyCycle (UINT8 numLed, UINT16 dutyCycle);
 // Macro definitions
 //==============================================================================
 
+#define N_LED_TOTAL     (16)
 
 //==============================================================================
 // Variable declarations

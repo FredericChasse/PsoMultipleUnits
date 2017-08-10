@@ -89,17 +89,29 @@ buf = [delimiter, typeOfMsg, lengthOfPayload, seeds];
 fwrite(port, buf);
 
 % Perturb
-nPerturbs = 1;
-perturbAmps = [-100];
-perturbUnits = {0:1:15};
-perturbIterations = [25];
+nPerturbs = 0;
+
+if nPerturbs > 0
+  perturbAmps = zeros(1, nPerturbs);
+  perturbUnits = cell(1, nPerturbs);
+  perturbIterations = zeros(1, nPerturbs);
+  perturbAmps(1) = -100;
+  perturbUnits{1} = 0:1:14;
+  perturbIterations(1) = 25;
+end
+
+if nPerturbs >= 2
+  perturbUnits{2} = [4 7 8 10];
+  perturbAmps(2) = 100;
+  perturbIterations(2) = 40;
+end
 
 perturbPayloadBaseLength = 4 + 2 + 1;
 delimiter = PROTOCOL_DELIMITER;
 typeOfMsg = SET_PERTURB;
-for i = 1 : nPerturb
+for i = 1 : nPerturbs
   iteration = typecast(uint32(perturbIterations(i)), 'uint8');
-  amplitude = typecast(uint16(perturbAmps(i)), 'uint8');
+  amplitude = typecast(int16(perturbAmps(i)), 'uint8');
   nUnits = uint8(length(perturbUnits{i}));
   units = uint8(perturbUnits{i});
   
@@ -112,17 +124,19 @@ end
 typeOfMsg = START_ACQ;
 startAlgoChar = PROTOCOL_START_ALGO;
 % algo = CHARACTERIZATION;
-algo = CLASSIC_PSO;
+% algo = CLASSIC_PSO;
 % algo = PARALLEL_PSO;
 % algo = PARALLEL_PSO_MULTI_SWARM;
 % algo = MULTI_UNIT;
 % algo = EXTREMUM_SEEKING;
-% algo = PPSO_PNO;
+algo = PPSO_PNO;
 % algo = PNO;
 % algo = DEBUG_ADC;
 % units = uint8(3:1:10);
 % units = uint8([3:6 11:14]);
-units = uint8(0:1:15);
+% units = uint8(0:1:14);
+units = uint8([0:1:4 7:1:14]);
+unitsMem = units;
 nUnits = uint8(length(units));
 % lengthOfPayload = fliplr(typecast(uint16(3 + nUnits), 'uint8'));
 lengthOfPayload = typecast(uint16(3 + nUnits), 'uint8');
@@ -132,7 +146,7 @@ fwrite(port, buf);
 
 if algo == CHARACTERIZATION
   nIterations = 256;
-%   nIterations = 10;
+%   nIterations = 60;
 elseif algo == CLASSIC_PSO
   nIterations = 140;
 elseif algo == PARALLEL_PSO
@@ -255,51 +269,53 @@ delete(port);
 
 %% Figures
 
-% close all
-
-% tmpFig = figure;
-% set(gcf, 'Position', get(0,'Screensize'));
-% maxPos = tmpFig.Position;
-% close(tmpFig);
-% maxHeigth = maxPos(4);
-% maxWidth  = maxPos(3);
-% figHeigth = maxHeigth;
-% figWidth  = floor(maxWidth /nUnits);
-
-% fig(1) = figure(1);
-% fig(1).Position = [1 1 figWidth figHeigth];
-% for i = 2 : nUnits
-%   fig(i) = figure(i);
-%   figPos = fig(i-1).Position;
-%   fig(i).Position = [figPos(1)+figWidth, 1, figWidth, figHeigth];
-% end
-
-curUnit = 1;
-unitsLeft = nUnits;
-while unitsLeft >0
-  nFigs = min(unitsLeft, 4);
-  units = curUnit:1:nFigs+curUnit-1;
+if algo == CHARACTERIZATION
   fig = figure;
-  set(gcf, 'Position', get(0,'Screensize'));
-  lengthOfData = length(posMem) / nData;
-  for i = 1 : nFigs
-    subplot(2,nFigs,i)
-    plot(posMem(i+curUnit-1:nUnits:end));
-    titleStr = ['Load [\Omega] - Unit ' num2str(curUnit+i-1)]; 
-    title(titleStr);
-    axes = axis;
-    axes(3) = 0;
-    axis(axes);
-    subplot(2,nFigs,i+nFigs)
-    plot(powMem(i+curUnit-1:nUnits:end));
-    titleStr = ['Power [W] - Unit ' num2str(curUnit+i-1)]; 
-    title(titleStr);
-    axes = axis;
-    axes(3) = 0;
-    axis(axes);
+  legendStr = {};
+  subplot(2,1,1)
+  plot(posMem(1:nUnits:end));
+  subplot(2,1,2)
+  hold on
+  for i = 1 : nUnits
+    set(gcf, 'Position', get(0,'Screensize'));
+    lengthOfData = length(posMem) / nData;
+    plot(powMem(i:nUnits:end));
+    legendStr{i} = ['Unit ' num2str(unitsMem(i))];
   end
-  curUnit = curUnit + nFigs;
-  unitsLeft = unitsLeft - nFigs;
+  subplot(2,1,1)
+  title('External load [\Omega]')
+  subplot(2,1,2)
+  title('Power output [W]')
+  legend(legendStr)
+    
+else
+  curUnit = 1;
+  unitsLeft = nUnits;
+  while unitsLeft >0
+    nFigs = min(unitsLeft, 4);
+    units = curUnit:1:nFigs+curUnit-1;
+    fig = figure;
+    set(gcf, 'Position', get(0,'Screensize'));
+    lengthOfData = length(posMem) / nData;
+    for i = 1 : nFigs
+      subplot(2,nFigs,i)
+      plot(posMem(i+curUnit-1:nUnits:end));
+      titleStr = ['Load [\Omega] - Unit ' num2str(unitsMem(curUnit+i-1))]; 
+      title(titleStr);
+      axes = axis;
+      axes(3) = 0;
+      axis(axes);
+      subplot(2,nFigs,i+nFigs)
+      plot(powMem(i+curUnit-1:nUnits:end));
+      titleStr = ['Power [W] - Unit ' num2str(unitsMem(curUnit+i-1))]; 
+      title(titleStr);
+      axes = axis;
+      axes(3) = 0;
+      axis(axes);
+    end
+    curUnit = curUnit + nFigs;
+    unitsLeft = unitsLeft - nFigs;
+  end
 end
 
 if ~isempty(adcMem)

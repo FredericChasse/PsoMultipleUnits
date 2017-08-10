@@ -261,14 +261,9 @@ void StateInit(void)
   StartInterrupts();
   
   perturb->Init(perturb->ctx, 500);
-//  perturb->SetUnitIntensity(perturb->ctx, 0, 1000);
-//  perturb->SetUnitIntensity(perturb->ctx, 1, 1000);
-//  perturb->SetUnitIntensity(perturb->ctx, 2, 1000);
-//  SetPot(4, 0);
   
   while(oAcqOngoing);
   nSamples = 0;
-  ResetFilterValues();
   
 }
 
@@ -287,36 +282,17 @@ void StateAcq(void)
   if (oAdcReady)
   {
     oAdcReady = 0;
-
-//    GetAdcValues();
-
-//    while(oAcqOngoing);
-//    nSamples++;
-//    if (nSamples >= N_SAMPLES_PER_ADC_READ)
-//    {
-//      nSamples = 0;
-      
-//      sUartLineBuffer_t buf = {0};
-//      UINT8 string[6] = {'a','l','l','o','\r','\n'};
-//      memcpy(buf.buffer, string, 6);
-//      buf.length = 6;
-//      Uart.PutTxFifoBuffer(UART6, &buf);
-      
-//      DBG2_ON;
-      Adc.DisableInterrupts();
-      ComputeMeanAdcValues();
-//      DBG2_OFF;
-      if (oSessionActive)
-      {
-//        DBG1_ON;
-//        coreTickRate = Timer.Tic(2000000, SCALE_US);
-        oNewSample = 1;   // Go to stateCompute
-      }
-      else
-      {
-        Adc.EnableInterrupts();
-      }
-//    }
+    
+    Adc.DisableInterrupts();
+    ComputeMeanAdcValues();
+    if (oSessionActive)
+    {
+      oNewSample = 1;   // Go to StateCompute
+    }
+    else
+    {
+      Adc.EnableInterrupts();
+    }
   }
   
   //==================================================================
@@ -330,9 +306,9 @@ void StateAcq(void)
   UINT8 retBuf[MAX_DECODER_LENGTH];
   DecoderReturnMsg_t ret;
   UINT8 nUnits;
-  UINT32 iteration;
-  INT16 amplitude;
   UINT8 units[N_UNITS_TOTAL];
+  ProtocolSetPerturbPayload_t perturbPayload;
+  perturbPayload.units = units;
   UINT8 i;
   ret = codec->DecoderFsmStep(codec->ctx, retBuf);
   switch (ret)
@@ -344,11 +320,9 @@ void StateAcq(void)
       break;
       
     case DECODER_RET_MSG_NEW_PERTURB:
-      memcpy(&iteration , &retBuf[0], 4);       // UINT32
-      memcpy(&amplitude , &retBuf[4], 2);       // INT16
-      memcpy(&nUnits    , &retBuf[6], 1);       // UINT8
-      memcpy(&units[0]  , &retBuf[7], nUnits);  // UINT8 buffer
-      perturb->SetNewPerturb(perturb->ctx, units, nUnits, amplitude, iteration);
+      memcpy(&perturbPayload, &retBuf[0], sizeOfSetPerturbPayloadBase);
+      memcpy(&perturbPayload.units[0], &retBuf[sizeOfSetPerturbPayloadBase], perturbPayload.nUnits);  // UINT8 buffer
+      perturb->SetNewPerturb(perturb->ctx, perturbPayload.units, perturbPayload.nUnits, perturbPayload.amplitude, perturbPayload.iteration);
       break;
       
     case DECODER_RET_MSG_START_ALGO:
@@ -367,90 +341,80 @@ void StateAcq(void)
             oAlgoIsPso      = 1;
             oDbgAdc         = 0;
             oSessionActive  = 1;
-            while(oAcqOngoing);
-            nSamples        = 0;  // Reset the samples
-            ResetFilterValues();
             algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PSO_1D);
             algo->Init(algo->ctx, algoArray);
+            while(oAcqOngoing);
+            nSamples = 0;
             break;
             
           case PARALLEL_PSO_MULTI_SWARM:
             oAlgoIsPso      = 1;
             oDbgAdc         = 0;
             oSessionActive  = 1;
-            while(oAcqOngoing);
-            nSamples        = 0;  // Reset the samples
-            ResetFilterValues();
             algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PARALLEL_PSO_MULTI_SWARM);
             algo->Init(algo->ctx, algoArray);
+            while(oAcqOngoing);
+            nSamples = 0;
             break;
             
           case CHARACTERIZATION:
             oAlgoIsPso      = 0;
             oDbgAdc         = 0;
             oSessionActive  = 1;
-            while(oAcqOngoing);
-            nSamples        = 0;  // Reset the samples
-            ResetFilterValues();
             algo = (AlgoInterface_t *) CharacterizationInterface();
             algo->Init(algo->ctx, algoArray);
+            while(oAcqOngoing);
+            nSamples = 0;
             break;
             
           case PARALLEL_PSO:
             oAlgoIsPso      = 1;
             oDbgAdc         = 0;
             oSessionActive  = 1;
-            while(oAcqOngoing);
-            nSamples        = 0;  // Reset the samples
-            ResetFilterValues();
             algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PARALLEL_PSO);
             algo->Init(algo->ctx, algoArray);
+            while(oAcqOngoing);
+            nSamples = 0;
             break;
             
           case EXTREMUM_SEEKING:
             oAlgoIsPso      = 0;
             oDbgAdc         = 0;
             oSessionActive  = 1;
-            while(oAcqOngoing);
-            nSamples        = 0;  // Reset the samples
-            ResetFilterValues();
             algo = (AlgoInterface_t *) ExtremumSeekingInterface();
             algo->Init(algo->ctx, algoArray);
+            while(oAcqOngoing);
+            nSamples = 0;
             break;
             
           case PPSO_PNO:
             oAlgoIsPso      = 0;
             oDbgAdc         = 0;
             oSessionActive  = 1;
-            while(oAcqOngoing);
-            nSamples        = 0;  // Reset the samples
-            ResetFilterValues();
             algo = (AlgoInterface_t *) PpsoPnoInterface();
             algo->Init(algo->ctx, algoArray);
+            while(oAcqOngoing);
+            nSamples = 0;
             break;
             
           case PNO:
             oAlgoIsPso      = 0;
             oDbgAdc         = 0;
             oSessionActive  = 1;
-            while(oAcqOngoing);
-//            nSamples        = 0;  // Reset the samples
-//            ResetFilterValues();
             algo = (AlgoInterface_t *) PnoInterface();
             algo->Init(algo->ctx, algoArray);
-            ResetFilterValues();
+            while(oAcqOngoing);
+            nSamples = 0;
             break;
             
           case DEBUG_ADC:
             oAlgoIsPso      = 0;
             oDbgAdc         = 1;
             oSessionActive  = 1;
-            while(oAcqOngoing);
-//            nSamples        = 0;  // Reset the samples
-//            ResetFilterValues();
             algo = (AlgoInterface_t *) DebugAdcInterface();
             algo->Init(algo->ctx, algoArray);
-            ResetFilterValues();
+            while(oAcqOngoing);
+            nSamples = 0;
             break;
             
           default:
@@ -483,7 +447,7 @@ void StateAcq(void)
       break;
       
     default:
-      LED1_ON;
+//      LED1_ON;
     case DECODER_RET_MSG_NO_MSG:
       break;
   }
@@ -579,5 +543,6 @@ void StateError(void)
     LED2_TOGGLE;
     
     Timer.DelayMs(500);
+    Wdt.Clear();
   }
 }

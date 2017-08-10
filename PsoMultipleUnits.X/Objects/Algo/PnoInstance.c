@@ -146,6 +146,7 @@ float _PnoInstance_ComputePosSwarm (PnoInstance_t *pnoi, BOOL *oPerturbed)
   
   if (!SteadyStatePno_CheckForSteadyState(&pnoi->ss))
   {
+    *oPerturbed = 0;
     pnoi->pos.prevPos = pnoi->pos.curPos;
     pnoi->pos.curPos += pnoi->delta*pnoi->k;
     if (pnoi->pos.curPos > pnoi->umax)

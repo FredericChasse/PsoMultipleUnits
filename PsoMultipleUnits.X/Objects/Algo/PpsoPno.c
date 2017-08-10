@@ -141,6 +141,9 @@ INT8 _PpsoPno_Init (PpsoPno_t *pso, UnitArrayInterface_t *unitArray)
   pso->timeElapsed  = 0;
   pso->sampleTime   = SAMPLING_TIME_FLOAT;
   
+  pso->classifier = (ClassifierInterface_t *) ClassifierInterface();
+  pso->classifier->Init(pso->classifier->ctx, unitArray, 3*POT_STEP_VALUE);
+  
   pso->unitArray->GetPosLimits(pso->unitArray->ctx, &minPos, &maxPos);
   
   const PsoSwarmParam_t _swarmParam = 
@@ -151,7 +154,7 @@ INT8 _PpsoPno_Init (PpsoPno_t *pso, UnitArrayInterface_t *unitArray)
    ,.posMin                 = minPos
    ,.posMax                 = maxPos
    ,.minParticles           = 3
-   ,.perturbAmp             = 3*POT_STEP_VALUE
+   ,.perturbAmp             = 2*POT_STEP_VALUE
    ,.sentinelMargin         = 0.05
    ,.type                   = PSO_SWARM_TYPE_PARALLEL_PSO_MULTI_SWARM
    ,.nSamplesForSteadyState = 5
@@ -178,9 +181,9 @@ INT8 _PpsoPno_Init (PpsoPno_t *pso, UnitArrayInterface_t *unitArray)
   memcpy(&pso->swarmParam, &_swarmParam, sizeof(PsoSwarmParam_t));
   memcpy(&pso->pnoParam  , &_pnoParam  , sizeof(PnoSwarmParam_t));
   
-  swarmArray  = (UnitArrayInterface_t *) UnitArrayInterface();
+  swarmArray = (UnitArrayInterface_t *) UnitArrayInterface();
   swarmArray->Init(swarmArray->ctx, 1);
-  nUnits      = unitArray->GetNUnits(unitArray->ctx);
+  nUnits = unitArray->GetNUnits(unitArray->ctx);
   for (i = 0; i < nUnits; i++)
   {
     swarmArray->AddUnitToArray(swarmArray->ctx, unitArray->GetUnitHandle(unitArray->ctx, i));
