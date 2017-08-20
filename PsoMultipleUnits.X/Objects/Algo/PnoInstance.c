@@ -172,6 +172,10 @@ float _PnoInstance_ComputePosSwarm (PnoInstance_t *pnoi, BOOL *oPerturbed)
         *oPerturbed = 0;
       }
     }
+    else
+    {
+      *oPerturbed = 0;
+    }
     pnoi->pos.prevPos = pnoi->pos.curPos;
   }
   

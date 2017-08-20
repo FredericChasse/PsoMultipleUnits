@@ -80,24 +80,25 @@ delimiter = PROTOCOL_DELIMITER;
 typeOfMsg = NEW_RNG_SEED;
 % lengthOfPayload = fliplr(typecast(uint16(16), 'uint8'));
 lengthOfPayload = typecast(uint16(16), 'uint8');
-[seed1, seed2] = GenerateNewSeeds;
-% seed1 = uint64(6634093205851280027);
-% seed2 = uint64(9627091455319487185);
+% [seed1, seed2] = GenerateNewSeeds;
+seed1 = uint64(1799302888391068585);
+seed2 = uint64(10088183421295372486);
 seeds = typecast([seed1, seed2], 'uint8');
 
 buf = [delimiter, typeOfMsg, lengthOfPayload, seeds];
 fwrite(port, buf);
 
 % Perturb
-nPerturbs = 0;
+nPerturbs = 1;
 
 if nPerturbs > 0
   perturbAmps = zeros(1, nPerturbs);
   perturbUnits = cell(1, nPerturbs);
   perturbIterations = zeros(1, nPerturbs);
   perturbAmps(1) = -100;
-  perturbUnits{1} = 0:1:14;
-  perturbIterations(1) = 25;
+%   perturbUnits{1} = 0:1:3;
+  perturbUnits{1} = [0:1:4 7:1:14];
+  perturbIterations(1) = 50;
 end
 
 if nPerturbs >= 2

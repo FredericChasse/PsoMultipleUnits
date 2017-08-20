@@ -119,6 +119,8 @@ void _PpsoPno_Release (PpsoPno_t *pso)
     pso->pnos[i] = NULL;
   }
   
+  pso->classifier->Release(pso->classifier->ctx);
+  
   pso->iteration    = 0;
   pso->nParaSwarms  = 0;
   pso->nSeqSwarms   = 0;
@@ -224,9 +226,15 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
   UINT8 allIdxToRemove[N_UNITS_TOTAL][N_UNITS_TOTAL] = {0};
   UINT8 allIdxToRemoveSize[N_UNITS_TOTAL] = {0};
   
+  
   // <editor-fold defaultstate="collapsed" desc="Update algo values and classifier">
   pso->iteration++;
   pso->timeElapsed += pso->sampleTime;
+  
+  if (pso->iteration >= 27)
+  {
+    nIdxToRemove = 0;
+  }
   
   for (i = 0; i < nUnits; i++)
   {
@@ -494,7 +502,7 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
       }
     }
   }
-  if (i > 0)
+  if (pso->nPnos)
   {
     for (i = 0; i < pso->nPnos; i++)
     {
@@ -517,14 +525,14 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
         idxPerturbed[nPerturbed++] = array->GetUnitId(array->ctx, allIdxPerturbed[idx][iUnit]);
       }
       
-      swarm->Release(pno->ctx);
+      swarm->Release(swarm->ctx);
       _PpsoPno_ShiftSeqSwarmsLeft(pso, i);
       i--;
       pso->nSeqSwarms--;
       array->Release(array->ctx);
     }
   }
-  if (i > 0)
+  if (pso->nSeqSwarms)
   {
     for (i = 0; i < pso->nSeqSwarms; i++)
     {

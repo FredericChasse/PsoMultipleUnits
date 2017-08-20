@@ -28,6 +28,7 @@ typedef struct
 {
   UnitArrayInterface_t *unitArray;
   UINT8                 nUnits;
+  UINT8                 unitsIdToIdx[N_UNITS_TOTAL];
   Position_t            curPos[N_UNITS_TOTAL];
   Position_t            optPos[N_UNITS_TOTAL];
   float                 margin;
@@ -52,11 +53,12 @@ static int _CompareFunc         (const void *p1, const void *p2);
 
 Classifier_t _classifier = 
 {
-  .unitArray  = NULL
- ,.nUnits     = 0
- ,.curPos     = {0}
- ,.optPos     = {0}
- ,.margin     = 0.0f
+  .unitArray      = NULL
+ ,.nUnits         = 0
+ ,.unitsIdToIdx   = {0}
+ ,.curPos         = {0}
+ ,.optPos         = {0}
+ ,.margin         = 0.0f
 };
 
 const ClassifierInterface_t _classifier_if = 
@@ -82,6 +84,7 @@ INT8 _Classifier_Init (Classifier_t *c, UnitArrayInterface_t *unitArray, float m
   {
     return -1;
   }
+  
   c->unitArray = unitArray;
   c->nUnits    = unitArray->GetNUnits(unitArray->ctx);
   c->margin    = margin;
@@ -89,6 +92,7 @@ INT8 _Classifier_Init (Classifier_t *c, UnitArrayInterface_t *unitArray, float m
   {
     Position_Reset(&c->curPos[i]);
     Position_Reset(&c->optPos[i]);
+    c->unitsIdToIdx[c->unitArray->GetUnitId(c->unitArray->ctx, i)] = i;
   }
   return 0;
 }
@@ -96,7 +100,7 @@ INT8 _Classifier_Init (Classifier_t *c, UnitArrayInterface_t *unitArray, float m
 
 float _Classifier_GetBestPos (Classifier_t *c, UINT8 idx)
 {
-  return c->optPos[idx].curPos;
+  return c->optPos[c->unitsIdToIdx[idx]].curPos;
 }
 
 
@@ -146,8 +150,8 @@ INT8 _Classifier_ResetValues (Classifier_t *c, UINT8 *idx, UINT8 nIdx)
   
   for (i = 0; i < nIdx; i++)
   {
-    c->optPos[idx[i]].curPos = c->curPos[idx[i]].curPos;
-    c->optPos[idx[i]].curFitness = c->curPos[idx[i]].curFitness;
+    c->optPos[c->unitsIdToIdx[idx[i]]].curPos = c->curPos[c->unitsIdToIdx[idx[i]]].curPos;
+    c->optPos[c->unitsIdToIdx[idx[i]]].curFitness = c->curPos[c->unitsIdToIdx[idx[i]]].curFitness;
   }
   
   return 0;
@@ -169,12 +173,12 @@ INT16 _Classifier_Classify (Classifier_t *c, UINT8 *idx, UINT8 nIdx, UINT8 *grou
   
   for (i = 0; i < nIdx; i++)
   {
-    optPosSorted[i] = c->optPos[idx[i]].curPos;
+    optPosSorted[i] = c->optPos[c->unitsIdToIdx[idx[i]]].curPos;
   }
   
   memcpy(optPos, optPosSorted, 4*nIdx);
   
-  qsort( (void *) optPosSorted, (size_t) nIdx, sizeof(UINT8), &_CompareFunc);
+  qsort( (void *) optPosSorted, (size_t) nIdx, sizeof(float), &_CompareFunc);
   
 #define IDX_USED (N_UNITS_TOTAL+1)
   
@@ -250,15 +254,16 @@ void _Classifier_Release (Classifier_t *c)
   {
     Position_Reset(&c->curPos[i]);
     Position_Reset(&c->optPos[i]);
+    c->unitsIdToIdx[i] = 0;
   }
 }
 
 
 static int _CompareFunc (const void *p1, const void *p2)
 {
-  if ( *(float *) p1  > *(float *) p2 ) return -1;
+  if ( *(float *) p1  > *(float *) p2 ) return  1;
   if ( *(float *) p1 == *(float *) p2 ) return  0;
-  if ( *(float *) p1  < *(float *) p2 ) return  1;
+  if ( *(float *) p1  < *(float *) p2 ) return -1;
 }
 
 
