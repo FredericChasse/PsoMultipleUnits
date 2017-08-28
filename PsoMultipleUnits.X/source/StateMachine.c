@@ -66,7 +66,7 @@ sUartFifoBuffer_t matlabData =
 //BOOL oSmoothData = 1;
 BOOL oSmoothData = 0;
 BOOL oDbgAdc = 0;
-BOOL oSendAdcData = 0;
+UINT8 oSendAdcData = 0;
 
 volatile UINT16 nSamples = 0;
 
@@ -84,8 +84,9 @@ PerturbInterface_t *perturb;
 
 CodecInterface_t *codec;
 
-BOOL oSendPsoDbgData = 0;
+UINT8 oSendPsoDbgData = 1;
 BOOL oAlgoIsPso = 0;
+BOOL oAlgoIsPpsoPno = 0;
 
 UINT8 dbgIdx = 0;
 float dbgPos[3] = {320.5882,410.7843,948.0392};
@@ -319,6 +320,11 @@ void StateAcq(void)
       Rng_InitSeed(seed1, seed2);
       break;
       
+    case DECODER_RET_MSG_SET_DEBUG_DATA:
+      memcpy(&oSendPsoDbgData, &retBuf[0], sizeOfSetDebugDataPayloadBase);
+      memcpy(&oSendAdcData   , &retBuf[0], sizeOfSetDebugDataPayloadBase);
+      break;
+      
     case DECODER_RET_MSG_NEW_PERTURB:
       memcpy(&perturbPayload, &retBuf[0], sizeOfSetPerturbPayloadBase);
       memcpy(&perturbPayload.units[0], &retBuf[sizeOfSetPerturbPayloadBase], perturbPayload.nUnits);  // UINT8 buffer
@@ -340,6 +346,7 @@ void StateAcq(void)
           case CLASSIC_PSO:
             oAlgoIsPso      = 1;
             oDbgAdc         = 0;
+            oAlgoIsPpsoPno  = 0;
             oSessionActive  = 1;
             algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PSO_1D);
             algo->Init(algo->ctx, algoArray);
@@ -349,6 +356,7 @@ void StateAcq(void)
             
           case PARALLEL_PSO_MULTI_SWARM:
             oAlgoIsPso      = 1;
+            oAlgoIsPpsoPno  = 0;
             oDbgAdc         = 0;
             oSessionActive  = 1;
             algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PARALLEL_PSO_MULTI_SWARM);
@@ -359,6 +367,7 @@ void StateAcq(void)
             
           case CHARACTERIZATION:
             oAlgoIsPso      = 0;
+            oAlgoIsPpsoPno  = 0;
             oDbgAdc         = 0;
             oSessionActive  = 1;
             algo = (AlgoInterface_t *) CharacterizationInterface();
@@ -369,6 +378,7 @@ void StateAcq(void)
             
           case PARALLEL_PSO:
             oAlgoIsPso      = 1;
+            oAlgoIsPpsoPno  = 0;
             oDbgAdc         = 0;
             oSessionActive  = 1;
             algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PARALLEL_PSO);
@@ -379,6 +389,7 @@ void StateAcq(void)
             
           case EXTREMUM_SEEKING:
             oAlgoIsPso      = 0;
+            oAlgoIsPpsoPno  = 0;
             oDbgAdc         = 0;
             oSessionActive  = 1;
             algo = (AlgoInterface_t *) ExtremumSeekingInterface();
@@ -389,6 +400,7 @@ void StateAcq(void)
             
           case PPSO_PNO:
             oAlgoIsPso      = 0;
+            oAlgoIsPpsoPno  = 1;
             oDbgAdc         = 0;
             oSessionActive  = 1;
             algo = (AlgoInterface_t *) PpsoPnoInterface();
@@ -399,6 +411,7 @@ void StateAcq(void)
             
           case PNO:
             oAlgoIsPso      = 0;
+            oAlgoIsPpsoPno  = 0;
             oDbgAdc         = 0;
             oSessionActive  = 1;
             algo = (AlgoInterface_t *) PnoInterface();
@@ -409,6 +422,7 @@ void StateAcq(void)
             
           case DEBUG_ADC:
             oAlgoIsPso      = 0;
+            oAlgoIsPpsoPno  = 0;
             oDbgAdc         = 1;
             oSessionActive  = 1;
             algo = (AlgoInterface_t *) DebugAdcInterface();
@@ -419,6 +433,7 @@ void StateAcq(void)
             
           default:
             oAlgoIsPso      = 0;
+            oAlgoIsPpsoPno  = 0;
             oDbgAdc         = 0;
             for (i = 0; i < nUnits; i++)
             {
@@ -435,6 +450,7 @@ void StateAcq(void)
         DBG1_OFF;
         oSessionActive = 0;
         oAlgoIsPso     = 0;
+        oAlgoIsPpsoPno  = 0;
         oDbgAdc        = 0;
         algo->Release(algo->ctx);
         nUnits = algoArray->GetNUnits(algoArray->ctx);
@@ -472,9 +488,10 @@ void StateCompute(void)
         ;
   UINT8 nUnits = algoArray->GetNUnits(algoArray->ctx);
   
-  ProtocolUnitsDataPayload_t newUnitsPayload = {0};
-  ProtocolPsoDataPayload_t   newPsoPayload   = {0};
-  ProtocolAdcDataPayload_t   newAdcPayload   = {0};
+  ProtocolUnitsDataPayload_t    newUnitsPayload = {0};
+  ProtocolPsoDataPayload_t      newPsoPayload   = {0};
+  ProtocolAdcDataPayload_t      newAdcPayload   = {0};
+  ProtocolPpsoPnoDataPayload_t  newPpsoPnoPayload = {0};
   
   for (i = 0; i < nUnits; i++)
   {
@@ -504,6 +521,15 @@ void StateCompute(void)
     newPsoPayload.speed   = pSpeed;
     algo->GetDebugData(algo->ctx, &newPsoPayload);
     codec->CodeNewPsoMsg(codec->ctx, &newPsoPayload);
+  }
+  
+  if (oSendPsoDbgData && oAlgoIsPpsoPno)
+  {
+    algo->GetDebugData(algo->ctx, &newPpsoPnoPayload);
+    if (newPpsoPnoPayload.nGroups)
+    {
+      codec->CodeNewPpsoPnoMsg(codec->ctx, &newPpsoPnoPayload);
+    }
   }
   
   if ((nUnits==1) && oDbgAdc && oSendAdcData)

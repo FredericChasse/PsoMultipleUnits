@@ -20,6 +20,7 @@
 #include "Classifier.h"
 #include "PnoSwarm.h"
 #include "Potentiometer.h"
+#include "Protocol.h"       // For debugging
 
 
 // Private definitions
@@ -40,7 +41,48 @@ typedef struct
   PsoSwarmInterface_t *seqSwarms[N_UNITS_TOTAL];
   PsoSwarmInterface_t *paraSwarms[N_UNITS_TOTAL];
   ClassifierInterface_t *classifier;
+  ProtocolPpsoPnoDataPayload_t classifierGroups;
 } PpsoPno_t;
+
+#ifndef SEND_DEBUG_DATA_TO_UART
+#define SEND_DEBUG_DATA_TO_UART
+#endif
+
+const UINT8  strReleasing[] = "Releasing "
+            ,strReleasingLen = 10
+            ,strCreating[] = "Creating "
+            ,strCreatingLen = 9
+            ,strEnter[] = "\n\r"
+            ,strEnterLen = 2
+            ,strNSeqSwarms[] = "N seq swarms = "
+            ,strNSeqSwarmsLen = 15
+            ,strNPnos[] = "N P&O = "
+            ,strNPnosLen = 8
+            ,strNParaSwarms[] = "N para swarms = "
+            ,strNParaSwarmsLen = 16
+            ,strSpace = '0'
+            ,strSpaceLen = 1
+            ,strNumbers[N_UNITS_TOTAL] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E'}
+            ,strSwarmCreateError[] = "Creating overflow "
+            ,strSwarmCreateErrorLen = 18
+            ,strSwarmReleaseError[] = "Releasing void "
+            ,strSwarmReleaseErrorLen = 15
+            ,strSeqSwarm[] = "seq swarm"
+            ,strSeqSwarmLen = 9
+            ,strParaSwarm[] = "para swarm"
+            ,strParaSwarmLen = 10
+            ,strPnoSwarm[] = "pno swarm"
+            ,strPnoSwarmLen = 9
+            ,strInvalidParameter[] = "Invalid parameter!"
+            ,strInvalidParameterLen = 18
+            ;
+
+typedef enum
+{
+  DBG_PARA_SWARM
+ ,DBG_SEQ_SWARM
+ ,DBG_PNO
+} DbgDataType_t;
 
 
 // Private prototypes
@@ -50,12 +92,22 @@ INT8  _PpsoPno_Init               (PpsoPno_t *pso, UnitArrayInterface_t *unitArr
 INT8  _PpsoPno_Run                (PpsoPno_t *pso);
 float _PpsoPno_GetTimeElapsed     (PpsoPno_t *pso);
 void  _PpsoPno_Release            (PpsoPno_t *pso);
-void  _PpsoPno_GetDebugData       (PpsoPno_t *pso, void *ret);
+void  _PpsoPno_GetDebugData       (PpsoPno_t *pso, ProtocolPpsoPnoDataPayload_t *ret);
 
 void _PpsoPno_ShiftParaSwarmsLeft (PpsoPno_t *pso, UINT8 idxToShift);
 void _PpsoPno_ShiftSeqSwarmsLeft  (PpsoPno_t *pso, UINT8 idxToShift);
 void _PpsoPno_ShiftPnosLeft       (PpsoPno_t *pso, UINT8 idxToShift);
 static int _CompareFunc           (const void *p1, const void *p2);
+
+void _SendAlgoStatus              (PpsoPno_t *pso);
+void _SendCreatingSwarm           (PpsoPno_t *pso, DbgDataType_t type, UINT8 idx);
+void _SendReleasingSwarm          (PpsoPno_t *pso, DbgDataType_t type, UINT8 idx);
+void _SendAlgoStep                (PpsoPno_t *pso, UINT8 step);
+void _SendUnitsPos                (PpsoPno_t *pso);
+void _SendClassifierResults       (PpsoPno_t *pso);
+void _SendPerturbedUnits          (PpsoPno_t *pso, UINT8 *idx, UINT8 nUnits);
+void _SendUnitsToRemove           (PpsoPno_t *pso, UINT8 swarmId, UINT8 *units, UINT8 nUnits);
+void _SendSwarmPerturbedUnits     (PpsoPno_t *pso, DbgDataType_t type, UINT8 swarmId, UINT8 *units, UINT8 nUnits);
 
 
 // Private variables
@@ -63,19 +115,20 @@ static int _CompareFunc           (const void *p1, const void *p2);
 
 PpsoPno_t _ppsoPno = 
 {
-  .unitArray    = NULL
- ,.sampleTime   = SAMPLING_TIME_FLOAT
- ,.timeElapsed  = 0
- ,.iteration    = 0
- ,.nParaSwarms  = 0
- ,.nSeqSwarms   = 0
- ,.nPnos        = 0
- ,.paraSwarms   = {NULL}
- ,.seqSwarms    = {NULL}
- ,.pnos         = {NULL}
- ,.classifier   = NULL
- ,.swarmParam   = {NULL}
- ,.pnoParam     = {NULL}
+  .unitArray        = NULL
+ ,.sampleTime       = SAMPLING_TIME_FLOAT
+ ,.timeElapsed      = 0
+ ,.iteration        = 0
+ ,.nParaSwarms      = 0
+ ,.nSeqSwarms       = 0
+ ,.nPnos            = 0
+ ,.paraSwarms       = {NULL}
+ ,.seqSwarms        = {NULL}
+ ,.pnos             = {NULL}
+ ,.classifier       = NULL
+ ,.swarmParam       = {NULL}
+ ,.pnoParam         = {NULL}
+ ,.classifierGroups = {0, 0, {0}, {0}}
 };
 
 const AlgoInterface_t _ppsoPno_if =
@@ -92,9 +145,9 @@ const AlgoInterface_t _ppsoPno_if =
 // Private functions
 //==============================================================================
 
-void _PpsoPno_GetDebugData (PpsoPno_t *pso, void *ret)
+void _PpsoPno_GetDebugData (PpsoPno_t *pso, ProtocolPpsoPnoDataPayload_t *ret)
 {
-  return;
+  memcpy(ret, &pso->classifierGroups, sizeof(ProtocolPpsoPnoDataPayload_t));
 }
 
 
@@ -198,11 +251,14 @@ INT8 _PpsoPno_Init (PpsoPno_t *pso, UnitArrayInterface_t *unitArray)
   {
     unitArray->SetPos(unitArray->ctx, i, pso->paraSwarms[0]->GetParticlePos(pso->paraSwarms[0]->ctx, i));
   }
+  
+  pso->classifierGroups.nGroups = 0;
 }
 
 
 INT8 _PpsoPno_Run (PpsoPno_t *pso)
 {
+  // <editor-fold defaultstate="collapsed" desc="Init">
   UnitArrayInterface_t *array = pso->unitArray;
   PsoSwarmInterface_t *swarm;
   PnoSwarmInterface_t *pno;
@@ -215,7 +271,6 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
         ;
   BOOL oInSteadyState;
   UINT8 idxPerturbed[N_UNITS_TOTAL];
-  float fitness[N_UNITS_TOTAL];
   float nextPositions[N_UNITS_TOTAL];
   UINT32 nPerturbed;
   UINT32 iAlgo = 0;
@@ -226,20 +281,17 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
   UINT8 allIdxToRemove[N_UNITS_TOTAL][N_UNITS_TOTAL] = {0};
   UINT8 allIdxToRemoveSize[N_UNITS_TOTAL] = {0};
   
+  pso->classifierGroups.nGroups = 0;
+  
+#ifdef SEND_DEBUG_DATA_TO_UART
+  _SendAlgoStatus(pso);
+  _SendUnitsPos(pso);
+#endif
+  // </editor-fold>
   
   // <editor-fold defaultstate="collapsed" desc="Update algo values and classifier">
   pso->iteration++;
   pso->timeElapsed += pso->sampleTime;
-  
-  if (pso->iteration >= 27)
-  {
-    nIdxToRemove = 0;
-  }
-  
-  for (i = 0; i < nUnits; i++)
-  {
-    fitness[i] = array->GetPower(array->ctx, i);
-  }
   
   pso->classifier->UpdateValues(pso->classifier->ctx);
   // </editor-fold>
@@ -285,6 +337,9 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
     //-----------------------------------
     if (nIdxToRemove)
     {
+#ifdef SEND_DEBUG_DATA_TO_UART
+  _SendUnitsToRemove(pso, i, idxToRemove, nIdxToRemove);
+#endif
       memcpy(&allIdxToRemove[iAlgo][0], idxToRemove, nIdxToRemove);
       allIdxToRemoveSize[iAlgo] = nIdxToRemove;
     }
@@ -298,6 +353,9 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
     //-----------------------------------
     if (nPerturbed)
     {
+#ifdef SEND_DEBUG_DATA_TO_UART
+  _SendSwarmPerturbedUnits(pso, DBG_PARA_SWARM, i, idxPerturbed, nPerturbed);
+#endif
       memcpy(&allIdxPerturbed[iAlgo][0], idxPerturbed, nPerturbed);
       allIdxPerturbedSize[iAlgo] = nPerturbed;
     }
@@ -348,6 +406,9 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
     
     if (nPerturbed)
     {
+#ifdef SEND_DEBUG_DATA_TO_UART
+  _SendSwarmPerturbedUnits(pso, DBG_PNO, i, idxPerturbed, nPerturbed);
+#endif
       memcpy(&allIdxPerturbed[iAlgo][0], idxPerturbed, nPerturbed);
       allIdxPerturbedSize[iAlgo] = nPerturbed;
     }
@@ -397,6 +458,9 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
       //-----------------------------------
       if (nPerturbed)
       {
+#ifdef SEND_DEBUG_DATA_TO_UART
+  _SendSwarmPerturbedUnits(pso, DBG_SEQ_SWARM, i, idxPerturbed, nPerturbed);
+#endif
         memcpy(&allIdxPerturbed[iAlgo][0], idxPerturbed, nPerturbed);
         allIdxPerturbedSize[iAlgo] = nPerturbed;
       }
@@ -407,7 +471,7 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
       if (oInSteadyState)
       {
         nParticles = swarm->GetNParticles(swarm->ctx);
-        for (iUnit = 0; iUnit < nParticles; i++)
+        for (iUnit = 0; iUnit < nParticles; iUnit++)
         {
           swarm->SetParticlePos(swarm->ctx, iUnit, pso->classifier->GetBestPos(pso->classifier->ctx, array->GetUnitId(array->ctx, 0)));
         }
@@ -433,13 +497,13 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
   // <editor-fold defaultstate="collapsed" desc="Classifier">
   // Classifier
   //----------------------------------------------------------------------------
-  
   UINT8 algoIdxPerturbed[N_UNITS_TOTAL] = {0};
   UINT8 algoIdxPerturbedSize = 0;
   UINT8 tmp, idx;
   iAlgo = 0;
   nPerturbed = 0;
   
+  // <editor-fold defaultstate="collapsed" desc="Set the correct algo indexes">
   // Set the correct algo indexes
   //-----------------------------------
   if (pso->nPnos)
@@ -467,7 +531,10 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
     }
   }
   //-----------------------------------
+  // </editor-fold>
   
+  
+  // <editor-fold defaultstate="collapsed" desc="Assess perturbed P&O instances">
   // Assess perturbed P&O instances
   //-----------------------------------
   for (i = 0; i < pso->nPnos; i++)
@@ -492,12 +559,12 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
       }
       else
       {
+        qsort( (void *) &allIdxPerturbed[idx][0], (size_t) allIdxPerturbedSize[idx], sizeof(UINT8), &_CompareFunc);
         pno->RemoveInstances(pno->ctx, &allIdxPerturbed[idx][0], allIdxPerturbedSize[idx]);
         
-        qsort( (void *) &allIdxPerturbed[idx][0], (size_t) allIdxPerturbedSize[idx], sizeof(UINT8), &_CompareFunc);
-        for (iUnit = allIdxPerturbedSize[idx]; iUnit > 0; iUnit--)
+        for (iUnit = 0; iUnit < allIdxPerturbedSize[idx]; iUnit++)
         {
-          array->RemoveUnitFromArray(array->ctx, allIdxPerturbed[idx][iUnit-1]);
+          array->RemoveUnitFromArray(array->ctx, allIdxPerturbed[idx][iUnit]);
         }
       }
     }
@@ -510,7 +577,10 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
     }
   }
   //-----------------------------------
+  // </editor-fold>
   
+ 
+  // <editor-fold defaultstate="collapsed" desc="Assess perturbed Sequential PSO">
   // Assess perturbed Sequential PSO
   //-----------------------------------
   for (i = 0; i < pso->nSeqSwarms; i++)
@@ -540,39 +610,41 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
     }
   }
   //-----------------------------------
+  // </editor-fold>
   
+  
+  // <editor-fold defaultstate="collapsed" desc="Assess perturbed Parallel PSO">
   // Assess perturbed Parallel PSO
   //-----------------------------------
   void *units[N_UNITS_TOTAL];
   UnitArrayInterface_t *newArray;
+  UINT8 tmpUnitsToRemove[N_UNITS_TOTAL], nUnitsToRemove = 0;
   for (i = 0; i < pso->nParaSwarms; i++)
   {
     swarm = pso->paraSwarms[i];
     array = swarm->GetUnitArray(swarm->ctx);
     
-    if (allIdxToRemoveSize[i])
+    idx = algoIdxPerturbed[iAlgo++];
+    
+    if (allIdxToRemoveSize[idx])
     {
-      qsort( (void *) &allIdxToRemove[i][0], (size_t) allIdxToRemoveSize[idx], sizeof(UINT8), &_CompareFunc);
-      for (iUnit = 0; iUnit < allIdxToRemoveSize[i]; iUnit++)
+      qsort( (void *) &allIdxToRemove[idx][0], (size_t) allIdxToRemoveSize[idx], sizeof(UINT8), &_CompareFunc);
+      for (iUnit = 0; iUnit < allIdxToRemoveSize[idx]; iUnit++)
       {
-        nextPositions[iUnit] = swarm->GetParticlePos(swarm->ctx, allIdxToRemove[i][iUnit]);
-        units[iUnit] = array->GetUnitHandle(array->ctx, allIdxToRemove[i][iUnit]);
+        nextPositions[iUnit] = swarm->GetParticlePos(swarm->ctx, allIdxToRemove[idx][iUnit]);
+        units[iUnit] = array->GetUnitHandle(array->ctx, allIdxToRemove[idx][iUnit]);
       }
-//      swarm->RemoveParticles(swarm->ctx, &allIdxToRemove[i][0], allIdxToRemoveSize[i]);
       
       newArray = (UnitArrayInterface_t *) UnitArrayInterface();
-//      for (iUnit = allIdxToRemoveSize[i]; iUnit > 0; iUnit--)
-//      {
-//        array->RemoveUnitFromArray(array->ctx, allIdxToRemove[i][iUnit-1]);
-//      }
-      for (iUnit = 0; iUnit < allIdxToRemoveSize[i]; iUnit++)
+      
+      for (iUnit = 0; iUnit < allIdxToRemoveSize[idx]; iUnit++)
       {
         newArray->AddUnitToArray(newArray->ctx, units[iUnit]);
       }
       
-      pso->pnos[pso->nPnos++] = (PnoSwarmInterface_t *) PnoSwarmInterface();
-      pno = pso->pnos[pso->nPnos - 1];
-      pno->Init(pno->ctx, newArray, &pso->pnoParam, pso->nPnos-1);
+      pso->pnos[pso->nPnos] = (PnoSwarmInterface_t *) PnoSwarmInterface();
+      pno = pso->pnos[pso->nPnos];
+      pno->Init(pno->ctx, newArray, &pso->pnoParam, pso->nPnos++);
       nUnits = pno->GetNInstances(pno->ctx);
       for (iUnit = 0; iUnit < nUnits; iUnit++)
       {
@@ -581,8 +653,6 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
       }
     }
     
-    idx = algoIdxPerturbed[iAlgo++];
-    
     if (allIdxPerturbedSize[idx])
     {
       for (iUnit = 0; iUnit < allIdxPerturbedSize[idx]; iUnit++)
@@ -590,10 +660,10 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
         idxPerturbed[nPerturbed++] = array->GetUnitId(array->ctx, allIdxPerturbed[idx][iUnit]);
       }
       
-      if (allIdxToRemove[i])
+      if (allIdxToRemoveSize[idx])
       {
-        memcpy(&allIdxPerturbed[idx][allIdxPerturbedSize[idx]], &allIdxToRemove[i][0], allIdxToRemoveSize[i]);
-        allIdxPerturbedSize[idx] += allIdxToRemoveSize[i];
+        memcpy(&allIdxPerturbed[idx][allIdxPerturbedSize[idx]], &allIdxToRemove[idx][0], allIdxToRemoveSize[idx]);
+        allIdxPerturbedSize[idx] += allIdxToRemoveSize[idx];
       }
       
       nUnits = swarm->GetNParticles(swarm->ctx);
@@ -607,6 +677,7 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
       }
       else if ((nUnits - allIdxPerturbedSize[idx]) < pso->swarmParam.minParticles)
       {
+        qsort( (void *) &allIdxPerturbed[idx][0], (size_t) allIdxPerturbedSize[idx], sizeof(UINT8), &_CompareFunc);
         swarm->RemoveParticles(swarm->ctx, &allIdxPerturbed[idx][0], allIdxPerturbedSize[idx]);
         for (iUnit = 0; iUnit < allIdxPerturbedSize[idx]; iUnit++)
         {
@@ -625,8 +696,8 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
         pso->nParaSwarms--;
         i--;
         pso->pnos[pso->nPnos] = (PnoSwarmInterface_t *) PnoSwarmInterface();
-        pno = pso->pnos[pso->nPnos++];
-        pno->Init(pno->ctx, newArray, &pso->pnoParam, pso->nPnos - 1);
+        pno = pso->pnos[pso->nPnos];
+        pno->Init(pno->ctx, newArray, &pso->pnoParam, pso->nPnos++);
         for (iUnit = 0; iUnit < nUnits; iUnit++)
         {
           pno->SetPos(pno->ctx, iUnit, nextPositions[iUnit]);
@@ -634,6 +705,7 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
       }
       else
       {
+        qsort( (void *) &allIdxPerturbed[idx][0], (size_t) allIdxPerturbedSize[idx], sizeof(UINT8), &_CompareFunc);
         swarm->RemoveParticles(swarm->ctx, &allIdxPerturbed[idx][0], allIdxPerturbedSize[idx]);
         for (iUnit = 0; iUnit < allIdxPerturbedSize[idx]; iUnit++)
         {
@@ -641,10 +713,10 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
         }
       }
     }
-    else if (allIdxToRemoveSize[i])
+    else if (allIdxToRemoveSize[idx])
     {
       nUnits = swarm->GetNParticles(swarm->ctx);
-      if (allIdxToRemoveSize[i] == nUnits)
+      if (allIdxToRemoveSize[idx] == nUnits)
       {
         swarm->Release(swarm->ctx);
         array->Release(array->ctx);
@@ -652,12 +724,12 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
         pso->nParaSwarms--;
         i--;
       }
-      else if ((nUnits - allIdxToRemoveSize[i]) < pso->swarmParam.minParticles)
+      else if ((nUnits - allIdxToRemoveSize[idx]) < pso->swarmParam.minParticles)
       {
-        swarm->RemoveParticles(swarm->ctx, &allIdxToRemove[i][0], allIdxToRemoveSize[i]);
-        for (iUnit = 0; iUnit < allIdxToRemoveSize[i]; iUnit++)
+        swarm->RemoveParticles(swarm->ctx, &allIdxToRemove[idx][0], allIdxToRemoveSize[idx]);
+        for (iUnit = 0; iUnit < allIdxToRemoveSize[idx]; iUnit++)
         {
-          array->RemoveUnitFromArray(array->ctx, allIdxToRemove[i][iUnit]);
+          array->RemoveUnitFromArray(array->ctx, allIdxToRemove[idx][iUnit]);
         }
         nUnits = swarm->GetNParticles(swarm->ctx);
         newArray = (UnitArrayInterface_t *) UnitArrayInterface();
@@ -672,8 +744,8 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
         pso->nParaSwarms--;
         i--;
         pso->pnos[pso->nPnos] = (PnoSwarmInterface_t *) PnoSwarmInterface();
-        pno = pso->pnos[pso->nPnos++];
-        pno->Init(pno->ctx, newArray, &pso->pnoParam, pso->nPnos - 1);
+        pno = pso->pnos[pso->nPnos];
+        pno->Init(pno->ctx, newArray, &pso->pnoParam, pso->nPnos++);
         for (iUnit = 0; iUnit < nUnits; iUnit++)
         {
           pno->SetPos(pno->ctx, iUnit, nextPositions[iUnit]);
@@ -681,16 +753,26 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
       }
       else
       {
-        swarm->RemoveParticles(swarm->ctx, &allIdxToRemove[i][0], allIdxToRemoveSize[idx]);
+        swarm->RemoveParticles(swarm->ctx, &allIdxToRemove[idx][0], allIdxToRemoveSize[idx]);
         for (iUnit = 0; iUnit < allIdxToRemoveSize[idx]; iUnit++)
         {
-          array->RemoveUnitFromArray(array->ctx, allIdxToRemove[i][iUnit]);
+          array->RemoveUnitFromArray(array->ctx, allIdxToRemove[idx][iUnit]);
         }
       }
     }
   }
+  if (pso->nParaSwarms)
+  {
+    for (i = 0; i < pso->nParaSwarms; i++)
+    {
+      pso->paraSwarms[i]->SetId(pso->paraSwarms[i]->ctx, i);
+    }
+  }
   //-----------------------------------
+  // </editor-fold>
   
+  
+  // <editor-fold defaultstate="collapsed" desc="Reposition perturbed units">
   // Reposition perturbed units
   //-----------------------------------
   UINT8 groups[N_UNITS_TOTAL];
@@ -699,13 +781,25 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
   UINT32 offset = 0;
   if (nPerturbed)
   {
+#ifdef SEND_DEBUG_DATA_TO_UART
+  _SendPerturbedUnits(pso, idxPerturbed, nPerturbed);
+#endif
     nGroups = pso->classifier->Classify(pso->classifier->ctx, idxPerturbed, nPerturbed, groups, lengths);
+    if (nGroups)
+    {
+      pso->classifierGroups.iteration = pso->iteration;
+      pso->classifierGroups.nGroups = nGroups;
+      memcpy(pso->classifierGroups.groups, groups, N_UNITS_TOTAL);
+      memcpy(pso->classifierGroups.groupLengths, lengths, N_UNITS_TOTAL);
+#ifdef SEND_DEBUG_DATA_TO_UART
+  _SendClassifierResults(pso);
+#endif
+    }
     pso->classifier->ResetValues(pso->classifier->ctx, idxPerturbed, nPerturbed);
     array = pso->unitArray;
     
     for (iGroup = 0; iGroup < nGroups; iGroup++)
     {
-      
       if (lengths[iGroup] < pso->swarmParam.minParticles)   // Sequential PSO
       {
         for (iUnit = 0; iUnit < lengths[iGroup]; iUnit++)
@@ -723,7 +817,6 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
       else  // Parallel PSO
       {
         newArray = array->CreateSubArray(array->ctx, &groups[offset], lengths[iGroup]);
-        offset += lengths[iGroup];
         pso->paraSwarms[pso->nParaSwarms] = (PsoSwarmInterface_t *) PsoSwarmInterface();
         swarm = pso->paraSwarms[pso->nParaSwarms];
         pso->swarmParam.type = PSO_SWARM_TYPE_PARALLEL_PSO_MULTI_SWARM;
@@ -733,10 +826,12 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
         {
           newArray->SetPos(newArray->ctx, iUnit, swarm->GetParticlePos(swarm->ctx, iUnit));
         }
+        offset += lengths[iGroup];
       }
     }
   }
   //-----------------------------------
+  // </editor-fold>
   
   //----------------------------------------------------------------------------
   // </editor-fold>
@@ -789,6 +884,469 @@ static int _CompareFunc (const void *p1, const void *p2)
   if ( *(UINT8 *) p1  > *(UINT8 *) p2 ) return -1;
   if ( *(UINT8 *) p1 == *(UINT8 *) p2 ) return  0;
   if ( *(UINT8 *) p1  < *(UINT8 *) p2 ) return  1;
+}
+
+
+void _SendAlgoStatus (PpsoPno_t *pso)
+{
+  sUartLineBuffer_t buf = {0};
+  
+  if (pso->nParaSwarms > N_UNITS_TOTAL || pso->nPnos > N_UNITS_TOTAL || pso->nSeqSwarms > N_UNITS_TOTAL)
+  {
+    const UINT8 strErrorPso[] = "Wrong PSO parameters\n\r", strErrorPsoLen = 22;
+    memcpy(&buf.buffer[0], strErrorPso, strErrorPsoLen);
+    buf.length = strErrorPsoLen;
+    while(Uart.PutTxFifoBuffer(U_DBG, &buf) < 0);
+    return;
+  }
+  
+  const UINT8 strIteration[] = "i = ", strIterationLen = 4;
+  memcpy(&buf.buffer[0], strIteration, strIterationLen);
+  buf.length = strIterationLen;
+  buf.length += sprintf(&buf.buffer[buf.length], "%i", pso->iteration);
+  while (Uart.PutTxFifoBuffer(U_DBG, &buf) < 0);
+  
+  memcpy(&buf.buffer[0], strEnter, strEnterLen);
+  buf.length = strEnterLen;
+  
+  memcpy(&buf.buffer[buf.length], strNParaSwarms, strNParaSwarmsLen);
+  buf.length += strNParaSwarmsLen;
+  buf.buffer[buf.length] = strNumbers[pso->nParaSwarms];
+  buf.length++;
+  memcpy(&buf.buffer[buf.length], strEnter, strEnterLen);
+  buf.length += strEnterLen;
+  
+  memcpy(&buf.buffer[buf.length], strNSeqSwarms, strNSeqSwarmsLen);
+  buf.length += strNSeqSwarmsLen;
+  buf.buffer[buf.length] = strNumbers[pso->nSeqSwarms];
+  buf.length++;
+  memcpy(&buf.buffer[buf.length], strEnter, strEnterLen);
+  buf.length += strEnterLen;
+  
+  memcpy(&buf.buffer[buf.length], strNPnos, strNPnosLen);
+  buf.length += strNPnosLen;
+  buf.buffer[buf.length] = strNumbers[pso->nPnos];
+  buf.length++;
+  memcpy(&buf.buffer[buf.length], strEnter, strEnterLen);
+  buf.length += strEnterLen;
+  
+  memcpy(&buf.buffer[buf.length], strEnter, strEnterLen);
+  buf.length += strEnterLen;
+  
+  while (Uart.PutTxFifoBuffer(U_DBG, &buf) < 0);
+  while (!Uart.Var.uartTxFifo[U_DBG_IDX].bufEmpty);
+}
+
+
+void _SendCreatingSwarm (PpsoPno_t *pso, DbgDataType_t type, UINT8 idx)
+{
+  sUartLineBuffer_t buf = {0};
+  switch (type)
+  {
+    case DBG_PARA_SWARM:
+      if (idx >= N_UNITS_TOTAL || pso->nParaSwarms >= (N_UNITS_TOTAL - 1))
+      {
+        memcpy(&buf.buffer[0], strSwarmCreateError, strSwarmCreateErrorLen);
+        buf.length = strSwarmCreateErrorLen;
+        memcpy(&buf.buffer[buf.length], strParaSwarm, strParaSwarmLen);
+        buf.length += strParaSwarmLen;
+        memcpy(&buf.buffer[buf.length], strEnter, strEnterLen);
+        buf.length += strEnterLen;
+      }
+      else
+      {
+        memcpy(&buf.buffer[0], strCreating, strCreatingLen);
+        buf.length = strCreatingLen;
+        memcpy(&buf.buffer[buf.length], strParaSwarm, strParaSwarmLen);
+        buf.length += strParaSwarmLen;
+        buf.buffer[buf.length] = strSpace;
+        buf.length++;
+        buf.buffer[buf.length] = strNumbers[idx];
+        buf.length++;
+        memcpy(&buf.buffer[buf.length], strEnter, strEnterLen);
+        buf.length += strEnterLen;
+      }
+      break;
+      
+    case DBG_SEQ_SWARM:
+      if (idx >= N_UNITS_TOTAL || pso->nSeqSwarms >= (N_UNITS_TOTAL - 1))
+      {
+        memcpy(&buf.buffer[0], strSwarmCreateError, strSwarmCreateErrorLen);
+        buf.length = strSwarmCreateErrorLen;
+        memcpy(&buf.buffer[buf.length], strSeqSwarm, strSeqSwarmLen);
+        buf.length += strSeqSwarmLen;
+        memcpy(&buf.buffer[buf.length], strEnter, strEnterLen);
+        buf.length += strEnterLen;
+      }
+      else
+      {
+        memcpy(&buf.buffer[0], strCreating, strCreatingLen);
+        buf.length = strCreatingLen;
+        memcpy(&buf.buffer[buf.length], strSeqSwarm, strSeqSwarmLen);
+        buf.length += strSeqSwarmLen;
+        buf.buffer[buf.length] = strSpace;
+        buf.length++;
+        buf.buffer[buf.length] = strNumbers[idx];
+        buf.length++;
+        memcpy(&buf.buffer[buf.length], strEnter, strEnterLen);
+        buf.length += strEnterLen;
+      }
+      break;
+      
+    case DBG_PNO:
+      if (idx >= N_UNITS_TOTAL || pso->nPnos >= (N_UNITS_TOTAL - 1))
+      {
+        memcpy(&buf.buffer[0], strSwarmCreateError, strSwarmCreateErrorLen);
+        buf.length = strSwarmCreateErrorLen;
+        memcpy(&buf.buffer[buf.length], strPnoSwarm, strPnoSwarmLen);
+        buf.length += strPnoSwarmLen;
+        memcpy(&buf.buffer[buf.length], strEnter, strEnterLen);
+        buf.length += strEnterLen;
+      }
+      else
+      {
+        memcpy(&buf.buffer[0], strCreating, strCreatingLen);
+        buf.length = strCreatingLen;
+        memcpy(&buf.buffer[buf.length], strPnoSwarm, strPnoSwarmLen);
+        buf.length += strPnoSwarmLen;
+        buf.buffer[buf.length] = strSpace;
+        buf.length++;
+        buf.buffer[buf.length] = strNumbers[idx];
+        buf.length++;
+        memcpy(&buf.buffer[buf.length], strEnter, strEnterLen);
+        buf.length += strEnterLen;
+      }
+      break;
+      
+    default:
+      memcpy(&buf.buffer[0], strInvalidParameter, strInvalidParameterLen);
+      buf.length = strInvalidParameterLen;
+      break;
+  }
+  
+  memcpy(&buf.buffer[buf.length], strEnter, strEnterLen);
+  buf.length += strEnterLen;
+  
+  while (Uart.PutTxFifoBuffer(U_DBG, &buf) < 0);
+  while (!Uart.Var.uartTxFifo[U_DBG_IDX].bufEmpty);
+}
+
+
+void _SendReleasingSwarm (PpsoPno_t *pso, DbgDataType_t type, UINT8 idx)
+{
+  sUartLineBuffer_t buf = {0};
+  switch (type)
+  {
+    case DBG_PARA_SWARM:
+      if (pso->paraSwarms[idx] == 0 || pso->nParaSwarms <= idx)
+      {
+        memcpy(&buf.buffer[0], strSwarmReleaseError, strSwarmReleaseErrorLen);
+        buf.length = strSwarmReleaseErrorLen;
+        memcpy(&buf.buffer[buf.length], strParaSwarm, strParaSwarmLen);
+        buf.length += strParaSwarmLen;
+        memcpy(&buf.buffer[buf.length], strEnter, strEnterLen);
+        buf.length += strEnterLen;
+      }
+      else
+      {
+        memcpy(&buf.buffer[0], strReleasing, strReleasingLen);
+        buf.length = strReleasingLen;
+        memcpy(&buf.buffer[buf.length], strParaSwarm, strParaSwarmLen);
+        buf.length += strParaSwarmLen;
+        buf.buffer[buf.length] = strSpace;
+        buf.length++;
+        buf.buffer[buf.length] = strNumbers[idx];
+        buf.length++;
+        memcpy(&buf.buffer[buf.length], strEnter, strEnterLen);
+        buf.length += strEnterLen;
+      }
+      break;
+      
+    case DBG_SEQ_SWARM:
+      if (pso->seqSwarms[idx] == 0 || pso->nSeqSwarms <= idx)
+      {
+        memcpy(&buf.buffer[0], strSwarmReleaseError, strSwarmReleaseErrorLen);
+        buf.length = strSwarmReleaseErrorLen;
+        memcpy(&buf.buffer[buf.length], strSeqSwarm, strSeqSwarmLen);
+        buf.length += strSeqSwarmLen;
+        memcpy(&buf.buffer[buf.length], strEnter, strEnterLen);
+        buf.length += strEnterLen;
+      }
+      else
+      {
+        memcpy(&buf.buffer[0], strReleasing, strReleasingLen);
+        buf.length = strReleasingLen;
+        memcpy(&buf.buffer[buf.length], strSeqSwarm, strSeqSwarmLen);
+        buf.length += strSeqSwarmLen;
+        buf.buffer[buf.length] = strSpace;
+        buf.length++;
+        buf.buffer[buf.length] = strNumbers[idx];
+        buf.length++;
+        memcpy(&buf.buffer[buf.length], strEnter, strEnterLen);
+        buf.length += strEnterLen;
+      }
+      break;
+      
+    case DBG_PNO:
+      if (pso->pnos[idx] == 0 || pso->nPnos <= idx)
+      {
+        memcpy(&buf.buffer[0], strSwarmReleaseError, strSwarmReleaseErrorLen);
+        buf.length = strSwarmReleaseErrorLen;
+        memcpy(&buf.buffer[buf.length], strPnoSwarm, strPnoSwarmLen);
+        buf.length += strPnoSwarmLen;
+        memcpy(&buf.buffer[buf.length], strEnter, strEnterLen);
+        buf.length += strEnterLen;
+      }
+      else
+      {
+        memcpy(&buf.buffer[0], strReleasing, strReleasingLen);
+        buf.length = strReleasingLen;
+        memcpy(&buf.buffer[buf.length], strPnoSwarm, strPnoSwarmLen);
+        buf.length += strPnoSwarmLen;
+        buf.buffer[buf.length] = strSpace;
+        buf.length++;
+        buf.buffer[buf.length] = strNumbers[idx];
+        buf.length++;
+        memcpy(&buf.buffer[buf.length], strEnter, strEnterLen);
+        buf.length += strEnterLen;
+      }
+      break;
+      
+    default:
+      memcpy(&buf.buffer[0], strInvalidParameter, strInvalidParameterLen);
+      buf.length = strInvalidParameterLen;
+      break;
+  }
+  
+  memcpy(&buf.buffer[buf.length], strEnter, strEnterLen);
+  buf.length += strEnterLen;
+  
+  while (Uart.PutTxFifoBuffer(U_DBG, &buf) < 0);
+  while (!Uart.Var.uartTxFifo[U_DBG_IDX].bufEmpty);
+}
+
+
+void _SendAlgoStep (PpsoPno_t *pso, UINT8 step)
+{
+  sUartLineBuffer_t buf;
+  
+  buf.length = sprintf(buf.buffer, "Step %i\n\r", step);
+  while (Uart.PutTxFifoBuffer(U_DBG, &buf) < 0);
+  while (!Uart.Var.uartTxFifo[U_DBG_IDX].bufEmpty);
+}
+
+
+void _SendUnitsPos (PpsoPno_t *pso)
+{
+  UINT8 i, j, nUnits, id;
+  PsoSwarmInterface_t *swarm;
+  PnoSwarmInterface_t *pno;
+  sUartLineBuffer_t buf = {0};
+  UnitArrayInterface_t *array;
+  
+  for (i = 0; i < pso->nParaSwarms; i++)
+  {
+    memcpy(&buf.buffer[buf.length], strParaSwarm, strParaSwarmLen);
+    buf.length += strParaSwarmLen;
+    buf.buffer[buf.length++] = strNumbers[i];
+    buf.buffer[buf.length++] = ':';
+    swarm = pso->paraSwarms[i];
+    array = swarm->GetUnitArray(swarm->ctx);
+    nUnits = array->GetNUnits(array->ctx);
+    for (j = 0; j < nUnits; j++)
+    {
+      buf.buffer[buf.length++] = ' ';
+      id = array->GetUnitId(array->ctx, j);
+      buf.buffer[buf.length++] = strNumbers[id];
+    }
+    buf.buffer[buf.length++] = '\n';
+    buf.buffer[buf.length++] = '\r';
+  }
+  if (buf.length)
+  {
+    while(Uart.PutTxFifoBuffer(U_DBG, &buf) < 0);
+  }
+  
+  buf.length = 0;
+  for (i = 0; i < pso->nSeqSwarms; i++)
+  {
+    memcpy(&buf.buffer[buf.length], strSeqSwarm, strSeqSwarmLen);
+    buf.length += strSeqSwarmLen;
+    buf.buffer[buf.length++] = strNumbers[i];
+    buf.buffer[buf.length++] = ':';
+    swarm = pso->seqSwarms[i];
+    array = swarm->GetUnitArray(swarm->ctx);
+    nUnits = array->GetNUnits(array->ctx);
+    for (j = 0; j < nUnits; j++)
+    {
+      buf.buffer[buf.length++] = ' ';
+      id = array->GetUnitId(array->ctx, j);
+      buf.buffer[buf.length++] = strNumbers[id];
+    }
+    buf.buffer[buf.length++] = '\n';
+    buf.buffer[buf.length++] = '\r';
+  }
+  if (buf.length)
+  {
+    while(Uart.PutTxFifoBuffer(U_DBG, &buf) < 0);
+  }
+  
+  buf.length = 0;
+  for (i = 0; i < pso->nPnos; i++)
+  {
+    memcpy(&buf.buffer[buf.length], strPnoSwarm, strPnoSwarmLen);
+    buf.length += strPnoSwarmLen;
+    buf.buffer[buf.length++] = strNumbers[i];
+    buf.buffer[buf.length++] = ':';
+    pno = pso->pnos[i];
+    array = pno->GetArray(pno->ctx);
+    nUnits = array->GetNUnits(array->ctx);
+    for (j = 0; j < nUnits; j++)
+    {
+      buf.buffer[buf.length++] = ' ';
+      id = array->GetUnitId(array->ctx, j);
+      buf.buffer[buf.length++] = strNumbers[id];
+    }
+    buf.buffer[buf.length++] = '\n';
+    buf.buffer[buf.length++] = '\r';
+  }
+  buf.buffer[buf.length++] = '\n';
+  buf.buffer[buf.length++] = '\r';
+  while(Uart.PutTxFifoBuffer(U_DBG, &buf) < 0);
+  while(!Uart.Var.uartTxFifo[U_DBG_IDX].bufEmpty);
+}
+
+
+void _SendPerturbedUnits (PpsoPno_t *pso, UINT8 *idx, UINT8 nUnits)
+{
+  sUartLineBuffer_t buf = {0};
+  UnitArrayInterface_t *array = pso->unitArray;
+  UINT8 i;
+  const UINT8 strPerturbedUnits[] = "Perturbed units = ", strPerturbedUnitsLen = 18;
+  
+  memcpy(&buf.buffer[buf.length], strPerturbedUnits, strPerturbedUnitsLen);
+  buf.length += strPerturbedUnitsLen;
+  
+  for (i = 0; i < nUnits; i++)
+  {
+    buf.buffer[buf.length++] = strNumbers[array->GetUnitId(array->ctx, i)];
+    buf.buffer[buf.length++] = ' ';
+  }
+  buf.buffer[buf.length++] = '\n';
+  buf.buffer[buf.length++] = '\r';
+  
+  while (Uart.PutTxFifoBuffer(U_DBG, &buf) < 0);
+  while (!Uart.Var.uartTxFifo[U_DBG_IDX].bufEmpty);
+}
+
+
+void _SendClassifierResults (PpsoPno_t *pso)
+{
+  sUartLineBuffer_t buf = {0};
+  UINT8 i, j, offset = 0;;
+  const UINT8  strGroup[]   = "Group "
+              ,strGroupLen  = 6
+              ,strEqual[]   = " = "
+              ,strEqualLen  = 3
+              ;
+  
+  for (i = 0; i < pso->classifierGroups.nGroups; i++)
+  {
+    memcpy(&buf.buffer[buf.length], strGroup, strGroupLen);
+    buf.length += strGroupLen;
+    buf.buffer[buf.length++] = strNumbers[i];
+    memcpy(&buf.buffer[buf.length], strEqual, strEqualLen);
+    buf.length += strEqualLen;
+    for (j = 0; j < pso->classifierGroups.groupLengths[i]; j++)
+    {
+      buf.buffer[buf.length++] = strNumbers[pso->classifierGroups.groups[j + offset]];
+      buf.buffer[buf.length++] = ' ';
+    }
+    offset += pso->classifierGroups.groupLengths[i];
+    buf.buffer[buf.length++] = '\n';
+    buf.buffer[buf.length++] = '\r';
+  }
+  buf.buffer[buf.length++] = '\n';
+  buf.buffer[buf.length++] = '\r';
+  
+  while (Uart.PutTxFifoBuffer(U_DBG, &buf) < 0);
+  while (!Uart.Var.uartTxFifo[U_DBG_IDX].bufEmpty);
+}
+
+
+void _SendSwarmPerturbedUnits(PpsoPno_t *pso, DbgDataType_t type, UINT8 swarmId, UINT8 *units, UINT8 nUnits)
+{
+  sUartLineBuffer_t buf = {0};
+  UINT8 i;
+  const UINT8  strErrorMsg[]        = "Wrong parameter!\n\r"
+              ,strErrorMsgLen       = 18
+              ,strPerturbedUnits[]  = " perturbed units: "
+              ,strPerturbedUnitsLen = 18;
+              ;
+  
+  switch(type)
+  {
+    case DBG_PARA_SWARM:
+      memcpy(&buf.buffer[buf.length], strParaSwarm, strParaSwarmLen);
+      buf.length += strParaSwarmLen;
+      break;
+    case DBG_SEQ_SWARM:
+      memcpy(&buf.buffer[buf.length], strSeqSwarm, strSeqSwarmLen);
+      buf.length += strSeqSwarmLen;
+      break;
+    case DBG_PNO:
+      memcpy(&buf.buffer[buf.length], strPnoSwarm, strPnoSwarmLen);
+      buf.length += strPnoSwarmLen;
+      break;
+    default:
+      memcpy(&buf.buffer[buf.length], strErrorMsg, strErrorMsgLen);
+      buf.length = strErrorMsgLen;
+      while (Uart.PutTxFifoBuffer(U_DBG, &buf) < 0);
+  }
+  
+  buf.buffer[buf.length++] = strNumbers[swarmId];
+  memcpy(&buf.buffer[buf.length], strPerturbedUnits, strPerturbedUnitsLen);
+  buf.length += strPerturbedUnitsLen;
+  
+  for (i = 0; i < nUnits; i++)
+  {
+    buf.buffer[buf.length++] = strNumbers[units[i]];
+    buf.buffer[buf.length++] = ' ';
+  }
+  buf.buffer[buf.length++] = '\n';
+  buf.buffer[buf.length++] = '\r';
+  
+  while (Uart.PutTxFifoBuffer(U_DBG, &buf) < 0);
+  while (!Uart.Var.uartTxFifo[U_DBG_IDX].bufEmpty);
+}
+
+
+void _SendUnitsToRemove (PpsoPno_t *pso, UINT8 swarmId, UINT8 *units, UINT8 nUnits)
+{
+  sUartLineBuffer_t buf = {0};
+  UINT8 i;
+  const UINT8  strRemoveUnits[]  = " units to remove: "
+              ,strRemoveUnitsLen = 18;
+              ;
+  
+  memcpy(&buf.buffer[buf.length], strParaSwarm, strParaSwarmLen);
+  buf.length += strParaSwarmLen;
+  
+  buf.buffer[buf.length++] = strNumbers[swarmId];
+  
+  memcpy(&buf.buffer[buf.length], strRemoveUnits, strRemoveUnitsLen);
+  buf.length += strRemoveUnitsLen;
+  
+  for (i = 0; i < nUnits; i++)
+  {
+    buf.buffer[buf.length++] = strNumbers[units[i]];
+    buf.buffer[buf.length++] = ' ';
+  }
+  buf.buffer[buf.length++] = '\n';
+  buf.buffer[buf.length++] = '\r';
+  
+  while (Uart.PutTxFifoBuffer(U_DBG, &buf) < 0);
+  while (!Uart.Var.uartTxFifo[U_DBG_IDX].bufEmpty);
 }
 
 

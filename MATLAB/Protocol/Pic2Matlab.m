@@ -7,32 +7,34 @@ delete(f);
 
 %% Constants
 
-% PROTOCOL_DELIMITER = uint8(hex2num('7E'));
-PROTOCOL_DELIMITER = uint8(126);
+PROTOCOL_DELIMITER        = uint8(126);
 
-NEW_RNG_SEED = uint8(0);
-START_ACQ = uint8(1);
-STOP_ACQ = uint8(2);
-SET_PERTURB = uint8(3);
-UNITS_DATA = uint8(4);
-PSO_DATA = uint8(5);
-ADC_DATA = uint8(6);
+NEW_RNG_SEED              = uint8(0);
+START_ACQ                 = uint8(1);
+STOP_ACQ                  = uint8(2);
+SET_PERTURB               = uint8(3);
+SET_DEBUG_DATA            = uint8(4);
+UNITS_DATA                = uint8(5);
+PSO_DATA                  = uint8(6);
+ADC_DATA                  = uint8(7);
+PPSO_PNO_DATA             = uint8(8);
 
-CLASSIC_PSO = uint8(0);
-PARALLEL_PSO = uint8(1);
-PARALLEL_PSO_MULTI_SWARM = uint8(2);
-MULTI_UNIT = uint8(3);
-EXTREMUM_SEEKING = uint8(4);
-CHARACTERIZATION = uint8(5);
-PPSO_PNO = uint8(6);
-PNO = uint8(7);
-DEBUG_ADC = uint8(8);
+CLASSIC_PSO               = uint8(0);
+PARALLEL_PSO              = uint8(1);
+PARALLEL_PSO_MULTI_SWARM  = uint8(2);
+MULTI_UNIT                = uint8(3);
+EXTREMUM_SEEKING          = uint8(4);
+CHARACTERIZATION          = uint8(5);
+PPSO_PNO                  = uint8(6);
+PNO                       = uint8(7);
+DEBUG_ADC                 = uint8(8);
 
-PROTOCOL_START_ALGO = uint8('!' - 0);
+PROTOCOL_START_ALGO       = uint8('!' - 0);
+PROTOCOL_STOP_ALGO        = uint8('x' - 0);
 
-PROTOCOL_STOP_ALGO = uint8('x' - 0);
+SIZE_OF_PROTOCOL_HEADER   = 4;
 
-SIZE_OF_PROTOCOL_HEADER = 4;
+N_UNITS_TOTAL             = 15;
 
 %% Port setup
 
@@ -78,11 +80,10 @@ fopen(port);
 % RNG Seed
 delimiter = PROTOCOL_DELIMITER;
 typeOfMsg = NEW_RNG_SEED;
-% lengthOfPayload = fliplr(typecast(uint16(16), 'uint8'));
 lengthOfPayload = typecast(uint16(16), 'uint8');
 % [seed1, seed2] = GenerateNewSeeds;
-seed1 = uint64(1799302888391068585);
-seed2 = uint64(10088183421295372486);
+seed1 = uint64(14373098484861655346);
+seed2 = uint64(2396346581266420478);
 seeds = typecast([seed1, seed2], 'uint8');
 
 buf = [delimiter, typeOfMsg, lengthOfPayload, seeds];
@@ -98,6 +99,7 @@ if nPerturbs > 0
   perturbAmps(1) = -100;
 %   perturbUnits{1} = 0:1:3;
   perturbUnits{1} = [0:1:4 7:1:14];
+%   perturbUnits{1} = [0:1:14];
   perturbIterations(1) = 50;
 end
 
@@ -146,32 +148,45 @@ buf = [delimiter, typeOfMsg, lengthOfPayload, startAlgoChar, algo, nUnits, units
 fwrite(port, buf);
 
 if algo == CHARACTERIZATION
+  oSendDebugData = uint8(0);
   nIterations = 256;
 %   nIterations = 60;
 elseif algo == CLASSIC_PSO
+  oSendDebugData = uint8(0);
   nIterations = 140;
 elseif algo == PARALLEL_PSO
+  oSendDebugData = uint8(0);
   nIterations = 60;
 elseif algo == PARALLEL_PSO_MULTI_SWARM
+  oSendDebugData = uint8(0);
   nIterations = 130;
 elseif algo == PPSO_PNO
+  oSendDebugData = uint8(1);
   nIterations = 130;
+%   nIterations = 60;
 elseif algo == PNO
+  oSendDebugData = uint8(0);
   nIterations = 40;
 elseif algo == DEBUG_ADC
-  nIterations = 2*25;
+  oSendDebugData = uint8(1);
+  nIterations = 25;
 else
+  oSendDebugData = uint8(0);
   nIterations = 20;
 end
+
+
+% Send debug data or not
+delimiter = PROTOCOL_DELIMITER;
+typeOfMsg = SET_DEBUG_DATA;
+lengthOfPayload = typecast(uint16(1), 'uint8');
+oSendDebugData = typecast(oSendDebugData, 'uint8');
+buf = [delimiter, typeOfMsg, lengthOfPayload, oSendDebugData];
+fwrite(port, buf);
 
 %% Algo run
 
 nSolarCells = double(nUnits);
-
-% Wait for the user to stop the program
-% stopBtn = 0;
-% f = figure(i+1);
-% b = uicontrol('style','push','string','Stop','callback','stopBtn=stopBtn+1');
 
 tsMem  = [];
 posMem = [];
@@ -186,9 +201,10 @@ adcMem = [];
 
 tic
 wbh = waitbar(0, ['Iteration : ' num2str(0) '/' num2str(nIterations)]);  % Waitbar handle
-for iIteration = 1 : nIterations
-  % header
-%   buf = fread(port, SIZE_OF_PROTOCOL_HEADER, 'uint8');
+
+iIteration = 0;
+while iIteration <= nIterations
+  waitbar(iIteration/nIterations, wbh, ['Iteration: ' num2str(iIteration) '/' num2str(nIterations)])
   buf = fread(port, SIZE_OF_PROTOCOL_HEADER);
   delimiter = buf(1);
   typeOfMsg = buf(2);
@@ -197,6 +213,7 @@ for iIteration = 1 : nIterations
   %payload
   buf = fread(port, lengthOfPayload, 'uint8');
   if typeOfMsg == UNITS_DATA
+    iIteration = iIteration + 1;
     timestamp = typecast(typecast(uint8(buf(1:4)'), 'uint32'), 'single');
     nUnits = buf(5);
     nData = buf(6);
@@ -244,9 +261,25 @@ for iIteration = 1 : nIterations
       data = typecast(uint8(buf(5:end)'), 'uint16');
       adcMem = [adcMem data];
     end
+      
+  elseif typeOfMsg == PPSO_PNO_DATA
+    algoIteration = double(typecast(uint8(buf(1:2)'), 'uint16'));
+    nGroups = buf(3);
+    groups = buf(4:3+N_UNITS_TOTAL);
+    groupLengths = buf(N_UNITS_TOTAL+4 : 3 + N_UNITS_TOTAL + N_UNITS_TOTAL);
     
+    if nGroups > 0
+      groups = groups';
+      groupOffset = 0;
+      fprintf(['Sim iteration = ' num2str(iIteration) '\n']);
+      fprintf(['Algo iteration = ' num2str(algoIteration) '\n']);
+      for iGroup = 1 : nGroups
+        fprintf(['Group ' num2str(iGroup) ' = ' num2str(groups(1 + groupOffset : groupOffset + groupLengths(iGroup))) '\n'])
+        groupOffset = groupOffset + groupLengths(iGroup);
+      end
+      fprintf('\n')
+    end
   end
-  waitbar(iIteration/nIterations, wbh, ['Iteration: ' num2str(iIteration) '/' num2str(nIterations)])
 end
 toc
 close(wbh)
@@ -262,7 +295,7 @@ fwrite(port, buf);
 % Remove contents of input buffer
 flushinput(port);
 
-% Disconnect from instrument object, obj1.
+% Disconnect from instrument object.
 fclose(port);
 
 % Clean up all objects.

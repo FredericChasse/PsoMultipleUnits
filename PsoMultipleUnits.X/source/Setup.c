@@ -266,18 +266,18 @@ void InitUart (void)
   UartFifoMode_t     oFifoMode      = UART_INTERRUPT_ON_TX_BUFFER_EMPTY | UART_INTERRUPT_ON_RX_NOT_EMPTY;
   UartLineCtrlMode_t oLineControl   = UART_DATA_SIZE_8_BITS | UART_PARITY_NONE | UART_STOP_BITS_1;
 
-  Uart.Open(UART3, BAUD9600  , oConfigDbg, oFifoMode, oLineControl);   // Open UART 3 as : 9600 BAUD, 1 stop bit, no parity and 8 bits data
-  Uart.Open(UART6, BAUD115200, oConfigMatlab, oFifoMode, oLineControl);   // Open UART 6 as : 9600 BAUD, 1 stop bit, no parity and 8 bits data
+  Uart.Open(U_DBG, BAUD57600  , oConfigDbg, oFifoMode, oLineControl);   // Open UART 3 as : 9600 BAUD, 1 stop bit, no parity and 8 bits data
+  Uart.Open(U_MATLAB, BAUD115200, oConfigMatlab, oFifoMode, oLineControl);   // Open UART 6 as : 9600 BAUD, 1 stop bit, no parity and 8 bits data
 //  Uart.Open(UART6, BAUD9600, oConfigMatlab, oFifoMode, oLineControl);   // Open UART 6 as : 9600 BAUD, 1 stop bit, no parity and 8 bits data
 
-  Uart.EnableRx(UART3);
-  Uart.EnableRx(UART6);
+  Uart.EnableRx(U_DBG);
+  Uart.EnableRx(U_MATLAB);
 
-  Uart.EnableTx(UART3);
-  Uart.EnableTx(UART6);
+  Uart.EnableTx(U_DBG);
+  Uart.EnableTx(U_MATLAB);
 
-  Uart.ConfigInterrupt(UART3, UART3_INTERRUPT_PRIORITY, UART3_INTERRUPT_SUBPRIORITY);
-  Uart.ConfigInterrupt(UART6, UART6_INTERRUPT_PRIORITY, UART6_INTERRUPT_SUBPRIORITY);
+  Uart.ConfigInterrupt(U_DBG, UART3_INTERRUPT_PRIORITY, UART3_INTERRUPT_SUBPRIORITY);
+  Uart.ConfigInterrupt(U_MATLAB, UART6_INTERRUPT_PRIORITY, UART6_INTERRUPT_SUBPRIORITY);
   
 }
 

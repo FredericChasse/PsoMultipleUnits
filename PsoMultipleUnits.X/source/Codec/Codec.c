@@ -53,11 +53,12 @@ typedef struct
 // Private prototypes
 //==============================================================================
 
-UINT8               _Codec_Init             (Codec_t *c, UartModule_t uartChannel);
-DecoderReturnMsg_t  _Codec_DecoderFsmStep   (Codec_t *c, UINT8 *rxMsg);
-UINT8               _Codec_CodeNewUnitsMsg  (Codec_t *c, ProtocolUnitsDataPayload_t *newMsg);
-UINT8               _Codec_CodeNewPsoMsg    (Codec_t *c, ProtocolPsoDataPayload_t *newMsg);
-UINT8               _Codec_CodeNewAdcMsg    (Codec_t *c, ProtocolAdcDataPayload_t *newMsg);
+UINT8               _Codec_Init                 (Codec_t *c, UartModule_t uartChannel);
+DecoderReturnMsg_t  _Codec_DecoderFsmStep       (Codec_t *c, UINT8 *rxMsg);
+UINT8               _Codec_CodeNewUnitsMsg      (Codec_t *c, ProtocolUnitsDataPayload_t *newMsg);
+UINT8               _Codec_CodeNewPsoMsg        (Codec_t *c, ProtocolPsoDataPayload_t *newMsg);
+UINT8               _Codec_CodeNewPpsoPnoMsg    (Codec_t *c, ProtocolPpsoPnoDataPayload_t *newMsg);
+UINT8               _Codec_CodeNewAdcMsg        (Codec_t *c, ProtocolAdcDataPayload_t *newMsg);
 
 // Private variables
 //==============================================================================
@@ -70,12 +71,13 @@ UINT8        _decoderArray[MAX_DECODER_LENGTH];
 
 const CodecInterface_t _codec_if = 
 {
-  .ctx              = (void *)                    &_codec
- ,.Init             = (CodecInit_fct)             &_Codec_Init
- ,.DecoderFsmStep   = (CodecDecoderFsmStep_fct)   &_Codec_DecoderFsmStep
- ,.CodeNewUnitsMsg  = (CodecCodeNewUnitsMsg_fct)  &_Codec_CodeNewUnitsMsg
- ,.CodeNewPsoMsg    = (CodecCodeNewPsoMsg_fct)    &_Codec_CodeNewPsoMsg
- ,.CodeNewAdcMsg    = (CodecCodeNewAdcMsg_fct)    &_Codec_CodeNewAdcMsg
+  .ctx                  = (void *)                        &_codec
+ ,.Init                 = (CodecInit_fct)                 &_Codec_Init
+ ,.DecoderFsmStep       = (CodecDecoderFsmStep_fct)       &_Codec_DecoderFsmStep
+ ,.CodeNewUnitsMsg      = (CodecCodeNewUnitsMsg_fct)      &_Codec_CodeNewUnitsMsg
+ ,.CodeNewPsoMsg        = (CodecCodeNewPsoMsg_fct)        &_Codec_CodeNewPsoMsg
+ ,.CodeNewPpsoPnoMsg    = (CodecCodeNewPpsoPnoMsg_fct)    &_Codec_CodeNewPpsoPnoMsg
+ ,.CodeNewAdcMsg        = (CodecCodeNewAdcMsg_fct)        &_Codec_CodeNewAdcMsg
 };
 
 // Private functions
@@ -161,6 +163,36 @@ UINT8 _Codec_CodeNewAdcMsg (Codec_t *c, ProtocolAdcDataPayload_t *newMsg)
     
     left -= tmpLen;
   }
+  
+  return 0;
+}
+
+UINT8 _Codec_CodeNewPpsoPnoMsg (Codec_t *c, ProtocolPpsoPnoDataPayload_t *newMsg)
+{
+  sUartLineBuffer_t buf = {0};
+  
+  ProtocolHeader_t header = 
+  {
+    .delimiter        = PROTOCOL_DELIMITER
+   ,.type             = PPSO_PNO_DATA
+   ,.lengthOfPayload  = sizeOfPpsoPnoDataPayloadBase
+  };
+  memcpy(&buf.buffer[0], &header, sizeOfProtocolHeader);
+  buf.length += sizeOfProtocolHeader;
+  
+  memcpy(&buf.buffer[buf.length], &newMsg->iteration, sizeOfPpsoPnoIteration);
+  buf.length += sizeOfPpsoPnoIteration;
+  
+  memcpy(&buf.buffer[buf.length], &newMsg->nGroups, sizeOfPpsoPnoNGroups);
+  buf.length += sizeOfPpsoPnoNGroups;
+  
+  memcpy(&buf.buffer[buf.length], &newMsg->groups, sizeOfPpsoPsoGroups);
+  buf.length += sizeOfPpsoPsoGroups;
+  
+  memcpy(&buf.buffer[buf.length], &newMsg->groupLengths, sizeOfPpsoPsoGroupLengths);
+  buf.length += sizeOfPpsoPsoGroupLengths;
+  
+  while(Uart.PutTxFifoBuffer(c->uartChannel, &buf) < 0);
   
   return 0;
 }
@@ -383,6 +415,18 @@ DecoderReturnMsg_t _Codec_DecoderFsmStep (Codec_t *c, UINT8 *rxMsg)
             if ((sizeOfPayload - sizeOfSetPerturbPayloadBase) == rxBuf[sizeOfSetPerturbPayloadBase-1])  // Valid payload
             memcpy(rxMsg, rxBuf, sizeOfPayload);
             return DECODER_RET_MSG_NEW_PERTURB;
+          }
+          else
+          {
+            return DECODER_RET_MSG_NO_MSG;
+          }
+          
+        case SET_DBG_DATA:
+          c->decoder->state = S_DECODER_STANDBY;
+          if (sizeOfSetDebugDataPayloadBase == sizeOfPayload)
+          {
+            memcpy(rxMsg, rxBuf, sizeOfPayload);
+            return DECODER_RET_MSG_SET_DEBUG_DATA;
           }
           else
           {

@@ -37,22 +37,25 @@ typedef enum
  ,DECODER_RET_MSG_START_ALGO
  ,DECODER_RET_MSG_STOP_ALGO
  ,DECODER_RET_MSG_NEW_PERTURB
+ ,DECODER_RET_MSG_SET_DEBUG_DATA
 } DecoderReturnMsg_t;
 
-typedef UINT8               (*CodecInit_fct)            (void *ctx, UartModule_t uartChannel);
-typedef DecoderReturnMsg_t  (*CodecDecoderFsmStep_fct)  (void *ctx, UINT8 *rxMsg);
-typedef UINT8               (*CodecCodeNewUnitsMsg_fct) (void *ctx, ProtocolUnitsDataPayload_t *newMsg);
-typedef UINT8               (*CodecCodeNewPsoMsg_fct)   (void *ctx, ProtocolPsoDataPayload_t *newMsg);
-typedef UINT8               (*CodecCodeNewAdcMsg_fct)   (void *ctx, ProtocolAdcDataPayload_t *newMsg);
+typedef UINT8               (*CodecInit_fct)                (void *ctx, UartModule_t uartChannel);
+typedef DecoderReturnMsg_t  (*CodecDecoderFsmStep_fct)      (void *ctx, UINT8 *rxMsg);
+typedef UINT8               (*CodecCodeNewUnitsMsg_fct)     (void *ctx, ProtocolUnitsDataPayload_t *newMsg);
+typedef UINT8               (*CodecCodeNewPsoMsg_fct)       (void *ctx, ProtocolPsoDataPayload_t *newMsg);
+typedef UINT8               (*CodecCodeNewPpsoPnoMsg_fct)   (void *ctx, ProtocolPpsoPnoDataPayload_t *newMsg);
+typedef UINT8               (*CodecCodeNewAdcMsg_fct)       (void *ctx, ProtocolAdcDataPayload_t *newMsg);
 
 typedef struct
 {
-  void                     *ctx;
-  CodecInit_fct             Init;
-  CodecDecoderFsmStep_fct   DecoderFsmStep;
-  CodecCodeNewUnitsMsg_fct  CodeNewUnitsMsg;
-  CodecCodeNewPsoMsg_fct    CodeNewPsoMsg;
-  CodecCodeNewAdcMsg_fct    CodeNewAdcMsg;
+  void                       *ctx;
+  CodecInit_fct               Init;
+  CodecDecoderFsmStep_fct     DecoderFsmStep;
+  CodecCodeNewUnitsMsg_fct    CodeNewUnitsMsg;
+  CodecCodeNewPsoMsg_fct      CodeNewPsoMsg;
+  CodecCodeNewPpsoPnoMsg_fct  CodeNewPpsoPnoMsg;
+  CodecCodeNewAdcMsg_fct      CodeNewAdcMsg;
 } CodecInterface_t;
 
 // Public functions

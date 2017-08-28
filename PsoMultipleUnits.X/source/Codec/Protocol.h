@@ -35,10 +35,12 @@ typedef enum
  ,START_ACQ     = 0x01
  ,END_ACQ       = 0x02
  ,SET_PERTURB   = 0x03
+ ,SET_DBG_DATA  = 0x04
   
- ,UNITS_DATA    = 0x04
- ,PSO_DATA      = 0x05
- ,ADC_DATA      = 0x06
+ ,UNITS_DATA    = 0x05
+ ,PSO_DATA      = 0x06
+ ,ADC_DATA      = 0x07
+ ,PPSO_PNO_DATA = 0x08
 } ProtocolMsgType_t;
 
 typedef struct
@@ -69,6 +71,12 @@ typedef struct
   UINT8 *units;
 } ProtocolSetPerturbPayload_t;
 extern const size_t sizeOfSetPerturbPayloadBase;
+
+typedef struct
+{
+  UINT8 oSendDebugData;
+} ProtocolSetDebugDataPayload_t;
+extern const size_t sizeOfSetDebugDataPayloadBase;
 
 typedef enum
 {
@@ -144,6 +152,19 @@ extern const size_t sizeOfPsoOneParticleSpeed;
 extern const size_t sizeOfPsoOneParticlePos;
 extern const size_t sizeOfPsoOneParticlefitness;
 extern const size_t sizeOfPsoDataPayloadBase;
+
+typedef struct
+{
+  UINT16 iteration;
+  UINT8  nGroups;
+  UINT8  groups[N_UNITS_TOTAL];
+  UINT8  groupLengths[N_UNITS_TOTAL];
+} ProtocolPpsoPnoDataPayload_t;
+extern const size_t sizeOfPpsoPnoIteration;
+extern const size_t sizeOfPpsoPnoNGroups;
+extern const size_t sizeOfPpsoPsoGroups;
+extern const size_t sizeOfPpsoPsoGroupLengths;
+extern const size_t sizeOfPpsoPnoDataPayloadBase;
 //==============================================================================
 
 // Protocol message definition

@@ -46,6 +46,7 @@ void  _Classifier_Release       (Classifier_t *c);
 float _Classifier_GetBestPos    (Classifier_t *c, UINT8 idx);
 
 static int _CompareFunc         (const void *p1, const void *p2);
+static int _CompareFuncUint8    (const void *p1, const void *p2);
 
 
 // Private variables
@@ -188,7 +189,7 @@ INT16 _Classifier_Classify (Classifier_t *c, UINT8 *idx, UINT8 nIdx, UINT8 *grou
     {
       if (optPosSorted[i] == optPos[j])
       {
-        idxSorted[i] = j;
+        idxSorted[i] = c->unitsIdToIdx[idx[j]];
         optPos[j] = IDX_USED;
         break;
       }
@@ -220,6 +221,7 @@ INT16 _Classifier_Classify (Classifier_t *c, UINT8 *idx, UINT8 nIdx, UINT8 *grou
           tmpIdx = tmpGroups[iGroup - 1][lengths[iGroup - 1] - 1];
           tmpGroups[iGroup][lengths[iGroup]++] = tmpIdx;
           tmpGroups[iGroup][lengths[iGroup]++] = idxSorted[i];
+          lengths[iGroup - 1]--;
         }
         else
         {
@@ -256,6 +258,14 @@ void _Classifier_Release (Classifier_t *c)
     Position_Reset(&c->optPos[i]);
     c->unitsIdToIdx[i] = 0;
   }
+}
+
+
+static int _CompareFuncUint8 (const void *p1, const void *p2)
+{
+  if ( *(UINT8 *) p1  > *(UINT8 *) p2 ) return  1;
+  if ( *(UINT8 *) p1 == *(UINT8 *) p2 ) return  0;
+  if ( *(UINT8 *) p1  < *(UINT8 *) p2 ) return -1;
 }
 
 

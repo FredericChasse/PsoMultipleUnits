@@ -210,13 +210,6 @@ void * _UnitArray_CreateSubArray (UnitArray_t *array, UINT8 *idx, UINT8 nIdx)
 }
 
 
-void _UnitArray_SplitInto2Arrays (UnitArray_t *array, UINT8 *idxToSplit, UINT8 nToSplit, void *splitArray, void *keepArray)
-{
-  UnitInterface_t *unitsToKeep[N_UNITS_TOTAL];
-  UnitInterface_t *unitsToSplit[N_UNITS_TOTAL];
-}
-
-
 INT8 _UnitArray_RemoveUnitFromArray (UnitArray_t *array, UINT8 idx)
 {
   UINT8 len;
@@ -258,9 +251,9 @@ const UnitArrayInterface_t * UnitArrayInterface(void)
     for (i = 0; i < N_ARRAYS_TOTAL; i++)
     {
       // Init the array itself and its interface
-      _arrays[i].linkKey  = i;
-      _arrays[i].nUnits   = 0;
-      _arrays[i].id       = 0;
+      _arrays[i].linkKey                = i;
+      _arrays[i].nUnits                 = 0;
+      _arrays[i].id                     = 0;
       
       _arrays_if[i].ctx                 = (void *)                            &_arrays[i];
       _arrays_if[i].Init                = (UnitArrayInit_fct)                 &_UnitArray_Init;

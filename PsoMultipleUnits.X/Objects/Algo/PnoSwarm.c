@@ -107,6 +107,7 @@ INT8 _PnoSwarm_Init (PnoSwarm_t *pno, UnitArrayInterface_t *unitArray, PnoSwarmP
 void _PnoSwarm_Release (PnoSwarm_t *pno)
 {
   UINT8 i;
+  Node_t *node = &_pnosNodes[pno->linkKey];
   
   for (i = 0; i < pno->nInstances; i++)
   {
@@ -116,6 +117,9 @@ void _PnoSwarm_Release (PnoSwarm_t *pno)
   pno->unitArray      = NULL;
   pno->id             = 0;
   pno->iteration      = 0;
+  
+  LinkedList_RemoveNode(node->list, node);
+  LinkedList_AddToEnd(&_unusedPnos, node);
 }
 
 
