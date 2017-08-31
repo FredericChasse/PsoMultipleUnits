@@ -52,7 +52,7 @@ void __ISR(_TIMER_1_VECTOR, T1_INTERRUPT_PRIORITY) Timer1InterruptHandler(void)
   // Increment the number of overflows from this timer. Used primarily by Input Capture
   Timer.Var.nOverflows[0]++;
   
-//  LED2_TOGGLE;
+//  LED2_TOGGLE();
   
   mT1ClearIntFlag();
 }
@@ -286,7 +286,7 @@ void __ISR(_UART_6_VECTOR, U6_INTERRUPT_PRIORITY) Uart6InterruptHandler(void)
 //=============================================
 void __ISR(_ADC_VECTOR, ADC_INTERRUPT_PRIO) AdcInterruptHandler(void)
 {
-  DBG0_ON;
+  DBG0_ON();
 //  static BOOL oFirst = 1;
 //  static UINT32 coreTick;
 //  static INT32 time;
@@ -336,7 +336,7 @@ void __ISR(_ADC_VECTOR, ADC_INTERRUPT_PRIO) AdcInterruptHandler(void)
   }
   oAcqOngoing = 0;
   
-  DBG0_OFF;
+  DBG0_OFF();
 }
 //=============================================
 

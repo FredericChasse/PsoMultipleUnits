@@ -63,11 +63,11 @@ void LedToggle(sSkadi_t *skadi, sSkadiArgs_t args)
 
   if (led == 1)
   {
-    LED1_TOGGLE;
+    LED1_TOGGLE();
   }
   else if (led == 2)
   {
-    LED2_TOGGLE;
+    LED2_TOGGLE();
   }
   else
   {

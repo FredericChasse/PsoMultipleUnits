@@ -228,7 +228,7 @@ void _Swarm_SetSteadyState (PsoSwarm_t *s)
 
 void _Swarm_ComputeGbest (PsoSwarm_t *s)
 {
-  float max, temp, fitness;
+  float max = 0, temp, fitness;
   UINT8 i, iBest;
   for (i = 0; i < s->nParticles; i++)
   {
@@ -377,7 +377,7 @@ UINT8 _Swarm_CheckForPerturb (PsoSwarm_t *s, UINT8 *idxPerturbed)
     {
       idxPerturbed[nPerturbed] = i;
       nPerturbed++;
-      if (s->param.type == PSO_SWARM_TYPE_PSO_1D)
+      if (s->param.type == PSO_SWARM_TYPE_PSO_1D || s->param.type == PSO_SWARM_TYPE_PARALLEL_PSO)
       {
         s->oResetParticles = 1;
       }

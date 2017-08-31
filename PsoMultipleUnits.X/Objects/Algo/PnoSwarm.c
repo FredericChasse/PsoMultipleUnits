@@ -133,7 +133,7 @@ UINT8 _PnoSwarm_ComputeAllPos (PnoSwarm_t *pno, float *newPos, UINT8 *idxPerturb
 {
   UINT8 i;
   PnoInstanceInterface_t *pnoi;
-  BOOL oPerturbed;
+  UINT8 oPerturbed;
   UINT8 nPerturbed = 0;
   
   for (i = 0; i < pno->nInstances; i++)

@@ -34,7 +34,7 @@ typedef enum
 } PnoType_t;
 
 typedef void  (*PnoiInit_fct)             (void *ctx, UINT8 id, UINT8 delta, UINT8 pos, UINT8 umin, UINT8 umax, float perturbOsc);
-typedef UINT8 (*PnoiComputePos_fct)       (void *ctx, BOOL *oPerturbed);
+typedef float (*PnoiComputePos_fct)       (void *ctx, UINT8 *oPerturbed);
 typedef void  (*PnoiSetPos_fct)           (void *ctx, float pos);
 typedef void  (*PnoiSetPosIdx_fct)        (void *ctx, UINT8 pos);
 typedef float (*PnoiGetPos_fct)           (void *ctx);

@@ -145,7 +145,7 @@ void _Pno_Release (Pno_t *pno)
 INT8 _Pno_Run (Pno_t *pno)
 {
   UINT8 i;
-  BOOL dummy;
+  UINT8 dummy;
   PnoInstanceInterface_t *pnoi;
   UINT8 newPos;
   BOOL oFirstIteration = pno->iteration == 0 ? 1 : 0;

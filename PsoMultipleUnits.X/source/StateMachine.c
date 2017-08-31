@@ -334,7 +334,7 @@ void StateAcq(void)
     case DECODER_RET_MSG_START_ALGO:
       if (!oSessionActive) // Ensure we are not already started
       {
-        DBG1_ON;
+        DBG1_ON();
         nUnits = retBuf[1];
         memcpy(units, &retBuf[2], nUnits);
         for (i = 0; i < nUnits; i++)
@@ -409,7 +409,7 @@ void StateAcq(void)
             nSamples = 0;
             break;
             
-          case PNO:
+          case PNO_CLASSIC:
             oAlgoIsPso      = 0;
             oAlgoIsPpsoPno  = 0;
             oDbgAdc         = 0;
@@ -447,7 +447,7 @@ void StateAcq(void)
     case DECODER_RET_MSG_STOP_ALGO:
       if (oSessionActive)   // To ensure that we are currently running
       {
-        DBG1_OFF;
+        DBG1_OFF();
         oSessionActive = 0;
         oAlgoIsPso     = 0;
         oAlgoIsPpsoPno  = 0;
@@ -463,7 +463,7 @@ void StateAcq(void)
       break;
       
     default:
-//      LED1_ON;
+//      LED1_ON();
     case DECODER_RET_MSG_NO_MSG:
       break;
   }
@@ -541,12 +541,12 @@ void StateCompute(void)
     codec->CodeNewAdcMsg(codec->ctx, &newAdcPayload);
   }
   
-  DBG2_ON;
+  DBG2_ON();
   algo->Run(algo->ctx);
   perturb->Run(perturb->ctx);
   ResetFilterValues();
   Adc.EnableInterrupts();
-  DBG2_OFF;
+  DBG2_OFF();
   
 }
 
@@ -560,13 +560,13 @@ void StateError(void)
 {
   INTDisableInterrupts();   // Disable all interrupts of the system.
   
-  LED1_ON;
-  LED2_OFF;
+  LED1_ON();
+  LED2_OFF();
   
   while(1)
   {
-    LED1_TOGGLE;
-    LED2_TOGGLE;
+    LED1_TOGGLE();
+    LED2_TOGGLE();
     
     Timer.DelayMs(500);
     Wdt.Clear();

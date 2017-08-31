@@ -61,7 +61,7 @@ void InitTimer(void)
   timerCounterValue = Timer.Open(TIMER_3, ADC_TIMER_PERIOD, ADC_TIMER_SCALE);   // Timer used for ADC
   if (timerCounterValue < 0)
   {
-    LED1_ON;
+    LED1_ON();
   }
 //  timerCounterValue = Timer.Open(TIMER_4, 500, SCALE_MS);   // Open Timer 4 with a period of 500 ms
 //  timerCounterValue = Timer.Open(TIMER_5, 500, SCALE_US);   // Open Timer 5 with a period of 500 us
@@ -75,7 +75,7 @@ void InitTimer(void)
   err = Timer.ConfigInterrupt(TIMER_3, TIMER3_INTERRUPT_PRIORITY, TIMER3_INTERRUPT_SUBPRIORITY); // Sets the priority of the TIMER_3 to the values specified in Interrupt.h
   if (err < 0)
   {
-    LED1_ON;
+    LED1_ON();
   }
 //  Timer.ConfigInterrupt(TIMER_4, TIMER4_INTERRUPT_PRIORITY, TIMER4_INTERRUPT_SUBPRIORITY); // Sets the priority of the TIMER_4 to the values specified in Interrupt.h
 //  Timer.ConfigInterrupt(TIMER_5, TIMER5_INTERRUPT_PRIORITY, TIMER5_INTERRUPT_SUBPRIORITY); // Sets the priority of the TIMER_5 to the values specified in Interrupt.h
@@ -101,7 +101,7 @@ void InitSpi(void)
   err = Spi.Open(SPI3, oMasterFlags, 1e6);   // Open the SPI3 as a master at a bitrate of 10 MHz
   if (err < 0)                // Check for errors
   {
-    LED1_ON;    // Turn on the LED_DEBUG1
+    LED1_ON();    // Turn on the LED_DEBUG1
   }
 
   // SPI interrupts not functionnal as of yet
@@ -232,12 +232,12 @@ void InitPorts(void)
                           | BIT_3   // RST_POT3n
                           );
   
-  LED1_OFF;
-  LED2_OFF;
+  LED1_OFF();
+  LED2_OFF();
   
-  DBG0_OFF;
-  DBG1_OFF;
-  DBG2_OFF;
+  DBG0_OFF();
+  DBG1_OFF();
+  DBG2_OFF();
 
 // Device reset
 //=================================================================
@@ -249,7 +249,7 @@ void InitPorts(void)
   {
     RCONCLR = _RCON_SWR_MASK;
     Port.F.SetPinsDigitalOut(BIT_0);  // LED1
-    LED1_ON;
+    LED1_ON();
   }
 //=================================================================
 }
@@ -303,7 +303,7 @@ void InitI2c(void)
   err = I2c.ConfigInterrupt(I2C5, I2C5_INTERRUPT_PRIORITY, I2C5_INTERRUPT_SUBPRIORITY);
   if (err < 0)
   {
-    LED1_ON;
+    LED1_ON();
   }
 }
 
@@ -380,13 +380,13 @@ void InitAdc(void)
   err = Adc.Open(samplingClk, configHardware, configPort, configScan);
   if (err < 0)
   {
-    LED1_ON;
+    LED1_ON();
   }
 
   err = Adc.ConfigInterrupt(ADC_INTERRUPT_PRIORITY, ADC_INTERRUPT_SUBPRIORITY);
   if (err < 0)
   {
-    LED1_ON;
+    LED1_ON();
   }
 }
 
@@ -405,7 +405,7 @@ void StartInterrupts(void)
   err = Timer.DisableInterrupt(TIMER_3);
   if (err < 0)
   {
-    LED1_ON;
+    LED1_ON();
   }
 //  Timer.EnableInterrupt(TIMER_4);
 //  Timer.EnableInterrupt(TIMER_5);
@@ -438,7 +438,7 @@ void StartInterrupts(void)
   err = Adc.EnableInterrupts();   // Works only when not in manual mode
   if (err < 0)
   {
-    LED1_ON;
+    LED1_ON();
   }
 
 
@@ -449,17 +449,17 @@ void StartInterrupts(void)
   err = I2c.EnableInterrupt (I2C5, I2C_MASTER_INTERRUPT);
   if (err < 0)
   {
-    LED1_ON;
+    LED1_ON();
   }
   err = I2c.DisableInterrupt(I2C5, I2C_SLAVE_INTERRUPT);
   if (err < 0)
   {
-    LED1_ON;
+    LED1_ON();
   }
   err = I2c.DisableInterrupt(I2C5, I2C_BUS_COLLISION_INTERRUPT);
   if (err < 0)
   {
-    LED1_ON;
+    LED1_ON();
   }
   
 

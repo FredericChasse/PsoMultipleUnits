@@ -96,7 +96,7 @@ if nPerturbs > 0
   perturbAmps = zeros(1, nPerturbs);
   perturbUnits = cell(1, nPerturbs);
   perturbIterations = zeros(1, nPerturbs);
-  perturbAmps(1) = -100;
+  perturbAmps(1) = -200;
 %   perturbUnits{1} = 0:1:3;
   perturbUnits{1} = [0:1:4 7:1:14];
 %   perturbUnits{1} = [0:1:14];
@@ -132,8 +132,8 @@ startAlgoChar = PROTOCOL_START_ALGO;
 % algo = PARALLEL_PSO_MULTI_SWARM;
 % algo = MULTI_UNIT;
 % algo = EXTREMUM_SEEKING;
-algo = PPSO_PNO;
-% algo = PNO;
+% algo = PPSO_PNO;
+algo = PNO;
 % algo = DEBUG_ADC;
 % units = uint8(3:1:10);
 % units = uint8([3:6 11:14]);
@@ -156,7 +156,7 @@ elseif algo == CLASSIC_PSO
   nIterations = 140;
 elseif algo == PARALLEL_PSO
   oSendDebugData = uint8(0);
-  nIterations = 60;
+  nIterations = 100;
 elseif algo == PARALLEL_PSO_MULTI_SWARM
   oSendDebugData = uint8(0);
   nIterations = 130;
@@ -166,7 +166,7 @@ elseif algo == PPSO_PNO
 %   nIterations = 60;
 elseif algo == PNO
   oSendDebugData = uint8(0);
-  nIterations = 40;
+  nIterations = 130;
 elseif algo == DEBUG_ADC
   oSendDebugData = uint8(1);
   nIterations = 25;

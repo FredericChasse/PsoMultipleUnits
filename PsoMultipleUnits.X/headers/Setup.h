@@ -65,19 +65,19 @@ void StartInterrupts  (void);
 // Macro definitions
 //==============================================================================
 
-#define LED1_ON       Port.F.ClearBits  (BIT_0)   
-#define LED2_ON       Port.F.ClearBits  (BIT_1)   
-#define LED1_OFF      Port.F.SetBits    (BIT_0)     
-#define LED2_OFF      Port.F.SetBits    (BIT_1)     
-#define LED1_TOGGLE   Port.F.ToggleBits (BIT_0)  
-#define LED2_TOGGLE   Port.F.ToggleBits (BIT_1)  
+#define LED1_ON()       Port.F.ClearBits  (BIT_0)   
+#define LED2_ON()       Port.F.ClearBits  (BIT_1)   
+#define LED1_OFF()      Port.F.SetBits    (BIT_0)     
+#define LED2_OFF()      Port.F.SetBits    (BIT_1)     
+#define LED1_TOGGLE()   Port.F.ToggleBits (BIT_0)  
+#define LED2_TOGGLE()   Port.F.ToggleBits (BIT_1)  
 
-#define DBG0_ON       Port.C.SetBits(BIT_13)    // GPIO0 RC13
-#define DBG1_ON       Port.C.SetBits(BIT_14)    // GPIO1 RC14
-#define DBG2_ON       Port.E.SetBits(BIT_4)     // GPIO2 RE4
-#define DBG0_OFF      Port.C.ClearBits(BIT_13)  // GPIO0 RC13
-#define DBG1_OFF      Port.C.ClearBits(BIT_14)  // GPIO1 RC14
-#define DBG2_OFF      Port.E.ClearBits(BIT_4)   // GPIO2 RE4
+#define DBG0_ON()       Port.C.SetBits(BIT_13)    // GPIO0 RC13
+#define DBG1_ON()       Port.C.SetBits(BIT_14)    // GPIO1 RC14
+#define DBG2_ON()       Port.E.SetBits(BIT_4)     // GPIO2 RE4
+#define DBG0_OFF()      Port.C.ClearBits(BIT_13)  // GPIO0 RC13
+#define DBG1_OFF()      Port.C.ClearBits(BIT_14)  // GPIO1 RC14
+#define DBG2_OFF()      Port.E.ClearBits(BIT_4)   // GPIO2 RE4
 
 #define U_MATLAB      UART6
 #define U_DBG         UART3
@@ -101,6 +101,7 @@ void StartInterrupts  (void);
 #define ADC_TIMER_PERIOD        (1)
 #define ADC_TIMER_SCALE         (SCALE_US)
 #define ADC_TIMER_SCALE_FLOAT   (TIMER_SCALE_US)
+//#define N_SAMPLES_PER_ADC_READ  (1000)     // Number of samples / ADC value
 #define N_SAMPLES_PER_ADC_READ  (2000)     // Number of samples / ADC value
 #define N_SAMPLES_TO_START      (N_SAMPLES_PER_ADC_READ)
 #define N_SAMPLES_TO_DROP       (20)      // Ignore n first samples

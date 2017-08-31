@@ -87,7 +87,7 @@ typedef enum
  ,EXTREMUM_SEEKING          = 0x04
  ,CHARACTERIZATION          = 0x05
  ,PPSO_PNO                  = 0x06
- ,PNO                       = 0x07
+ ,PNO_CLASSIC               = 0x07
  ,DEBUG_ADC                 = 0x08
 } ProtocolTypeOfAlgo_t;
 

@@ -203,8 +203,8 @@ INT8 _PpsoPno_Init (PpsoPno_t *pso, UnitArrayInterface_t *unitArray)
   
   const PsoSwarmParam_t _swarmParam = 
   {
-    .c1                     = 1
-   ,.c2                     = 2
+    .c1                     = 0.8
+   ,.c2                     = 1.5
    ,.omega                  = 0.4
    ,.posMin                 = minPos
    ,.posMax                 = maxPos
@@ -213,21 +213,21 @@ INT8 _PpsoPno_Init (PpsoPno_t *pso, UnitArrayInterface_t *unitArray)
    ,.sentinelMargin         = 0.05
    ,.type                   = PSO_SWARM_TYPE_PARALLEL_PSO_MULTI_SWARM
    ,.nSamplesForSteadyState = 5
-   ,.steadyStateOscAmp      = 0.01
+   ,.steadyStateOscAmp      = 0.05
    ,.iteration              = 0
    ,.currentParticle        = 0
   };
   
   const PnoSwarmParam_t _pnoParam = 
   {
-    .delta_int      = 1
-   ,.delta          = _pnoParam.delta_int * POT_STEP_VALUE
+    .delta_int      = 5
+   ,.delta          = 5 * POT_STEP_VALUE
    ,.uinit_int      = POT_MAX_INDEX/2
-   ,.uinit          = potRealValues[_pnoParam.uinit_int]
+   ,.uinit          = potRealValues[POT_MAX_INDEX/2]
    ,.umax_int       = POT_MAX_INDEX
-   ,.umax           = potRealValues[_pnoParam.umax_int]
+   ,.umax           = potRealValues[POT_MAX_INDEX]
    ,.umin_int       = POT_MIN_INDEX
-   ,.umin           = potRealValues[_pnoParam.umin_int]
+   ,.umin           = potRealValues[POT_MIN_INDEX]
    ,.nSamplesForSs  = 6
    ,.oscAmp         = 2
    ,.perturbOsc     = 0.05

@@ -57,8 +57,8 @@ typedef struct
 void  _PnoInstance_Init               (PnoInstance_t *pnoi, UINT8 id, UINT8 delta, UINT8 pos, UINT8 umin, UINT8 umax, float perturbOsc);
 void  _PnoInstance_SetSteadyState     (PnoInstance_t *pnoi, UINT8 samplesForSs, UINT8 oscAmp);
 BOOL  _PnoInstance_GetSteadyState     (PnoInstance_t *pnoi);
-UINT8 _PnoInstance_ComputePosClassic  (PnoInstance_t *pnoi, BOOL *oPerturbed);
-float _PnoInstance_ComputePosSwarm    (PnoInstance_t *pnoi, BOOL *oPerturbed);
+float _PnoInstance_ComputePosClassic  (PnoInstance_t *pnoi, UINT8 *oPerturbed);
+float _PnoInstance_ComputePosSwarm    (PnoInstance_t *pnoi, UINT8 *oPerturbed);
 void  _PnoInstance_SetPos             (PnoInstance_t *pnoi, float pos);
 float _PnoInstance_GetPos             (PnoInstance_t *pnoi);
 void  _PnoInstance_SetPosIdx          (PnoInstance_t *pnoi, UINT8 pos);
@@ -90,8 +90,9 @@ void _PnoInstance_Init (PnoInstance_t *pnoi, UINT8 id, UINT8 delta, UINT8 pos, U
   pnoi->delta_int = delta;
   pnoi->delta = delta*POT_STEP_VALUE;
   Position_Reset(&pnoi->pos);
+  SteadyStatePno_Reset(&pnoi->ss);
   pnoi->prevPotIdx = pnoi->curPotIdx = pos;
-  pnoi->pos.curPos = potRealValues[pos];
+  pnoi->pos.prevPos = pnoi->pos.curPos = potRealValues[pos];
   pnoi->k = 1;
   pnoi->umax_int = umax;
   pnoi->umin_int = umin;
@@ -107,7 +108,7 @@ void _PnoInstance_SetId (PnoInstance_t *pnoi, UINT8 id)
 }
 
 
-UINT8 _PnoInstance_ComputePosClassic (PnoInstance_t *pnoi, BOOL *oPerturbed)
+float _PnoInstance_ComputePosClassic (PnoInstance_t *pnoi, UINT8 *oPerturbed)
 {
   *oPerturbed = 0;
   
@@ -130,11 +131,11 @@ UINT8 _PnoInstance_ComputePosClassic (PnoInstance_t *pnoi, BOOL *oPerturbed)
   pnoi->pos.prevPos = pnoi->pos.curPos;
   pnoi->pos.curPos += potRealValues[pnoi->curPotIdx];
   
-  return pnoi->curPotIdx;
+  return (float) pnoi->curPotIdx;
 }
 
 
-float _PnoInstance_ComputePosSwarm (PnoInstance_t *pnoi, BOOL *oPerturbed)
+float _PnoInstance_ComputePosSwarm (PnoInstance_t *pnoi, UINT8 *oPerturbed)
 {
   float error;
   SteadyStatePno_AddSample(&pnoi->ss, &pnoi->pos.curPos);
@@ -308,7 +309,7 @@ const PnoInstanceInterface_t * PnoInstanceInterface (PnoType_t type)
   
   if (_unusedInstances.count == 0)
   {
-    LED1_ON;
+    LED1_ON();
     return NULL;
   }
   
