@@ -36,11 +36,12 @@ typedef enum
  ,END_ACQ       = 0x02
  ,SET_PERTURB   = 0x03
  ,SET_DBG_DATA  = 0x04
+ ,INIT_PERTURB  = 0x05
   
- ,UNITS_DATA    = 0x05
- ,PSO_DATA      = 0x06
- ,ADC_DATA      = 0x07
- ,PPSO_PNO_DATA = 0x08
+ ,UNITS_DATA    = 0x06
+ ,PSO_DATA      = 0x07
+ ,ADC_DATA      = 0x08
+ ,PPSO_PNO_DATA = 0x09
 } ProtocolMsgType_t;
 
 typedef struct
@@ -62,6 +63,12 @@ typedef struct
   UINT64 seed2;
 } ProtocolNewRngSeedPayload_t;
 extern const size_t sizeOfNewRngSeedPayload;
+
+typedef struct
+{
+  UINT16 amplitude;
+} ProtocolInitPerturbPayload_t;
+extern const size_t sizeOfInitPerturbPayloadBase;
 
 typedef struct
 {

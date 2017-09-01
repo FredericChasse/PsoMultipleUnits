@@ -309,6 +309,7 @@ void StateAcq(void)
   UINT8 nUnits;
   UINT8 units[N_UNITS_TOTAL];
   ProtocolSetPerturbPayload_t perturbPayload;
+  ProtocolInitPerturbPayload_t initPerturbPayload;
   perturbPayload.units = units;
   UINT8 i;
   ret = codec->DecoderFsmStep(codec->ctx, retBuf);
@@ -330,6 +331,15 @@ void StateAcq(void)
       memcpy(&perturbPayload.units[0], &retBuf[sizeOfSetPerturbPayloadBase], perturbPayload.nUnits);  // UINT8 buffer
       perturb->SetNewPerturb(perturb->ctx, perturbPayload.units, perturbPayload.nUnits, perturbPayload.amplitude, perturbPayload.iteration);
       break;
+      
+    case DECODER_RET_MSG_INIT_PERTURB:
+      memcpy(&initPerturbPayload, &retBuf[0], sizeOfInitPerturbPayloadBase);
+      for (i = 0; i < N_UNITS_TOTAL; i++)
+      {
+        perturb->SetUnitIntensity(perturb->ctx, i, initPerturbPayload.amplitude);
+      }
+      break;
+      
       
     case DECODER_RET_MSG_START_ALGO:
       if (!oSessionActive) // Ensure we are not already started

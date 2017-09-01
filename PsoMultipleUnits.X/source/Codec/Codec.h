@@ -38,6 +38,7 @@ typedef enum
  ,DECODER_RET_MSG_STOP_ALGO
  ,DECODER_RET_MSG_NEW_PERTURB
  ,DECODER_RET_MSG_SET_DEBUG_DATA
+ ,DECODER_RET_MSG_INIT_PERTURB
 } DecoderReturnMsg_t;
 
 typedef UINT8               (*CodecInit_fct)                (void *ctx, UartModule_t uartChannel);

@@ -433,6 +433,18 @@ DecoderReturnMsg_t _Codec_DecoderFsmStep (Codec_t *c, UINT8 *rxMsg)
             return DECODER_RET_MSG_NO_MSG;
           }
           
+        case INIT_PERTURB:
+          c->decoder->state = S_DECODER_STANDBY;
+          if (sizeOfInitPerturbPayloadBase == sizeOfPayload)
+          {
+            memcpy(rxMsg, rxBuf, sizeOfPayload);
+            return DECODER_RET_MSG_INIT_PERTURB;
+          }
+          else
+          {
+            return DECODER_RET_MSG_NO_MSG;
+          }
+          
         default:
           c->decoder->state = S_DECODER_STANDBY;
           return DECODER_RET_MSG_NO_MSG;

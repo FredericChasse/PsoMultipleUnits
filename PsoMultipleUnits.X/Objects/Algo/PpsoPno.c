@@ -44,9 +44,7 @@ typedef struct
   ProtocolPpsoPnoDataPayload_t classifierGroups;
 } PpsoPno_t;
 
-#ifndef SEND_DEBUG_DATA_TO_UART
 #define SEND_DEBUG_DATA_TO_UART
-#endif
 
 const UINT8  strReleasing[] = "Releasing "
             ,strReleasingLen = 10
