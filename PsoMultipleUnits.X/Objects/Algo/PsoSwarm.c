@@ -250,16 +250,16 @@ void _Swarm_ComputeGbest (PsoSwarm_t *s)
 
 void _Swarm_RandomizeAllParticles (PsoSwarm_t *s)
 {
-//  float range = s->param.posMax - s->param.posMin;
-//  float sectionLength = range / s->nParticles;
-//  float sections[PSO_SWARM_MAX_PARTICLES] = {0};
-//  sections[0] = s->param.posMin;
-//  sections[s->nParticles - 1] = s->param.posMax;
-  UINT8 range = POT_MAX_INDEX - POT_MIN_INDEX;
+  UINT8 idxMin = ComputePotValueFloat2Dec(s->param.posMin);
+  UINT8 idxMax = ComputePotValueFloat2Dec(s->param.posMax);
+  UINT8 range = idxMax - idxMin;
+//  UINT8 range = POT_MAX_INDEX - POT_MIN_INDEX;
   UINT8 sectionLength = (float) range / (float) s->nParticles + 0.5f;
   UINT8 sections[PSO_SWARM_MAX_PARTICLES + 1] = {0};
-  sections[0] = POT_MIN_INDEX;
-  sections[s->nParticles] = POT_MAX_INDEX;
+  sections[0] = idxMin;
+  sections[s->nParticles] = idxMax;
+//  sections[0] = POT_MIN_INDEX;
+//  sections[s->nParticles] = POT_MAX_INDEX;
   
   UINT8 i;
   PsoParticleInterface_t *p;

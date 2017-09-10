@@ -21,6 +21,7 @@
 #include "PnoSwarm.h"
 #include "Potentiometer.h"
 #include "Protocol.h"       // For debugging
+#include "StateMachine.h"   // For debugging
 
 
 // Private definitions
@@ -187,6 +188,7 @@ INT8 _PpsoPno_Init (PpsoPno_t *pso, UnitArrayInterface_t *unitArray)
   UINT8 nUnits;
   UINT8 i;
   float minPos, maxPos;
+  UINT8 minPosIdx, maxPosIdx;
   pso->unitArray    = unitArray;
   pso->nParaSwarms  = 1;
   pso->nSeqSwarms   = 0;
@@ -195,19 +197,27 @@ INT8 _PpsoPno_Init (PpsoPno_t *pso, UnitArrayInterface_t *unitArray)
   pso->sampleTime   = SAMPLING_TIME_FLOAT;
   
   pso->classifier = (ClassifierInterface_t *) ClassifierInterface();
+  __assert(pso->classifier);
   pso->classifier->Init(pso->classifier->ctx, unitArray, 3*POT_STEP_VALUE);
   
   pso->unitArray->GetPosLimits(pso->unitArray->ctx, &minPos, &maxPos);
+  minPosIdx = ComputePotValueFloat2Dec(minPos);
+  maxPosIdx = ComputePotValueFloat2Dec(maxPos);
   
   const PsoSwarmParam_t _swarmParam = 
-  {
-    .c1                     = 0.8
-   ,.c2                     = 1.5
-   ,.omega                  = 0.4
+  {    
+//    .c1                     = 0.8
+//   ,.c2                     = 1.5
+//   ,.omega                  = 0.4
+    .c1                     = 1
+   ,.c2                     = 2
+   ,.omega                  = 0.3
+    
    ,.posMin                 = minPos
    ,.posMax                 = maxPos
    ,.minParticles           = 3
-   ,.perturbAmp             = 2*POT_STEP_VALUE
+   ,.perturbAmp             = 1*POT_STEP_VALUE
+//   ,.perturbAmp             = 2*POT_STEP_VALUE
    ,.sentinelMargin         = 0.05
    ,.type                   = PSO_SWARM_TYPE_PARALLEL_PSO_MULTI_SWARM
    ,.nSamplesForSteadyState = 5
@@ -217,16 +227,28 @@ INT8 _PpsoPno_Init (PpsoPno_t *pso, UnitArrayInterface_t *unitArray)
   };
   
   const PnoSwarmParam_t _pnoParam = 
-  {
-    .delta_int      = 5
-   ,.delta          = 5 * POT_STEP_VALUE
-   ,.uinit_int      = POT_MAX_INDEX/2
-   ,.uinit          = potRealValues[POT_MAX_INDEX/2]
-   ,.umax_int       = POT_MAX_INDEX
-   ,.umax           = potRealValues[POT_MAX_INDEX]
-   ,.umin_int       = POT_MIN_INDEX
-   ,.umin           = potRealValues[POT_MIN_INDEX]
-   ,.nSamplesForSs  = 6
+  {    
+//    .delta_int      = 5
+//   ,.delta          = 5 * POT_STEP_VALUE
+//   ,.uinit_int      = POT_MAX_INDEX/2
+//   ,.uinit          = potRealValues[POT_MAX_INDEX/2]
+//   ,.umax_int       = POT_MAX_INDEX
+//   ,.umax           = potRealValues[POT_MAX_INDEX]
+//   ,.umin_int       = POT_MIN_INDEX
+//   ,.umin           = potRealValues[POT_MIN_INDEX]
+//   ,.nSamplesForSs  = 6
+//   ,.oscAmp         = 2
+//   ,.perturbOsc     = 0.05
+
+    .delta_int      = 1
+   ,.delta          = 1 * POT_STEP_VALUE
+   ,.uinit_int      = maxPosIdx
+   ,.uinit          = potRealValues[maxPosIdx]
+   ,.umax_int       = maxPosIdx
+   ,.umax           = potRealValues[maxPosIdx]
+   ,.umin_int       = minPosIdx
+   ,.umin           = potRealValues[minPosIdx]
+   ,.nSamplesForSs  = 12
    ,.oscAmp         = 2
    ,.perturbOsc     = 0.05
   };
@@ -235,6 +257,7 @@ INT8 _PpsoPno_Init (PpsoPno_t *pso, UnitArrayInterface_t *unitArray)
   memcpy(&pso->pnoParam  , &_pnoParam  , sizeof(PnoSwarmParam_t));
   
   swarmArray = (UnitArrayInterface_t *) UnitArrayInterface();
+  __assert(swarmArray);
   swarmArray->Init(swarmArray->ctx, 1);
   nUnits = unitArray->GetNUnits(unitArray->ctx);
   for (i = 0; i < nUnits; i++)
@@ -243,6 +266,7 @@ INT8 _PpsoPno_Init (PpsoPno_t *pso, UnitArrayInterface_t *unitArray)
   }
   
   pso->paraSwarms[0] = (PsoSwarmInterface_t *) PsoSwarmInterface();
+  __assert(pso->paraSwarms[0]);
   pso->paraSwarms[0]->Init(pso->paraSwarms[0]->ctx, swarmArray, &pso->swarmParam, 0);
   
   for (i = 0; i < nUnits; i++)
@@ -300,6 +324,7 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
   for (i = 0; i < pso->nParaSwarms; i++)
   {
     swarm = pso->paraSwarms[i];
+    __assert(swarm);
     
     swarm->IterationInc(swarm->ctx);
     
@@ -364,6 +389,7 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
     //-----------------------------------
     
     array = swarm->GetUnitArray(swarm->ctx);
+    __assert(array);
     nUnits = array->GetNUnits(array->ctx);
     
     for (iUnit = 0; iUnit < nUnits; iUnit++)
@@ -382,6 +408,7 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
   for (i = 0; i < pso->nPnos; i++)
   {
     pno = pso->pnos[i];
+    __assert(pno);
     
     pno->IncIteration(pno->ctx);
     
@@ -390,6 +417,7 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
     nUnits = pno->GetNInstances(pno->ctx);
     
     array = pno->GetArray(pno->ctx);
+    __assert(array);
     
     for (iUnit = 0; iUnit < nUnits; iUnit++)
     {
@@ -421,8 +449,10 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
   for (i = 0; i < pso->nSeqSwarms; i++)
   {
     swarm = pso->seqSwarms[i];
+    __assert(swarm);
     nParticles = swarm->GetNParticles(swarm->ctx);
     array = swarm->GetUnitArray(swarm->ctx);
+    __assert(array);
     
     curParticle = swarm->GetCurParticle(swarm->ctx);
     swarm->SetParticleFitness(swarm->ctx, curParticle, array->GetPower(array->ctx, 0));
@@ -539,9 +569,11 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
   {
     idx = algoIdxPerturbed[iAlgo++];
     pno = pso->pnos[i];
+    __assert(pno);
     if (allIdxPerturbedSize[idx])
     {
       array = pno->GetArray(pno->ctx);
+      __assert(array);
       for (iUnit = 0; iUnit < allIdxPerturbedSize[idx]; iUnit++)
       {
         idxPerturbed[nPerturbed++] = array->GetUnitId(array->ctx, allIdxPerturbed[idx][iUnit]);
@@ -585,9 +617,11 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
   {
     idx = algoIdxPerturbed[iAlgo++];
     swarm = pso->seqSwarms[i];
+    __assert(swarm);
     if (allIdxPerturbedSize[idx])
     {
       array = swarm->GetUnitArray(swarm->ctx);
+      __assert(array);
       for (iUnit = 0; iUnit < allIdxPerturbedSize[idx]; iUnit++)
       {
         idxPerturbed[nPerturbed++] = array->GetUnitId(array->ctx, allIdxPerturbed[idx][iUnit]);
@@ -620,7 +654,9 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
   for (i = 0; i < pso->nParaSwarms; i++)
   {
     swarm = pso->paraSwarms[i];
+    __assert(swarm);
     array = swarm->GetUnitArray(swarm->ctx);
+    __assert(array);
     
     idx = algoIdxPerturbed[iAlgo++];
     
@@ -634,6 +670,7 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
       }
       
       newArray = (UnitArrayInterface_t *) UnitArrayInterface();
+      __assert(newArray);
       
       for (iUnit = 0; iUnit < allIdxToRemoveSize[idx]; iUnit++)
       {
@@ -641,6 +678,7 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
       }
       
       pso->pnos[pso->nPnos] = (PnoSwarmInterface_t *) PnoSwarmInterface();
+      __assert(pso->pnos[pso->nPnos]);
       pno = pso->pnos[pso->nPnos];
       pno->Init(pno->ctx, newArray, &pso->pnoParam, pso->nPnos++);
       nUnits = pno->GetNInstances(pno->ctx);
@@ -683,6 +721,7 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
         }
         nUnits = swarm->GetNParticles(swarm->ctx);
         newArray = (UnitArrayInterface_t *) UnitArrayInterface();
+      __assert(newArray);
         for (iUnit = 0; iUnit < nUnits; iUnit++)
         {
           nextPositions[iUnit] = swarm->GetParticlePos(swarm->ctx, iUnit);
@@ -694,6 +733,7 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
         pso->nParaSwarms--;
         i--;
         pso->pnos[pso->nPnos] = (PnoSwarmInterface_t *) PnoSwarmInterface();
+      __assert(pso->pnos[pso->nPnos]);
         pno = pso->pnos[pso->nPnos];
         pno->Init(pno->ctx, newArray, &pso->pnoParam, pso->nPnos++);
         for (iUnit = 0; iUnit < nUnits; iUnit++)
@@ -714,6 +754,7 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
     else if (allIdxToRemoveSize[idx])
     {
       nUnits = swarm->GetNParticles(swarm->ctx);
+      
       if (allIdxToRemoveSize[idx] == nUnits)
       {
         swarm->Release(swarm->ctx);
@@ -731,6 +772,7 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
         }
         nUnits = swarm->GetNParticles(swarm->ctx);
         newArray = (UnitArrayInterface_t *) UnitArrayInterface();
+        __assert(newArray);
         for (iUnit = 0; iUnit < nUnits; iUnit++)
         {
           nextPositions[iUnit] = swarm->GetParticlePos(swarm->ctx, iUnit);
@@ -739,9 +781,11 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
         }
         swarm->Release(swarm->ctx);
         array->Release(array->ctx);
+        _PpsoPno_ShiftParaSwarmsLeft(pso, i);
         pso->nParaSwarms--;
         i--;
         pso->pnos[pso->nPnos] = (PnoSwarmInterface_t *) PnoSwarmInterface();
+        __assert(pso->pnos[pso->nPnos]);
         pno = pso->pnos[pso->nPnos];
         pno->Init(pno->ctx, newArray, &pso->pnoParam, pso->nPnos++);
         for (iUnit = 0; iUnit < nUnits; iUnit++)
@@ -803,7 +847,9 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
         for (iUnit = 0; iUnit < lengths[iGroup]; iUnit++)
         {
           newArray = array->CreateSubArray(array->ctx, &groups[offset + iUnit], 1);
+          __assert(newArray);
           pso->seqSwarms[pso->nSeqSwarms] = (PsoSwarmInterface_t *) PsoSwarmInterface();
+          __assert(pso->seqSwarms[pso->nSeqSwarms]);
           swarm = pso->seqSwarms[pso->nSeqSwarms];
           pso->swarmParam.type = PSO_SWARM_TYPE_PSO_1D;
           swarm->Init(swarm->ctx, newArray, &pso->swarmParam, pso->nSeqSwarms++);
@@ -815,7 +861,9 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
       else  // Parallel PSO
       {
         newArray = array->CreateSubArray(array->ctx, &groups[offset], lengths[iGroup]);
+        __assert(newArray);
         pso->paraSwarms[pso->nParaSwarms] = (PsoSwarmInterface_t *) PsoSwarmInterface();
+        __assert(pso->paraSwarms[pso->nParaSwarms]);
         swarm = pso->paraSwarms[pso->nParaSwarms];
         pso->swarmParam.type = PSO_SWARM_TYPE_PARALLEL_PSO_MULTI_SWARM;
         swarm->Init(swarm->ctx, newArray, &pso->swarmParam, pso->nParaSwarms++);

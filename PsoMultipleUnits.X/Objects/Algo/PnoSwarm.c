@@ -21,6 +21,7 @@
 #include "Position.h"
 #include "PnoInstance.h"
 #include "LinkedList.h"
+#include "StateMachine.h"     // For debugging
 
 
 // Private definitions
@@ -89,6 +90,7 @@ INT8 _PnoSwarm_Init (PnoSwarm_t *pno, UnitArrayInterface_t *unitArray, PnoSwarmP
   for (i = 0; i < pno->nInstances; i++)
   {
     pno->instances[i] = (PnoInstanceInterface_t *) PnoInstanceInterface(PNO_SWARM);
+    __assert(pno->instances[i]);
     memcpy(&pno->param[i], param, sizeof(PnoSwarmParam_t));
 //    pno->param[i].delta = POT_STEP_VALUE;
 //    pno->param[i].uinit = potRealValues[POT_MAX_INDEX/2];

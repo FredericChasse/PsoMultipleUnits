@@ -205,7 +205,7 @@ INT16 _Classifier_Classify (Classifier_t *c, UINT8 *idx, UINT8 nIdx, UINT8 *grou
   
   for (i = 1; i < nIdx; i++)
   {
-    if ( (optPosSorted[i] - optPosSorted[tmpGroups[iGroup][0]]) <= c->margin)
+    if ( (optPosSorted[i] - optPosSorted[iData]) <= c->margin)
     {
       tmpGroups[iGroup][lengths[iGroup]++] = idxSorted[i];
     }
@@ -232,6 +232,7 @@ INT16 _Classifier_Classify (Classifier_t *c, UINT8 *idx, UINT8 nIdx, UINT8 *grou
       {
         tmpGroups[iGroup][lengths[iGroup]++] = idxSorted[i];
       }
+      iData += lengths[iGroup - 1];
     }
   }
   

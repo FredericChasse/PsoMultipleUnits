@@ -83,15 +83,15 @@ delimiter = PROTOCOL_DELIMITER;
 typeOfMsg = NEW_RNG_SEED;
 lengthOfPayload = typecast(uint16(16), 'uint8');
 % [seed1, seed2] = GenerateNewSeeds;
-seed1 = uint64(14373098484861655346);
-seed2 = uint64(2396346581266420478);
+seed1 = uint64(10829063425906870008);
+seed2 = uint64(5557013956166326609);
 seeds = typecast([seed1, seed2], 'uint8');
 
 buf = [delimiter, typeOfMsg, lengthOfPayload, seeds];
 fwrite(port, buf);
 
 % Initial intensity
-initLedIntensity = 300;
+initLedIntensity = 150;
 delimiter = PROTOCOL_DELIMITER;
 typeOfMsg = INIT_PERTURB;
 lengthOfPayload = typecast(uint16(2), 'uint8');
@@ -102,15 +102,16 @@ fwrite(port, buf);
 
 % Perturb
 nPerturbs = 1;
+% nPerturbs = 0;
 
 if nPerturbs > 0
   perturbAmps = zeros(1, nPerturbs);
   perturbUnits = cell(1, nPerturbs);
   perturbIterations = zeros(1, nPerturbs);
-  perturbAmps(1) = 200;
+  perturbAmps(1) = 350;
 %   perturbUnits{1} = 0:1:3;
-%   perturbUnits{1} = [0:1:4 7:1:14];
-  perturbUnits{1} = [0:1:14];
+  perturbUnits{1} = [0:1:4 7:1:14];
+%   perturbUnits{1} = [0:1:14];
   perturbIterations(1) = 50;
 end
 
@@ -148,8 +149,8 @@ algo = PPSO_PNO;
 % algo = DEBUG_ADC;
 % units = uint8(3:1:10);
 % units = uint8([3:6 11:14]);
-units = uint8(0:1:14);
-% units = uint8([0:1:4 7:1:14]);
+% units = uint8(0:1:14);
+units = uint8([0:1:4 7:1:14]);
 unitsMem = units;
 nUnits = uint8(length(units));
 % lengthOfPayload = fliplr(typecast(uint16(3 + nUnits), 'uint8'));
@@ -173,11 +174,11 @@ elseif algo == PARALLEL_PSO_MULTI_SWARM
   nIterations = 130;
 elseif algo == PPSO_PNO
   oSendDebugData = uint8(1);
-  nIterations = 130;
+  nIterations = 220;
 %   nIterations = 60;
 elseif algo == PNO
   oSendDebugData = uint8(0);
-  nIterations = 130;
+  nIterations = 220;
 elseif algo == DEBUG_ADC
   oSendDebugData = uint8(1);
   nIterations = 25;
@@ -315,6 +316,8 @@ delete(port);
 %% Figures
 
 if algo == CHARACTERIZATION
+  optPos = zeros(1, nUnits);
+  optPow = zeros(1, nUnits);
   fig = figure;
   legendStr = {};
   subplot(2,1,1)
@@ -326,13 +329,21 @@ if algo == CHARACTERIZATION
     lengthOfData = length(posMem) / nData;
     plot(powMem(i:nUnits:end));
     legendStr{i} = ['Unit ' num2str(unitsMem(i))];
+    
+    tmpPow = powMem(i:nUnits:end);
+    tmpPos = posMem(i:nUnits:end);
+    
+    [maxPow, maxIdx] = max(tmpPow);
+    optPos(i) = tmpPos(maxIdx);
+    optPow(i) = tmpPow(maxIdx);
   end
   subplot(2,1,1)
   title('External load [\Omega]')
   subplot(2,1,2)
   title('Power output [W]')
   legend(legendStr)
-    
+  optPos
+  optPow
 else
   curUnit = 1;
   unitsLeft = nUnits;
@@ -563,53 +574,55 @@ if nPerturbs > 0
   fprintf('\t\t\t\t\t\t\t\t********  Before perturbation  ********\n')
   fprintf('==========================================================================================================\n')
 %   fprintf(['Unit\tS0\t\t\t\tPrecision\t\tConvergence\t\tEfficiency\tJoules\n']);
-  fprintf(['Unit\tLED Intensity\tPrecision\tSS @ ±' num2str(uint16(oscAmp*100)) '%%\tEfficiency\tJoules\t\tConvergence time\tConvergence power [mW]\n']);
+  fprintf(['Unit\tLED PWM\t\tRopt\t\tPrecision\tSS @ ±' num2str(uint16(oscAmp*100)) '%%\tEfficiency\tmJoules\t\tConv. time\tConvergence power [mW]\n']);
   for iUnit = 1 : nUnits
     fprintf([num2str(uint16(iUnit)) '\t\t'])
     if (initLedIntensity < 100)
       fprintf(' ')
     end
-    fprintf([num2str(initLedIntensity, '%.4f') '\t\t'])
+    fprintf([num2str(initLedIntensity, '%.4f') '\t'])
+    fprintf([num2str(optPosBefore(iUnit), '%.3f') '\t\t'])
     fprintf([num2str(precisionBefore(iUnit), '%.2f') '\t\t'])
     fprintf([num2str(uint16(steadyStateBefore(iUnit))) '\t\t\t'])
     fprintf([num2str(efficiencyBefore(iUnit), '%.2f') '\t\t'])
-    fprintf([num2str(joulesBefore(iUnit), '%.6f') '\t'])
-    fprintf([num2str(uint16(convergenceBefore(iUnit))) '\t\t\t\t\t'])
+    fprintf([num2str(joulesBefore(iUnit).*1000, '%.6f') '\t'])
+    fprintf([num2str(uint16(convergenceBefore(iUnit))) '\t\t\t'])
     fprintf([num2str(meanPowerBefore(iUnit)*1000, '%.4f') ' ±' num2str(ssOscBefore(iUnit), '%.2f') '%%'])
     fprintf('\n')
   end
   fprintf('----------------------------------------------------------------------------------------------------------\n')
-  fprintf('Total\t\t\t\t\t')
+  fprintf('Total\t\t\t\t\t\t\t')
   fprintf([num2str(mean(precisionBefore(:)), '%.2f') '\t\t\t\t\t'])
 %   fprintf([num2str(mean(efficiencyBefore(:)), '%.2f') '\t\t'])
   fprintf([num2str(totalEfficiencyBefore, '%.2f') '\t\t'])
-  fprintf([num2str(sum(joulesBefore(:)), '%.6f') '\t\t'])
+  fprintf([num2str(sum(joulesBefore(:).*1000), '%.6f') '\t\t'])
   
   fprintf('\n==========================================================================================================\n')
   fprintf(['\t\t\t\t\t\t\t\t********  After perturbation ' num2str(1) ' ********\n'])
   fprintf('==========================================================================================================\n')
 %   fprintf(['Unit\tS0\t\t\t\tPrecision\t\tConvergence\t\tEfficiency\tJoules\n']);
-  fprintf(['Unit\tLED intensity\tPrecision\tSS @ ±' num2str(uint16(oscAmp*100)) '%%\tEfficiency\tJoules\t\tConvergence time\tConvergence power [mW]\n']);
+  fprintf(['Unit\tLED PWM\t\tRopt\t\tPrecision\tSS @ ±' num2str(uint16(oscAmp*100)) '%%\tEfficiency\tmJoules\t\tConv. time\tConvergence power [mW]\n']);
   for iUnit = 1 : nUnits
     fprintf([num2str(uint16(iUnit)) '\t\t'])
     if (initLedIntensity + perturbAmps(1)) < 100
       fprintf(' ')
     end
-    fprintf([num2str(initLedIntensity + perturbAmps(1), '%.4f') '\t\t'])
+    fprintf([num2str(initLedIntensity + perturbAmps(1), '%.4f') '\t'])
+    fprintf([num2str(optPosAfter(iUnit), '%.3f') '\t\t'])
     fprintf([num2str(precisionAfter(iUnit), '%.2f') '\t\t'])
     fprintf([num2str(uint16(steadyStateAfter(iUnit))) '\t\t\t'])
     fprintf([num2str(efficiencyAfter(iUnit), '%.2f') '\t\t'])
-    fprintf([num2str(joulesAfter(iUnit), '%.6f') '\t'])
-    fprintf([num2str(uint16(convergenceAfter(iUnit))) '\t\t\t\t\t'])
+    fprintf([num2str(joulesAfter(iUnit).*1000, '%.6f') '\t'])
+    fprintf([num2str(uint16(convergenceAfter(iUnit))) '\t\t\t'])
     fprintf([num2str(meanPowerAfter(iUnit)*1000, '%.4f') ' ±' num2str(ssOscAfter(iUnit), '%.2f') '%%'])
     fprintf('\n')
   end
   fprintf('----------------------------------------------------------------------------------------------------------\n')
-  fprintf('Total\t\t\t\t\t')
+  fprintf('Total\t\t\t\t\t\t\t')
   fprintf([num2str(mean(precisionAfter(:)), '%.2f') '\t\t\t\t\t'])
 %   fprintf([num2str(mean(efficiencyAfter(:)), '%.2f') '\t\t'])
   fprintf([num2str(totalEfficiencyAfter, '%.2f') '\t\t'])
-  fprintf([num2str(sum(joulesAfter(:)), '%.6f') '\t\t'])
+  fprintf([num2str(sum(joulesAfter(:).*1000), '%.6f') '\t\t'])
 end
 
 fprintf('\n');

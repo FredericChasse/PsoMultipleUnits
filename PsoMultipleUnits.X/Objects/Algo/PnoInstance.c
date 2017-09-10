@@ -80,6 +80,8 @@ Node_t       _instancesNodes          [N_INSTANCES_TOTAL];
 
 static BOOL _oInstanceArrayInitialized = 0;
 
+UINT8 *_instancesKeys[N_INSTANCES_TOTAL];
+
 
 // Private functions
 //==============================================================================
@@ -302,6 +304,8 @@ const PnoInstanceInterface_t * PnoInstanceInterface (PnoType_t type)
       {
         _instancesNodes[i].next = NULL;
       }
+      
+      _instancesKeys[i] = &_instances[i].linkKey;
     }
     
     LinkedList_Init(&_unusedInstances, &_instancesNodes[0]);
