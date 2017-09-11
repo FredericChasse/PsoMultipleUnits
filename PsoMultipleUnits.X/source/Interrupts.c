@@ -287,23 +287,7 @@ void __ISR(_UART_6_VECTOR, U6_INTERRUPT_PRIORITY) Uart6InterruptHandler(void)
 void __ISR(_ADC_VECTOR, ADC_INTERRUPT_PRIO) AdcInterruptHandler(void)
 {
   DBG0_ON();
-//  static BOOL oFirst = 1;
-//  static UINT32 coreTick;
-//  static INT32 time;
-//  
-//  if (oFirst)
-//  {
-//    coreTick = Timer.Tic(200000, SCALE_NS);
-//    oFirst = 0;
-//  }
-//  else
-//  {
-//    time = Timer.Toc(200000, coreTick);
-//    oFirst = 1;
-//  }
   
-//  Adc.Read();               // Read the enabled channels and puts them in Adc.Var.adcReadValues[]
-//  oAdcReady = 1;
   oAcqOngoing = 1;
   cellVoltRaw[nSamples][ 0] = ReadADC10( 0);
   cellVoltRaw[nSamples][ 1] = ReadADC10( 1);
@@ -317,18 +301,9 @@ void __ISR(_ADC_VECTOR, ADC_INTERRUPT_PRIO) AdcInterruptHandler(void)
   cellVoltRaw[nSamples][ 9] = ReadADC10( 9);
   cellVoltRaw[nSamples][10] = ReadADC10(10);
   cellVoltRaw[nSamples][11] = ReadADC10(11);
-  cellVoltRaw[nSamples][12] = ReadADC10(12);
-  cellVoltRaw[nSamples][13] = ReadADC10(13);
-  cellVoltRaw[nSamples][14] = ReadADC10(14);
   INTClearFlag(INT_AD1);    // Clear the ADC conversion done interrupt Flag
   
-//  GetAdcValues();
-//  memcpy((void *) &cellVoltRaw[nSamples][0], (void *) &Adc.Var.adcReadValues[1], 30);  // sizeof(UINT16) * 15 = 30
   nSamples++;
-//  if (nSamples == N_SAMPLES_TO_START)
-//  {
-//    oAdcReady = 1;
-//  }
   if (nSamples >= N_SAMPLES_PER_ADC_READ)
   {
     nSamples = 0;

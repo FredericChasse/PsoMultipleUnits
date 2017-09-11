@@ -273,7 +273,6 @@ void StateInit(void)
 //===============================================================
 void StateAcq(void)
 {
-  float dbg; UINT8 idx;
   //==================================================================
   // ADC READ
   // Check cells voltage
@@ -306,9 +305,6 @@ void StateAcq(void)
   DecoderReturnMsg_t ret;
   UINT8 nUnits;
   UINT8 units[N_UNITS_TOTAL];
-  ProtocolSetPerturbPayload_t perturbPayload;
-  ProtocolInitPerturbPayload_t initPerturbPayload;
-  perturbPayload.units = units;
   UINT8 i;
   ret = codec->DecoderFsmStep(codec->ctx, retBuf);
   switch (ret)
@@ -462,7 +458,6 @@ void StateAcq(void)
       break;
       
     default:
-//      LED1_ON();
     case DECODER_RET_MSG_NO_MSG:
       break;
   }

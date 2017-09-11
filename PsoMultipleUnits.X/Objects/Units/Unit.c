@@ -32,6 +32,8 @@ typedef struct
   float power;
   float minPos;
   float maxPos;
+  UINT8 minPosIdx;
+  UINT8 maxPosIdx;
   BOOL  oFirstSetupDone;
 } Unit_t;
 
@@ -48,244 +50,18 @@ UINT8 _Unit_GetPosIdx     (Unit_t *unit);
 void  _Unit_GetPosLimits  (Unit_t *unit, float *minPos, float *maxPos);
 void  _Unit_SetPower      (Unit_t *unit, float power);
 
+
 // Private variables
 //==============================================================================
 
 extern struct sAllCells sCellValues;
 
-Unit_t _units[N_UNITS_TOTAL] = 
-{
-  {.id = 0 , .adcNum = UNIT_0_ADC , .potNum = UNIT_0_POT , .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE, .oFirstSetupDone = 0}
- ,{.id = 1 , .adcNum = UNIT_1_ADC , .potNum = UNIT_1_POT , .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE, .oFirstSetupDone = 0}
- ,{.id = 2 , .adcNum = UNIT_2_ADC , .potNum = UNIT_2_POT , .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE, .oFirstSetupDone = 0}
- ,{.id = 3 , .adcNum = UNIT_3_ADC , .potNum = UNIT_3_POT , .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE, .oFirstSetupDone = 0}
- ,{.id = 4 , .adcNum = UNIT_4_ADC , .potNum = UNIT_4_POT , .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE, .oFirstSetupDone = 0}
- ,{.id = 5 , .adcNum = UNIT_5_ADC , .potNum = UNIT_5_POT , .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE, .oFirstSetupDone = 0}
- ,{.id = 6 , .adcNum = UNIT_6_ADC , .potNum = UNIT_6_POT , .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE, .oFirstSetupDone = 0}
- ,{.id = 7 , .adcNum = UNIT_7_ADC , .potNum = UNIT_7_POT , .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE, .oFirstSetupDone = 0}
- ,{.id = 8 , .adcNum = UNIT_8_ADC , .potNum = UNIT_8_POT , .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE, .oFirstSetupDone = 0}
- ,{.id = 9 , .adcNum = UNIT_9_ADC , .potNum = UNIT_9_POT , .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE, .oFirstSetupDone = 0}
- ,{.id = 10, .adcNum = UNIT_10_ADC, .potNum = UNIT_10_POT, .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE, .oFirstSetupDone = 0}
- ,{.id = 11, .adcNum = UNIT_11_ADC, .potNum = UNIT_11_POT, .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE, .oFirstSetupDone = 0}
- ,{.id = 12, .adcNum = UNIT_12_ADC, .potNum = UNIT_12_POT, .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE, .oFirstSetupDone = 0}
- ,{.id = 13, .adcNum = UNIT_13_ADC, .potNum = UNIT_13_POT, .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE, .oFirstSetupDone = 0}
- ,{.id = 14, .adcNum = UNIT_14_ADC, .potNum = UNIT_14_POT, .pos = 50, .posIdx = 0, .power = 0, .minPos = MIN_POT_VALUE, .maxPos = MAX_POT_VALUE, .oFirstSetupDone = 0}
-};
+Unit_t _units[N_UNITS_TOTAL];
 
-const UnitInterface_t _unit0_if = 
-{
-  .ctx            = (void *)                &_units[0]
- ,.GetId          = (UnitGetId_fct)         &_Unit_GetId 
- ,.GetPos         = (UnitGetPos_fct)        &_Unit_GetPos 
- ,.GetPower       = (UnitGetPower_fct)      &_Unit_GetPower 
- ,.Init           = (UnitInit_fct)          &_Unit_Init 
- ,.SetPos         = (UnitSetPos_fct)        &_Unit_SetPos
- ,.GetPosLimits   = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
- ,.SetPower       = (UnitSetPower_fct)      &_Unit_SetPower
- ,.GetPosIdx      = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
- ,.SetPosWithIdx  = (UnitSetPosWithIdx_fct) &_Unit_SetPosWithIdx
-};
-const UnitInterface_t _unit1_if = 
-{
-  .ctx            = (void *)                &_units[1]
- ,.GetId          = (UnitGetId_fct)         &_Unit_GetId 
- ,.GetPos         = (UnitGetPos_fct)        &_Unit_GetPos 
- ,.GetPower       = (UnitGetPower_fct)      &_Unit_GetPower 
- ,.Init           = (UnitInit_fct)          &_Unit_Init 
- ,.SetPos         = (UnitSetPos_fct)        &_Unit_SetPos
- ,.GetPosLimits   = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
- ,.SetPower       = (UnitSetPower_fct)      &_Unit_SetPower
- ,.GetPosIdx      = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
- ,.SetPosWithIdx  = (UnitSetPosWithIdx_fct) &_Unit_SetPosWithIdx
-};
-const UnitInterface_t _unit2_if = 
-{
-  .ctx            = (void *)                &_units[2]
- ,.GetId          = (UnitGetId_fct)         &_Unit_GetId 
- ,.GetPos         = (UnitGetPos_fct)        &_Unit_GetPos 
- ,.GetPower       = (UnitGetPower_fct)      &_Unit_GetPower 
- ,.Init           = (UnitInit_fct)          &_Unit_Init 
- ,.SetPos         = (UnitSetPos_fct)        &_Unit_SetPos
- ,.GetPosLimits   = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
- ,.SetPower       = (UnitSetPower_fct)      &_Unit_SetPower
- ,.GetPosIdx      = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
- ,.SetPosWithIdx  = (UnitSetPosWithIdx_fct) &_Unit_SetPosWithIdx
-};
-const UnitInterface_t _unit3_if = 
-{
-  .ctx            = (void *)                &_units[3]
- ,.GetId          = (UnitGetId_fct)         &_Unit_GetId 
- ,.GetPos         = (UnitGetPos_fct)        &_Unit_GetPos 
- ,.GetPower       = (UnitGetPower_fct)      &_Unit_GetPower 
- ,.Init           = (UnitInit_fct)          &_Unit_Init 
- ,.SetPos         = (UnitSetPos_fct)        &_Unit_SetPos
- ,.GetPosLimits   = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
- ,.SetPower       = (UnitSetPower_fct)      &_Unit_SetPower
- ,.GetPosIdx      = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
- ,.SetPosWithIdx  = (UnitSetPosWithIdx_fct) &_Unit_SetPosWithIdx
-};
-const UnitInterface_t _unit4_if = 
-{
-  .ctx            = (void *)                &_units[4]
- ,.GetId          = (UnitGetId_fct)         &_Unit_GetId 
- ,.GetPos         = (UnitGetPos_fct)        &_Unit_GetPos 
- ,.GetPower       = (UnitGetPower_fct)      &_Unit_GetPower 
- ,.Init           = (UnitInit_fct)          &_Unit_Init 
- ,.SetPos         = (UnitSetPos_fct)        &_Unit_SetPos
- ,.GetPosLimits   = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
- ,.SetPower       = (UnitSetPower_fct)      &_Unit_SetPower
- ,.GetPosIdx      = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
- ,.SetPosWithIdx  = (UnitSetPosWithIdx_fct) &_Unit_SetPosWithIdx
-};
-const UnitInterface_t _unit5_if = 
-{
-  .ctx            = (void *)                &_units[5]
- ,.GetId          = (UnitGetId_fct)         &_Unit_GetId 
- ,.GetPos         = (UnitGetPos_fct)        &_Unit_GetPos 
- ,.GetPower       = (UnitGetPower_fct)      &_Unit_GetPower 
- ,.Init           = (UnitInit_fct)          &_Unit_Init 
- ,.SetPos         = (UnitSetPos_fct)        &_Unit_SetPos
- ,.GetPosLimits   = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
- ,.SetPower       = (UnitSetPower_fct)      &_Unit_SetPower
- ,.GetPosIdx      = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
- ,.SetPosWithIdx  = (UnitSetPosWithIdx_fct) &_Unit_SetPosWithIdx
-};
-const UnitInterface_t _unit6_if = 
-{
-  .ctx            = (void *)                &_units[6]
- ,.GetId          = (UnitGetId_fct)         &_Unit_GetId 
- ,.GetPos         = (UnitGetPos_fct)        &_Unit_GetPos 
- ,.GetPower       = (UnitGetPower_fct)      &_Unit_GetPower 
- ,.Init           = (UnitInit_fct)          &_Unit_Init 
- ,.SetPos         = (UnitSetPos_fct)        &_Unit_SetPos
- ,.GetPosLimits   = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
- ,.SetPower       = (UnitSetPower_fct)      &_Unit_SetPower
- ,.GetPosIdx      = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
- ,.SetPosWithIdx  = (UnitSetPosWithIdx_fct) &_Unit_SetPosWithIdx
-};
-const UnitInterface_t _unit7_if = 
-{
-  .ctx            = (void *)                &_units[7]
- ,.GetId          = (UnitGetId_fct)         &_Unit_GetId 
- ,.GetPos         = (UnitGetPos_fct)        &_Unit_GetPos 
- ,.GetPower       = (UnitGetPower_fct)      &_Unit_GetPower 
- ,.Init           = (UnitInit_fct)          &_Unit_Init 
- ,.SetPos         = (UnitSetPos_fct)        &_Unit_SetPos
- ,.GetPosLimits   = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
- ,.SetPower       = (UnitSetPower_fct)      &_Unit_SetPower
- ,.GetPosIdx      = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
- ,.SetPosWithIdx  = (UnitSetPosWithIdx_fct) &_Unit_SetPosWithIdx
-};
-const UnitInterface_t _unit8_if = 
-{
-  .ctx            = (void *)                &_units[8]
- ,.GetId          = (UnitGetId_fct)         &_Unit_GetId 
- ,.GetPos         = (UnitGetPos_fct)        &_Unit_GetPos 
- ,.GetPower       = (UnitGetPower_fct)      &_Unit_GetPower 
- ,.Init           = (UnitInit_fct)          &_Unit_Init 
- ,.SetPos         = (UnitSetPos_fct)        &_Unit_SetPos
- ,.GetPosLimits   = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
- ,.SetPower       = (UnitSetPower_fct)      &_Unit_SetPower
- ,.GetPosIdx      = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
- ,.SetPosWithIdx  = (UnitSetPosWithIdx_fct) &_Unit_SetPosWithIdx
-};
-const UnitInterface_t _unit9_if = 
-{
-  .ctx            = (void *)                &_units[9]
- ,.GetId          = (UnitGetId_fct)         &_Unit_GetId 
- ,.GetPos         = (UnitGetPos_fct)        &_Unit_GetPos 
- ,.GetPower       = (UnitGetPower_fct)      &_Unit_GetPower 
- ,.Init           = (UnitInit_fct)          &_Unit_Init 
- ,.SetPos         = (UnitSetPos_fct)        &_Unit_SetPos
- ,.GetPosLimits   = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
- ,.SetPower       = (UnitSetPower_fct)      &_Unit_SetPower
- ,.GetPosIdx      = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
- ,.SetPosWithIdx  = (UnitSetPosWithIdx_fct) &_Unit_SetPosWithIdx
-};
-const UnitInterface_t _unit10_if = 
-{
-  .ctx            = (void *)                &_units[10]
- ,.GetId          = (UnitGetId_fct)         &_Unit_GetId 
- ,.GetPos         = (UnitGetPos_fct)        &_Unit_GetPos 
- ,.GetPower       = (UnitGetPower_fct)      &_Unit_GetPower 
- ,.Init           = (UnitInit_fct)          &_Unit_Init 
- ,.SetPos         = (UnitSetPos_fct)        &_Unit_SetPos
- ,.GetPosLimits   = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
- ,.SetPower       = (UnitSetPower_fct)      &_Unit_SetPower
- ,.GetPosIdx      = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
- ,.SetPosWithIdx  = (UnitSetPosWithIdx_fct) &_Unit_SetPosWithIdx
-};
-const UnitInterface_t _unit11_if = 
-{
-  .ctx            = (void *)                &_units[11]
- ,.GetId          = (UnitGetId_fct)         &_Unit_GetId 
- ,.GetPos         = (UnitGetPos_fct)        &_Unit_GetPos 
- ,.GetPower       = (UnitGetPower_fct)      &_Unit_GetPower 
- ,.Init           = (UnitInit_fct)          &_Unit_Init 
- ,.SetPos         = (UnitSetPos_fct)        &_Unit_SetPos
- ,.GetPosLimits   = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
- ,.SetPower       = (UnitSetPower_fct)      &_Unit_SetPower
- ,.GetPosIdx      = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
- ,.SetPosWithIdx  = (UnitSetPosWithIdx_fct) &_Unit_SetPosWithIdx
-};
-const UnitInterface_t _unit12_if = 
-{
-  .ctx            = (void *)                &_units[12]
- ,.GetId          = (UnitGetId_fct)         &_Unit_GetId 
- ,.GetPos         = (UnitGetPos_fct)        &_Unit_GetPos 
- ,.GetPower       = (UnitGetPower_fct)      &_Unit_GetPower 
- ,.Init           = (UnitInit_fct)          &_Unit_Init 
- ,.SetPos         = (UnitSetPos_fct)        &_Unit_SetPos
- ,.GetPosLimits   = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
- ,.SetPower       = (UnitSetPower_fct)      &_Unit_SetPower
- ,.GetPosIdx      = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
- ,.SetPosWithIdx  = (UnitSetPosWithIdx_fct) &_Unit_SetPosWithIdx
-};
-const UnitInterface_t _unit13_if = 
-{
-  .ctx            = (void *)                &_units[13]
- ,.GetId          = (UnitGetId_fct)         &_Unit_GetId 
- ,.GetPos         = (UnitGetPos_fct)        &_Unit_GetPos 
- ,.GetPower       = (UnitGetPower_fct)      &_Unit_GetPower 
- ,.Init           = (UnitInit_fct)          &_Unit_Init 
- ,.SetPos         = (UnitSetPos_fct)        &_Unit_SetPos
- ,.GetPosLimits   = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
- ,.SetPower       = (UnitSetPower_fct)      &_Unit_SetPower
- ,.GetPosIdx      = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
- ,.SetPosWithIdx  = (UnitSetPosWithIdx_fct) &_Unit_SetPosWithIdx
-};
-const UnitInterface_t _unit14_if = 
-{
-  .ctx            = (void *)                &_units[14]
- ,.GetId          = (UnitGetId_fct)         &_Unit_GetId 
- ,.GetPos         = (UnitGetPos_fct)        &_Unit_GetPos 
- ,.GetPower       = (UnitGetPower_fct)      &_Unit_GetPower 
- ,.Init           = (UnitInit_fct)          &_Unit_Init 
- ,.SetPos         = (UnitSetPos_fct)        &_Unit_SetPos
- ,.GetPosLimits   = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits
- ,.SetPower       = (UnitSetPower_fct)      &_Unit_SetPower
- ,.GetPosIdx      = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx
- ,.SetPosWithIdx  = (UnitSetPosWithIdx_fct) &_Unit_SetPosWithIdx
-};
+UnitInterface_t _units_if[N_UNITS_TOTAL];
 
-const UnitInterface_t *_units_if[N_UNITS_TOTAL] = 
-{
-  &_unit0_if
- ,&_unit1_if
- ,&_unit2_if
- ,&_unit3_if
- ,&_unit4_if
- ,&_unit5_if
- ,&_unit6_if
- ,&_unit7_if
- ,&_unit8_if
- ,&_unit9_if
- ,&_unit10_if
- ,&_unit11_if
- ,&_unit12_if
- ,&_unit13_if
- ,&_unit14_if
-};
+static BOOL _oUnitsInitialized = 0;
+
 
 // Private functions
 //==============================================================================
@@ -296,9 +72,11 @@ void _Unit_Init (Unit_t *unit)
   {
     unit->oFirstSetupDone = 1;
     SetPot(unit->potNum, 0);
-    unit->pos = MIN_POT_VALUE;
-    unit->posIdx = 0;
-    unit->maxPos = potRealValues[90];   // 402.9412 Ohms
+    unit->pos = potRealValues[POT_MIN_INDEX];
+    unit->posIdx = POT_MIN_INDEX;
+    unit->minPos = potRealValues[POT_MIN_INDEX];
+    unit->minPosIdx = POT_MIN_INDEX;
+    unit->maxPos = potRealValues[POT_MAX_INDEX];   // 402.9412 Ohms
   }
 }
 
@@ -379,10 +157,43 @@ UINT8 _Unit_GetId (Unit_t *unit)
 //==============================================================================
 const UnitInterface_t * UnitInterface(UINT8 id)
 {
+  UINT8 i;
+  
   if (id > N_UNITS_TOTAL)
   {
     return 0;
   }
   
-  return _units_if[id];
+  if (!_oUnitsInitialized)
+  {
+    _oUnitsInitialized = 1;
+    
+    for (i = 0; i < N_UNITS_TOTAL; i++)
+    {
+      _units_if[i].ctx            = (void *)                &_units[i];
+      _units_if[i].GetId          = (UnitGetId_fct)         &_Unit_GetId;
+      _units_if[i].GetPos         = (UnitGetPos_fct)        &_Unit_GetPos;
+      _units_if[i].GetPosIdx      = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx;
+      _units_if[i].GetPosLimits   = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits;
+      _units_if[i].GetPower       = (UnitGetPower_fct)      &_Unit_GetPower;
+      _units_if[i].Init           = (UnitInit_fct)          &_Unit_Init;
+      _units_if[i].SetPos         = (UnitSetPos_fct)        &_Unit_SetPos;
+      _units_if[i].SetPosWithIdx  = (UnitSetPosWithIdx_fct) &_Unit_SetPosWithIdx;
+      _units_if[i].SetPower       = (UnitSetPower_fct)      &_Unit_SetPower;
+      
+      _units[i].adcNum              = unitAdcs[i];
+      _units[i].potNum              = unitPots[i];
+      _units[i].id                  = i;
+      _units[i].pos                 = potRealValues[POT_MIN_INDEX];
+      _units[i].posIdx              = POT_MIN_INDEX;
+      _units[i].minPos              = potRealValues[POT_MIN_INDEX];
+      _units[i].minPosIdx           = POT_MIN_INDEX;
+      _units[i].maxPos              = MAX_POT_VALUE;
+      _units[i].maxPosIdx           = POT_MAX_INDEX;
+      _units[i].power               = 0;
+      _units[i].oFirstSetupDone     = 0;
+    }
+  }
+  
+  return &_units_if[id];
 }

@@ -35,7 +35,15 @@ PROTOCOL_STOP_ALGO        = uint8('x' - 0);
 
 SIZE_OF_PROTOCOL_HEADER   = 4;
 
-N_UNITS_TOTAL             = 15;
+N_UNITS_TOTAL             = 12;
+
+N_LARGE_SAMPLES           = 4;
+
+POT_MIN_INDEX             = 90;
+POT_MAX_INDEX             = 255;
+CHARAC_N_ITERATIONS       = POT_MAX_INDEX - POT_MIN_INDEX + 1;
+
+
 
 %% Port setup
 
@@ -101,56 +109,25 @@ buf = [delimiter, typeOfMsg, lengthOfPayload, payload];
 fwrite(port, buf);
 
 % Perturb
-nPerturbs = 1;
+nPerturbs = 0;
 % nPerturbs = 0;
-
-if nPerturbs > 0
-  perturbAmps = zeros(1, nPerturbs);
-  perturbUnits = cell(1, nPerturbs);
-  perturbIterations = zeros(1, nPerturbs);
-  perturbAmps(1) = 350;
-%   perturbUnits{1} = 0:1:3;
-  perturbUnits{1} = [0:1:4 7:1:14];
-%   perturbUnits{1} = [0:1:14];
-  perturbIterations(1) = 50;
-end
-
-if nPerturbs >= 2
-  perturbUnits{2} = [4 7 8 10];
-  perturbAmps(2) = 100;
-  perturbIterations(2) = 40;
-end
-
-perturbPayloadBaseLength = 4 + 2 + 1;
-delimiter = PROTOCOL_DELIMITER;
-typeOfMsg = SET_PERTURB;
-for i = 1 : nPerturbs
-  iteration = typecast(uint32(perturbIterations(i)), 'uint8');
-  amplitude = typecast(int16(perturbAmps(i)), 'uint8');
-  nUnits = uint8(length(perturbUnits{i}));
-  units = uint8(perturbUnits{i});
-  
-  lengthOfPayload = typecast(uint16(perturbPayloadBaseLength + length(perturbUnits{i})), 'uint8');
-  buf = [delimiter, typeOfMsg, lengthOfPayload, iteration, amplitude, nUnits, units];
-  fwrite(port, buf)
-end
 
 % Start algo
 typeOfMsg = START_ACQ;
 startAlgoChar = PROTOCOL_START_ALGO;
-% algo = CHARACTERIZATION;
+algo = CHARACTERIZATION;
 % algo = CLASSIC_PSO;
 % algo = PARALLEL_PSO;
 % algo = PARALLEL_PSO_MULTI_SWARM;
 % algo = MULTI_UNIT;
 % algo = EXTREMUM_SEEKING;
 % algo = PPSO_PNO;
-algo = PNO;
+% algo = PNO;
 % algo = DEBUG_ADC;
 % units = uint8(3:1:10);
 % units = uint8([3:6 11:14]);
 % units = uint8(0:1:14);
-units = uint8([0:1:4 7:1:14]);
+units = uint8([0:1:2]);
 unitsMem = units;
 nUnits = uint8(length(units));
 % lengthOfPayload = fliplr(typecast(uint16(3 + nUnits), 'uint8'));
@@ -161,8 +138,7 @@ fwrite(port, buf);
 
 if algo == CHARACTERIZATION
   oSendDebugData = uint8(0);
-  nIterations = 256;
-%   nIterations = 60;
+  nIterations = CHARAC_N_ITERATIONS;
 elseif algo == CLASSIC_PSO
   oSendDebugData = uint8(0);
   nIterations = 140;
@@ -214,6 +190,16 @@ adcMem = [];
 tic
 wbh = waitbar(0, ['Iteration : ' num2str(0) '/' num2str(nIterations)]);  % Waitbar handle
 
+currentSample = 0;
+
+figure
+subplot(2,1,1)
+title('Rext')
+hold on
+subplot(2,1,2)
+title('Pout')
+hold on
+
 iIteration = 0;
 while iIteration <= nIterations
   waitbar(iIteration/nIterations, wbh, ['Iteration: ' num2str(iIteration) '/' num2str(nIterations)])
@@ -225,7 +211,11 @@ while iIteration <= nIterations
   %payload
   buf = fread(port, lengthOfPayload, 'uint8');
   if typeOfMsg == UNITS_DATA
-    iIteration = iIteration + 1;
+    currentSample = currentSample + 1;
+    if currentSample >= N_LARGE_SAMPLES
+      iIteration = iIteration + 1;
+      currentSample = 0;
+    end
     timestamp = typecast(typecast(uint8(buf(1:4)'), 'uint32'), 'single');
     nUnits = buf(5);
     nData = buf(6);
@@ -236,6 +226,11 @@ while iIteration <= nIterations
     tsMem  = [tsMem timestamp];
     posMem = [posMem positions];
     powMem = [powMem powers];
+    
+    subplot(2,1,1)
+    plot(timestamp, positions)
+    subplot(2,1,2)
+    plot(timestamp, powers)
     
   elseif typeOfMsg == PSO_DATA
     swarmIteration = double(typecast(uint8(buf(1:2)'), 'uint16'));

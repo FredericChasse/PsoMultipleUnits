@@ -26,8 +26,30 @@
 
 // Public definitions
 //==============================================================================
-#define POT_MAX_INDEX   (255)
-#define POT_MIN_INDEX   (0)
+#define POT_MAX_INDEX   (255)   // 1050 Ohms
+#define POT_MIN_INDEX   (90)    // 402.9412 Ohms
+
+//#define MAX_POT_VALUE   9.55k +9.56k+9.53k+9.54k
+//#define MAX_POT_VALUE   9545
+#define MAX_POT_VALUE   (1050.0f)
+//#define WIPER_VALUE     (51.7 + 50.9 + 52.3 + 50.2) / 4
+//#define WIPER_VALUE     51
+#define WIPER_VALUE     (50.0f)
+#define MIN_POT_VALUE   (402.9412f)
+//#define MID_VALUE       4.79k+4.88k+4.79k+4.79k
+//#define MID_VALUE       4800
+#define MID_VALUE       (545.30f)
+
+#define POT_STEP_VALUE  (3.9215686f)
+
+#define VREF            (2.489f)
+#define VREF_MV         (2489u)
+//#define VREF            3.268f
+
+#define CS0             LATDbits.LATD4
+#define CS1             LATDbits.LATD5
+#define CS2             LATDbits.LATD6
+#define CS3             LATDbits.LATD7
 //==============================================================================
 
 
@@ -115,39 +137,11 @@ inline INT8 SetPotAllUnits (UINT8 numPot, UINT8 value);
 
 
 //==============================================================================
-// Macro definitions
+// Variable declarations
 //==============================================================================
-//#define MAX_POT_VALUE   9.55k +9.56k+9.53k+9.54k
-//#define MAX_POT_VALUE   9545
-#define MAX_POT_VALUE   (1050.0f)
-//#define WIPER_VALUE     (51.7 + 50.9 + 52.3 + 50.2) / 4
-//#define WIPER_VALUE     51
-#define WIPER_VALUE     (50.0f)
-#define MIN_POT_VALUE   (WIPER_VALUE)
-//#define MID_VALUE       4.79k+4.88k+4.79k+4.79k
-//#define MID_VALUE       4800
-#define MID_VALUE       (545.30f)
-
-#define POT_STEP_VALUE  (3.9215686f)
-
-#define VREF            (2.489f)
-#define VREF_MV         (2489u)
-//#define VREF            3.268f
-
-#define CS0             LATDbits.LATD4
-#define CS1             LATDbits.LATD5
-#define CS2             LATDbits.LATD6
-#define CS3             LATDbits.LATD7
-
-//float potRealValues[256];
 
 extern const float potRealValuesInverse[256];
 extern const float potRealValues[256];
-
-
-//==============================================================================
-// Variable declarations
-//==============================================================================
 
 
 #endif	/* __POTENTIOMETER_H__ */

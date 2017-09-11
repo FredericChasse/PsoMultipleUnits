@@ -87,39 +87,7 @@ volatile UINT16 cellVoltRaw[N_SAMPLES_PER_ADC_READ][N_UNITS_TOTAL] = {0};
 
 inline void GetAdcValues (void)
 {
-  UINT8 i;
   memcpy((void *) &cellVoltRaw[nSamples][0], (void *) &Adc.Var.adcReadValues[1], 30);  // sizeof(UINT16) * 15 = 30
-//  memcpy((void *) &cellVoltageRaw[0], (void *) &Adc.Var.adcReadValues[0], 64);  // sizeof(UINT32) * 16 = 64
-//  memcpy((void *) &cellVoltageRaw[0], (void *) &Adc.Var.adcReadValues[0], 32);  // sizeof(UINT16) * 16 = 32
-//
-////  sCellValues.cells[ 0].cellVoltRaw[nSamples] = cellVoltageRaw[ 0];
-//  sCellValues.cells[ 1].cellVoltRaw[nSamples] = cellVoltageRaw[ 1];
-//  sCellValues.cells[ 2].cellVoltRaw[nSamples] = cellVoltageRaw[ 2];
-//  sCellValues.cells[ 3].cellVoltRaw[nSamples] = cellVoltageRaw[ 3];
-//  
-//  sCellValues.cells[ 4].cellVoltRaw[nSamples] = cellVoltageRaw[ 4];
-//  sCellValues.cells[ 5].cellVoltRaw[nSamples] = cellVoltageRaw[ 5];
-//  sCellValues.cells[ 6].cellVoltRaw[nSamples] = cellVoltageRaw[ 6];
-//  sCellValues.cells[ 7].cellVoltRaw[nSamples] = cellVoltageRaw[ 7];
-//  
-//  sCellValues.cells[ 8].cellVoltRaw[nSamples] = cellVoltageRaw[ 8];
-//  sCellValues.cells[ 9].cellVoltRaw[nSamples] = cellVoltageRaw[ 9];
-//  sCellValues.cells[10].cellVoltRaw[nSamples] = cellVoltageRaw[10];
-//  sCellValues.cells[11].cellVoltRaw[nSamples] = cellVoltageRaw[11];
-//  
-//  sCellValues.cells[12].cellVoltRaw[nSamples] = cellVoltageRaw[12];
-//  sCellValues.cells[13].cellVoltRaw[nSamples] = cellVoltageRaw[13];
-//  sCellValues.cells[14].cellVoltRaw[nSamples] = cellVoltageRaw[14];
-//  sCellValues.cells[15].cellVoltRaw[nSamples] = cellVoltageRaw[15];
-  
-//  in.oldest = in.previous;
-//  in.previous = in.current;
-//  in.current = cellVoltageRaw[10];
-//  
-////  UINT32 coreTickRate = Timer.Tic(15000, SCALE_NS);
-//  NpfZ32StaticOptimized(&in, &out);
-////  INT32 time = Timer.Toc(15000, coreTickRate);
-//  sCellValues.cells[10].cellVoltRaw[nSamples] = out.current;
 }
 
 extern volatile BOOL oAdcReady;
