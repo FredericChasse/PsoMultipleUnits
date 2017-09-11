@@ -45,9 +45,10 @@ typedef struct sLinkedList_t
 // Public functions
 //==============================================================================
 
-INT8 LinkedList_Init      (LinkedList_t *list, Node_t *head);
-INT8 LinkedList_AddToEnd  (LinkedList_t *list, Node_t *node);
-INT8 LinkedList_RemoveNode(LinkedList_t *list, Node_t *node);
+INT8    LinkedList_Init       (LinkedList_t *list, Node_t *head);
+INT8    LinkedList_AddToEnd   (LinkedList_t *list, Node_t *node);
+INT8    LinkedList_RemoveNode (LinkedList_t *list, Node_t *node);
+Node_t* LinkedList_FindNode   (LinkedList_t *list, void   *nodeCtx);
 
 
 

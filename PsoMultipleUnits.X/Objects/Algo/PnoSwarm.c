@@ -92,16 +92,9 @@ INT8 _PnoSwarm_Init (PnoSwarm_t *pno, UnitArrayInterface_t *unitArray, PnoSwarmP
     pno->instances[i] = (PnoInstanceInterface_t *) PnoInstanceInterface(PNO_SWARM);
     __assert(pno->instances[i]);
     memcpy(&pno->param[i], param, sizeof(PnoSwarmParam_t));
-//    pno->param[i].delta = POT_STEP_VALUE;
-//    pno->param[i].uinit = potRealValues[POT_MAX_INDEX/2];
-//    pno->param[i].umax = potRealValues[POT_MIN_INDEX];
-//    pno->param[i].umin = potRealValues[POT_MAX_INDEX];
-//    pno->param[i].nSamplesForSs = 6;
-//    pno->param[i].oscAmp = 2;
-//    pno->param[i].perturbOsc = 0.05;
     
-    pno->instances[i]->Init(pno->instances[i]->ctx, i, pno->param[i].delta_int, pno->param[i].uinit_int, pno->param[i].umin_int, pno->param[i].umax_int, pno->param[i].perturbOsc);
-    pno->instances[i]->SetSteadyState(pno->instances[i]->ctx, pno->param[i].nSamplesForSs, pno->param[i].oscAmp);
+    pno->instances[i]->Init(pno->instances[i], pno->param[i].delta_int, pno->param[i].uinit_int, pno->param[i].umin_int, pno->param[i].umax_int, pno->param[i].perturbOsc);
+    pno->instances[i]->SetSteadyState(pno->instances[i], pno->param[i].nSamplesForSs, pno->param[i].oscAmp);
   }
 }
 
@@ -113,7 +106,7 @@ void _PnoSwarm_Release (PnoSwarm_t *pno)
   
   for (i = 0; i < pno->nInstances; i++)
   {
-    pno->instances[i]->Release(pno->instances[i]->ctx);
+    pno->instances[i]->Release(pno->instances[i]);
   }
   pno->nInstances     = 0;
   pno->unitArray      = NULL;
@@ -141,14 +134,18 @@ UINT8 _PnoSwarm_ComputeAllPos (PnoSwarm_t *pno, float *newPos, UINT8 *idxPerturb
   for (i = 0; i < pno->nInstances; i++)
   {
     pnoi = pno->instances[i];
+    __assert(pnoi);
     
-    pnoi->SetFitness(pnoi->ctx, pno->unitArray->GetPower(pno->unitArray->ctx, i));
+    __assert(pno->unitArray);
+    __assert(pno->unitArray->ctx);
+    pnoi->SetFitness(pnoi, pno->unitArray->GetPower(pno->unitArray->ctx, i));
     if (pno->iteration == 1)
     {
-      pnoi->SetFitness(pnoi->ctx, pno->unitArray->GetPower(pno->unitArray->ctx, i));
+      pnoi->SetFitness(pnoi, pno->unitArray->GetPower(pno->unitArray->ctx, i));
     }
     
-    newPos[i] = pnoi->ComputePos(pnoi->ctx, &oPerturbed);
+    __assert(pnoi->ComputePos == dbgComputePosSwarm)
+    newPos[i] = pnoi->ComputePos(pnoi, &oPerturbed);
     if (oPerturbed)
     {
       idxPerturbed[nPerturbed++] = i;
@@ -178,14 +175,9 @@ void _PnoSwarm_RemoveInstances (PnoSwarm_t *pno, UINT8 *idx, UINT8 nInstances)
   
   for (i = 0; i < nInstances; i++)
   {
-    pno->instances[idx[i]]->Release(pno->instances[idx[i]]->ctx);
+    pno->instances[idx[i]]->Release(pno->instances[idx[i]]);
     _PnoSwarm_ShiftInstancesLeft(pno, idx[i]);
     pno->nInstances--;
-  }
-  
-  for (i = 0; i < pno->nInstances; i++)
-  {
-    pno->instances[i]->SetId(pno->instances[i]->ctx, i);
   }
 }
 
@@ -198,30 +190,33 @@ void _PnoSwarm_SetId (PnoSwarm_t *pno, UINT8 id)
 
 void _PnoSwarm_ShiftInstancesLeft (PnoSwarm_t *pno, UINT8 idxToShift)
 {
-  if (idxToShift == (pno->nInstances - 1))
+  UINT8 i;
+  UINT8 finalIdx = pno->nInstances - 1;
+  
+  for (i = idxToShift; i < finalIdx; i++)
   {
-    return;
+    pno->instances[i] = pno->instances[i+1];
   }
-  UINT8 offset = pno->nInstances - idxToShift - 1;
-  memmove(&pno->instances[idxToShift], &pno->instances[idxToShift + 1], offset * sizeof(PnoInstanceInterface_t *));
+  
+  pno->instances[pno->nInstances - 1] = NULL;
 }
 
 
 BOOL _PnoSwarm_GetSteadyState (PnoSwarm_t *pno, UINT8 idx)
 {
-  return pno->instances[idx]->GetSteadyState(pno->instances[idx]->ctx);
+  return pno->instances[idx]->GetSteadyState(pno->instances[idx]);
 }
 
 
 void _PnoSwarm_SetPos (PnoSwarm_t *pno, UINT8 idx, float pos)
 {
-  pno->instances[idx]->SetPos(pno->instances[idx]->ctx, pos);
+  pno->instances[idx]->SetPos(pno->instances[idx], pos);
 }
 
 
 void _PnoSwarm_SetFitness (PnoSwarm_t *pno, UINT8 idx, float fitness)
 {
-  pno->instances[idx]->SetFitness(pno->instances[idx]->ctx, fitness);
+  pno->instances[idx]->SetFitness(pno->instances[idx], fitness);
 }
 
 

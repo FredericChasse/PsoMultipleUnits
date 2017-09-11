@@ -141,3 +141,23 @@ INT8 LinkedList_RemoveNode (LinkedList_t *list, Node_t *node)
     return 0;
   }
 }
+
+Node_t* LinkedList_FindNode(LinkedList_t *list, void *nodeCtx)
+{
+  if ( (list == 0) || (nodeCtx == 0) )
+  {
+    return NULL;
+  }
+  Node_t *temp = list->head;
+  
+  while (temp != NULL)
+  {
+    if (nodeCtx == temp->ctx)
+    {
+      return temp;
+    }
+    temp = temp->next;
+  }
+  
+  return NULL;
+}

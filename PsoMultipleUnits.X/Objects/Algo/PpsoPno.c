@@ -46,35 +46,7 @@ typedef struct
 } PpsoPno_t;
 
 #define SEND_DEBUG_DATA_TO_UART
-
-const UINT8  strReleasing[] = "Releasing "
-            ,strReleasingLen = 10
-            ,strCreating[] = "Creating "
-            ,strCreatingLen = 9
-            ,strEnter[] = "\n\r"
-            ,strEnterLen = 2
-            ,strNSeqSwarms[] = "N seq swarms = "
-            ,strNSeqSwarmsLen = 15
-            ,strNPnos[] = "N P&O = "
-            ,strNPnosLen = 8
-            ,strNParaSwarms[] = "N para swarms = "
-            ,strNParaSwarmsLen = 16
-            ,strSpace = '0'
-            ,strSpaceLen = 1
-            ,strNumbers[N_UNITS_TOTAL] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E'}
-            ,strSwarmCreateError[] = "Creating overflow "
-            ,strSwarmCreateErrorLen = 18
-            ,strSwarmReleaseError[] = "Releasing void "
-            ,strSwarmReleaseErrorLen = 15
-            ,strSeqSwarm[] = "seq swarm"
-            ,strSeqSwarmLen = 9
-            ,strParaSwarm[] = "para swarm"
-            ,strParaSwarmLen = 10
-            ,strPnoSwarm[] = "pno swarm"
-            ,strPnoSwarmLen = 9
-            ,strInvalidParameter[] = "Invalid parameter!"
-            ,strInvalidParameterLen = 18
-            ;
+//#define SEND_ALGO_STEP_TO_UART
 
 typedef enum
 {
@@ -101,7 +73,7 @@ static int _CompareFunc           (const void *p1, const void *p2);
 void _SendAlgoStatus              (PpsoPno_t *pso);
 void _SendCreatingSwarm           (PpsoPno_t *pso, DbgDataType_t type, UINT8 idx);
 void _SendReleasingSwarm          (PpsoPno_t *pso, DbgDataType_t type, UINT8 idx);
-void _SendAlgoStep                (PpsoPno_t *pso, UINT8 step);
+void _SendAlgoStep                (UINT8 step);
 void _SendUnitsPos                (PpsoPno_t *pso);
 void _SendClassifierResults       (PpsoPno_t *pso);
 void _SendPerturbedUnits          (PpsoPno_t *pso, UINT8 *idx, UINT8 nUnits);
@@ -309,6 +281,7 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
   _SendAlgoStatus(pso);
   _SendUnitsPos(pso);
 #endif
+  
   // </editor-fold>
   
   // <editor-fold defaultstate="collapsed" desc="Update algo values and classifier">
@@ -321,6 +294,9 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
   // <editor-fold defaultstate="collapsed" desc="Parallel PSO">
   // Parallel PSO
   //----------------------------------------------------------------------------
+#ifdef SEND_ALGO_STEP_TO_UART
+  _SendAlgoStep(0);
+#endif
   for (i = 0; i < pso->nParaSwarms; i++)
   {
     swarm = pso->paraSwarms[i];
@@ -405,19 +381,45 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
   // <editor-fold defaultstate="collapsed" desc="P&O">
   // P&O
   //----------------------------------------------------------------------------
+#ifdef SEND_ALGO_STEP_TO_UART
+  _SendAlgoStep(1);
+#endif
   for (i = 0; i < pso->nPnos; i++)
   {
+#ifdef SEND_ALGO_STEP_TO_UART
+  _SendAlgoStep(10);
+#endif
     pno = pso->pnos[i];
     __assert(pno);
+#ifdef SEND_ALGO_STEP_TO_UART
+  _SendAlgoStep(11);
+#endif
     
     pno->IncIteration(pno->ctx);
+#ifdef SEND_ALGO_STEP_TO_UART
+  _SendAlgoStep(12);
+#endif
+  
+    if (pso->iteration >= 27)
+    {
+      _SendAlgoStep(27);
+    }
     
     nPerturbed = pno->ComputeAllPos(pno->ctx, nextPositions, idxPerturbed);
+#ifdef SEND_ALGO_STEP_TO_UART
+  _SendAlgoStep(13);
+#endif
     
     nUnits = pno->GetNInstances(pno->ctx);
+#ifdef SEND_ALGO_STEP_TO_UART
+  _SendAlgoStep(14);
+#endif
     
     array = pno->GetArray(pno->ctx);
     __assert(array);
+#ifdef SEND_ALGO_STEP_TO_UART
+  _SendAlgoStep(15);
+#endif
     
     for (iUnit = 0; iUnit < nUnits; iUnit++)
     {
@@ -430,6 +432,9 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
       array->SetPos(array->ctx, iUnit, nextPositions[iUnit]);
     }
     
+#ifdef SEND_ALGO_STEP_TO_UART
+  _SendAlgoStep(16);
+#endif
     if (nPerturbed)
     {
 #ifdef SEND_DEBUG_DATA_TO_UART
@@ -446,6 +451,9 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
   // <editor-fold defaultstate="collapsed" desc="Sequential PSO">
   // Sequential PSO
   //----------------------------------------------------------------------------
+#ifdef SEND_ALGO_STEP_TO_UART
+  _SendAlgoStep(2);
+#endif
   for (i = 0; i < pso->nSeqSwarms; i++)
   {
     swarm = pso->seqSwarms[i];
@@ -534,6 +542,9 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
   // <editor-fold defaultstate="collapsed" desc="Set the correct algo indexes">
   // Set the correct algo indexes
   //-----------------------------------
+#ifdef SEND_ALGO_STEP_TO_UART
+  _SendAlgoStep(3);
+#endif
   if (pso->nPnos)
   {
     tmp = pso->nParaSwarms + pso->nPnos;
@@ -565,6 +576,9 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
   // <editor-fold defaultstate="collapsed" desc="Assess perturbed P&O instances">
   // Assess perturbed P&O instances
   //-----------------------------------
+#ifdef SEND_ALGO_STEP_TO_UART
+  _SendAlgoStep(4);
+#endif
   for (i = 0; i < pso->nPnos; i++)
   {
     idx = algoIdxPerturbed[iAlgo++];
@@ -613,6 +627,9 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
   // <editor-fold defaultstate="collapsed" desc="Assess perturbed Sequential PSO">
   // Assess perturbed Sequential PSO
   //-----------------------------------
+#ifdef SEND_ALGO_STEP_TO_UART
+  _SendAlgoStep(5);
+#endif
   for (i = 0; i < pso->nSeqSwarms; i++)
   {
     idx = algoIdxPerturbed[iAlgo++];
@@ -651,6 +668,9 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
   void *units[N_UNITS_TOTAL];
   UnitArrayInterface_t *newArray;
   UINT8 tmpUnitsToRemove[N_UNITS_TOTAL], nUnitsToRemove = 0;
+#ifdef SEND_ALGO_STEP_TO_UART
+  _SendAlgoStep(6);
+#endif
   for (i = 0; i < pso->nParaSwarms; i++)
   {
     swarm = pso->paraSwarms[i];
@@ -821,6 +841,9 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
   UINT8 nGroups, iGroup;
   UINT8 lengths[N_UNITS_TOTAL];
   UINT32 offset = 0;
+#ifdef SEND_ALGO_STEP_TO_UART
+  _SendAlgoStep(7);
+#endif
   if (nPerturbed)
   {
 #ifdef SEND_DEBUG_DATA_TO_UART
@@ -933,6 +956,35 @@ static int _CompareFunc (const void *p1, const void *p2)
 }
 
 
+
+const UINT8  strReleasing[] = "Releasing "
+            ,strReleasingLen = 10
+            ,strCreating[] = "Creating "
+            ,strCreatingLen = 9
+            ,strEnter[] = "\n\r"
+            ,strEnterLen = 2
+            ,strNSeqSwarms[] = "N seq swarms = "
+            ,strNSeqSwarmsLen = 15
+            ,strNPnos[] = "N P&O = "
+            ,strNPnosLen = 8
+            ,strNParaSwarms[] = "N para swarms = "
+            ,strNParaSwarmsLen = 16
+            ,strSpace = '0'
+            ,strSpaceLen = 1
+            ,strNumbers[N_UNITS_TOTAL] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E'}
+            ,strSwarmCreateError[] = "Creating overflow "
+            ,strSwarmCreateErrorLen = 18
+            ,strSwarmReleaseError[] = "Releasing void "
+            ,strSwarmReleaseErrorLen = 15
+            ,strSeqSwarm[] = "seq swarm"
+            ,strSeqSwarmLen = 9
+            ,strParaSwarm[] = "para swarm"
+            ,strParaSwarmLen = 10
+            ,strPnoSwarm[] = "pno swarm"
+            ,strPnoSwarmLen = 9
+            ,strInvalidParameter[] = "Invalid parameter!"
+            ,strInvalidParameterLen = 18
+            ;
 void _SendAlgoStatus (PpsoPno_t *pso)
 {
   sUartLineBuffer_t buf = {0};
@@ -1172,13 +1224,14 @@ void _SendReleasingSwarm (PpsoPno_t *pso, DbgDataType_t type, UINT8 idx)
 }
 
 
-void _SendAlgoStep (PpsoPno_t *pso, UINT8 step)
+void _SendAlgoStep (UINT8 step)
 {
   sUartLineBuffer_t buf;
   
   buf.length = sprintf(buf.buffer, "Step %i\n\r", step);
   while (Uart.PutTxFifoBuffer(U_DBG, &buf) < 0);
   while (!Uart.Var.uartTxFifo[U_DBG_IDX].bufEmpty);
+  Timer.DelayMs(1);
 }
 
 

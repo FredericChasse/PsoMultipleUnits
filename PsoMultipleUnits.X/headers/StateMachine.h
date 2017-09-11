@@ -87,7 +87,7 @@ inline INT8 FifoRead (sUartFifoBuffer_t *fifo, UINT8 *data);
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-#define __assert(__func)    { if (__func == NULL) { StateError(); } }
+#define __assert(__val)    { if ((__val) == NULL) { StateError(); } }
 
 
 //==============================================================================

@@ -26,7 +26,7 @@
 // Public definitions
 //==============================================================================
 
-#define STEADY_STATE_PNO_MAX_SAMPLES      (10)
+#define STEADY_STATE_PNO_MAX_SAMPLES      (20)
 
 typedef struct
 {

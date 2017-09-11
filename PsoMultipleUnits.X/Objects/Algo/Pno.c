@@ -119,10 +119,10 @@ INT8 _Pno_Init (Pno_t *pno, UnitArrayInterface_t *unitArray)
     pno->param[i].oscAmp = 2;
     pno->param[i].perturbOsc = 0.05;
     
-    pno->instances[i]->Init(pno->instances[i]->ctx, i, pno->param[i].delta_int, pno->param[i].uinit_int, pno->param[i].umin_int, pno->param[i].umax_int, pno->param[i].perturbOsc);
-    pno->instances[i]->SetSteadyState(pno->instances[i]->ctx, pno->param[i].nSamplesForSs, pno->param[i].oscAmp);
+    pno->instances[i]->Init(pno->instances[i], pno->param[i].delta_int, pno->param[i].uinit_int, pno->param[i].umin_int, pno->param[i].umax_int, pno->param[i].perturbOsc);
+    pno->instances[i]->SetSteadyState(pno->instances[i], pno->param[i].nSamplesForSs, pno->param[i].oscAmp);
     
-    unitArray->SetPosIdx(unitArray->ctx, i, pno->instances[i]->GetPosIdx(pno->instances[i]->ctx));
+    unitArray->SetPosIdx(unitArray->ctx, i, pno->instances[i]->GetPosIdx(pno->instances[i]));
   }
 }
 
@@ -139,7 +139,7 @@ void _Pno_Release (Pno_t *pno)
   
   for (i = 0; i < pno->nInstances; i++)
   {
-    pno->instances[i]->Release(pno->instances[i]->ctx);
+    pno->instances[i]->Release(pno->instances[i]);
   }
   pno->nInstances     = 0;
   pno->timeElapsed    = 0;
@@ -163,13 +163,13 @@ INT8 _Pno_Run (Pno_t *pno)
   {
     pnoi = pno->instances[i];
     
-    pnoi->SetFitness(pnoi->ctx, pno->unitArray->GetPower(pno->unitArray->ctx, i));
+    pnoi->SetFitness(pnoi, pno->unitArray->GetPower(pno->unitArray->ctx, i));
     if (oFirstIteration)
     {
-      pnoi->SetFitness(pnoi->ctx, pno->unitArray->GetPower(pno->unitArray->ctx, i));
+      pnoi->SetFitness(pnoi, pno->unitArray->GetPower(pno->unitArray->ctx, i));
     }
     
-    newPos = pnoi->ComputePos(pnoi->ctx, &dummy);
+    newPos = pnoi->ComputePos(pnoi, &dummy);
     pno->unitArray->SetPosIdx(pno->unitArray->ctx, i, newPos);
   }
   

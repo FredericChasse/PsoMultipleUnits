@@ -21,6 +21,7 @@
 #include "PnoInstance.h"
 #include "Position.h"
 #include "SteadyStatePno.h"
+#include "StateMachine.h"   // For debugging
 
 
 // Private definitions
@@ -30,8 +31,9 @@
 
 typedef struct
 {
+  PnoInstanceInterface_t base;
+  
   UINT8 id;
-  UINT8 linkKey;
   Position_t pos;
   
   float umin;
@@ -54,7 +56,7 @@ typedef struct
 // Private prototypes
 //==============================================================================
 
-void  _PnoInstance_Init               (PnoInstance_t *pnoi, UINT8 id, UINT8 delta, UINT8 pos, UINT8 umin, UINT8 umax, float perturbOsc);
+void  _PnoInstance_Init               (PnoInstance_t *pnoi, UINT8 delta, UINT8 pos, UINT8 umin, UINT8 umax, float perturbOsc);
 void  _PnoInstance_SetSteadyState     (PnoInstance_t *pnoi, UINT8 samplesForSs, UINT8 oscAmp);
 BOOL  _PnoInstance_GetSteadyState     (PnoInstance_t *pnoi);
 float _PnoInstance_ComputePosClassic  (PnoInstance_t *pnoi, UINT8 *oPerturbed);
@@ -68,27 +70,39 @@ void  _PnoInstance_Release            (PnoInstance_t *pnoi);
 void  _PnoInstance_SetId              (PnoInstance_t *pnoi, UINT8 id);
 
 
+const PnoiComputePos_fct   dbgComputePosSwarm = (PnoiComputePos_fct) &_PnoInstance_ComputePosSwarm
+                          ,dbgComputePosClassic = (PnoiComputePos_fct) &_PnoInstance_ComputePosClassic
+                          ;
+const PnoiInit_fct dbgInit = (PnoiInit_fct) &_PnoInstance_Init;
+const PnoiSetSteadyState_fct dbgSetSteadyState = (PnoiSetSteadyState_fct) &_PnoInstance_SetSteadyState;
+const PnoiGetSteadyState_fct dbgGetSteadyState = (PnoiGetSteadyState_fct) &_PnoInstance_GetSteadyState;
+const PnoiSetPos_fct dbgSetPos = (PnoiSetPos_fct) &_PnoInstance_SetPos;
+const PnoiGetPos_fct dbgGetPos = (PnoiGetPos_fct) &_PnoInstance_GetPos;
+const PnoiSetPosIdx_fct dbgSetPosIdx = (PnoiSetPosIdx_fct) &_PnoInstance_SetPosIdx;
+const PnoiGetPosIdx_fct dbgGetPosIdx = (PnoiGetPosIdx_fct) &_PnoInstance_GetPosIdx;
+const PnoiSetFitness_fct dbgSetFitness = (PnoiSetFitness_fct) &_PnoInstance_SetFitness;
+const PnoiRelease_fct dbgRelease = (PnoiRelease_fct) &_PnoInstance_Release;
+const PnoiSetId_fct dbgSetId = (PnoiSetId_fct) &_PnoInstance_SetId;
+
+
+
 // Private variables
 //==============================================================================
 
-PnoInstance_t           _instances    [N_INSTANCES_TOTAL];
-PnoInstanceInterface_t  _instances_if [N_INSTANCES_TOTAL];
+PnoInstance_t _instances          [N_INSTANCES_TOTAL];
 
-LinkedList_t _unusedInstances       = {NULL, NULL, 0, N_INSTANCES_TOTAL};
-LinkedList_t _usedInstances         = {NULL, NULL, 0, N_INSTANCES_TOTAL};
-Node_t       _instancesNodes          [N_INSTANCES_TOTAL];
+LinkedList_t  _unusedInstances  = {NULL, NULL, 0, N_INSTANCES_TOTAL};
+LinkedList_t  _usedInstances    = {NULL, NULL, 0, N_INSTANCES_TOTAL};
+Node_t        _instancesNodes     [N_INSTANCES_TOTAL];
 
 static BOOL _oInstanceArrayInitialized = 0;
-
-UINT8 *_instancesKeys[N_INSTANCES_TOTAL];
 
 
 // Private functions
 //==============================================================================
 
-void _PnoInstance_Init (PnoInstance_t *pnoi, UINT8 id, UINT8 delta, UINT8 pos, UINT8 umin, UINT8 umax, float perturbOsc)
+void _PnoInstance_Init (PnoInstance_t *pnoi, UINT8 delta, UINT8 pos, UINT8 umin, UINT8 umax, float perturbOsc)
 {
-  pnoi->id = id;
   pnoi->delta_int = delta;
   pnoi->delta = delta*POT_STEP_VALUE;
   Position_Reset(&pnoi->pos);
@@ -223,14 +237,13 @@ void _PnoInstance_SetFitness (PnoInstance_t *pnoi, float fitness)
 
 void _PnoInstance_Release (PnoInstance_t *pnoi)
 {
-  Node_t *node = &_instancesNodes[pnoi->linkKey];
+  Node_t *node = LinkedList_FindNode(&_usedInstances, pnoi);
+  __assert(node);
   LinkedList_RemoveNode(node->list, node);
   LinkedList_AddToEnd(&_unusedInstances, node);
   
-//  SteadyState_Reset(&pnoi->steadyState);
   Position_Reset(&pnoi->pos);
     pnoi->delta
-  = pnoi->id
   = pnoi->k
   = pnoi->umin
   = pnoi->umax
@@ -277,23 +290,21 @@ const PnoInstanceInterface_t * PnoInstanceInterface (PnoType_t type)
     for (i = 0; i < N_INSTANCES_TOTAL; i++)
     {
       // Init the instance itself and its interface
-      _instances[i].linkKey = i;
-      
-      _instances_if[i].ctx            = (void *)                  &_instances[i];
-      _instances_if[i].Init           = (PnoiInit_fct)            &_PnoInstance_Init;
-      _instances_if[i].ComputePos     = (PnoiComputePos_fct)      &_PnoInstance_ComputePosClassic;
-      _instances_if[i].SetPos         = (PnoiSetPos_fct)          &_PnoInstance_SetPos;
-      _instances_if[i].GetPos         = (PnoiGetPos_fct)          &_PnoInstance_GetPos;
-      _instances_if[i].SetPosIdx      = (PnoiSetPosIdx_fct)       &_PnoInstance_SetPosIdx;
-      _instances_if[i].GetPosIdx      = (PnoiGetPosIdx_fct)       &_PnoInstance_GetPosIdx;
-      _instances_if[i].SetFitness     = (PnoiSetFitness_fct)      &_PnoInstance_SetFitness;
-      _instances_if[i].Release        = (PnoiRelease_fct)         &_PnoInstance_Release;
-      _instances_if[i].SetSteadyState = (PnoiSetSteadyState_fct)  &_PnoInstance_SetSteadyState;
-      _instances_if[i].GetSteadyState = (PnoiGetSteadyState_fct)  &_PnoInstance_GetSteadyState;
-      _instances_if[i].SetId          = (PnoiSetId_fct)           &_PnoInstance_SetId;
+      _instances[i].id                  = i;
+      _instances[i].base.Init           = (PnoiInit_fct)            &_PnoInstance_Init;
+      _instances[i].base.ComputePos     = (PnoiComputePos_fct)      &_PnoInstance_ComputePosClassic;
+      _instances[i].base.SetPos         = (PnoiSetPos_fct)          &_PnoInstance_SetPos;
+      _instances[i].base.GetPos         = (PnoiGetPos_fct)          &_PnoInstance_GetPos;
+      _instances[i].base.SetPosIdx      = (PnoiSetPosIdx_fct)       &_PnoInstance_SetPosIdx;
+      _instances[i].base.GetPosIdx      = (PnoiGetPosIdx_fct)       &_PnoInstance_GetPosIdx;
+      _instances[i].base.SetFitness     = (PnoiSetFitness_fct)      &_PnoInstance_SetFitness;
+      _instances[i].base.Release        = (PnoiRelease_fct)         &_PnoInstance_Release;
+      _instances[i].base.SetSteadyState = (PnoiSetSteadyState_fct)  &_PnoInstance_SetSteadyState;
+      _instances[i].base.GetSteadyState = (PnoiGetSteadyState_fct)  &_PnoInstance_GetSteadyState;
+      _instances[i].base.SetId          = (PnoiSetId_fct)           &_PnoInstance_SetId;
       
       // Init the linked list
-      _instancesNodes[i].ctx = (void *) &_instances_if[i];
+      _instancesNodes[i].ctx = (void *) &_instances[i];
       _instancesNodes[i].key = i;
       
       if (i < (N_INSTANCES_TOTAL - 1))
@@ -304,8 +315,6 @@ const PnoInstanceInterface_t * PnoInstanceInterface (PnoType_t type)
       {
         _instancesNodes[i].next = NULL;
       }
-      
-      _instancesKeys[i] = &_instances[i].linkKey;
     }
     
     LinkedList_Init(&_unusedInstances, &_instancesNodes[0]);
@@ -324,11 +333,11 @@ const PnoInstanceInterface_t * PnoInstanceInterface (PnoType_t type)
   
   if (type == PNO_CLASSIC)
   {
-    ((PnoInstanceInterface_t *) temp->ctx)->ComputePos = (PnoiComputePos_fct) &_PnoInstance_ComputePosClassic;
+    ((PnoInstance_t *) temp->ctx)->base.ComputePos = (PnoiComputePos_fct) &_PnoInstance_ComputePosClassic;
   }
   else
   {
-    ((PnoInstanceInterface_t *) temp->ctx)->ComputePos = (PnoiComputePos_fct) &_PnoInstance_ComputePosSwarm;
+    ((PnoInstance_t *) temp->ctx)->base.ComputePos = (PnoiComputePos_fct) &_PnoInstance_ComputePosSwarm;
   }
   return temp->ctx;
 }
