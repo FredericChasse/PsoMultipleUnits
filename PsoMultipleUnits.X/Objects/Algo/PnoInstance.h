@@ -67,21 +67,5 @@ typedef struct
 const PnoInstanceInterface_t * PnoInstanceInterface (PnoType_t type);
 
 
-// Debug variables
-//==============================================================================
-
-extern const PnoiComputePos_fct dbgComputePosSwarm, dbgComputePosClassic;
-extern const PnoiInit_fct dbgInit;
-extern const PnoiSetSteadyState_fct dbgSetSteadyState;
-extern const PnoiGetSteadyState_fct dbgGetSteadyState;
-extern const PnoiSetPos_fct dbgSetPos;
-extern const PnoiGetPos_fct dbgGetPos;
-extern const PnoiSetPosIdx_fct dbgSetPosIdx;
-extern const PnoiGetPosIdx_fct dbgGetPosIdx;
-extern const PnoiSetFitness_fct dbgSetFitness;
-extern const PnoiRelease_fct dbgRelease;
-extern const PnoiSetId_fct dbgSetId;
-
-
 
 #endif // __PNO_INSTANCE_H__

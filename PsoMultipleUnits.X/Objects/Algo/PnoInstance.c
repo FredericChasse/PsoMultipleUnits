@@ -70,22 +70,6 @@ void  _PnoInstance_Release            (PnoInstance_t *pnoi);
 void  _PnoInstance_SetId              (PnoInstance_t *pnoi, UINT8 id);
 
 
-const PnoiComputePos_fct   dbgComputePosSwarm = (PnoiComputePos_fct) &_PnoInstance_ComputePosSwarm
-                          ,dbgComputePosClassic = (PnoiComputePos_fct) &_PnoInstance_ComputePosClassic
-                          ;
-const PnoiInit_fct dbgInit = (PnoiInit_fct) &_PnoInstance_Init;
-const PnoiSetSteadyState_fct dbgSetSteadyState = (PnoiSetSteadyState_fct) &_PnoInstance_SetSteadyState;
-const PnoiGetSteadyState_fct dbgGetSteadyState = (PnoiGetSteadyState_fct) &_PnoInstance_GetSteadyState;
-const PnoiSetPos_fct dbgSetPos = (PnoiSetPos_fct) &_PnoInstance_SetPos;
-const PnoiGetPos_fct dbgGetPos = (PnoiGetPos_fct) &_PnoInstance_GetPos;
-const PnoiSetPosIdx_fct dbgSetPosIdx = (PnoiSetPosIdx_fct) &_PnoInstance_SetPosIdx;
-const PnoiGetPosIdx_fct dbgGetPosIdx = (PnoiGetPosIdx_fct) &_PnoInstance_GetPosIdx;
-const PnoiSetFitness_fct dbgSetFitness = (PnoiSetFitness_fct) &_PnoInstance_SetFitness;
-const PnoiRelease_fct dbgRelease = (PnoiRelease_fct) &_PnoInstance_Release;
-const PnoiSetId_fct dbgSetId = (PnoiSetId_fct) &_PnoInstance_SetId;
-
-
-
 // Private variables
 //==============================================================================
 

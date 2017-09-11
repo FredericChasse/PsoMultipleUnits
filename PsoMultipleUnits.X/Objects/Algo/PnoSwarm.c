@@ -144,7 +144,6 @@ UINT8 _PnoSwarm_ComputeAllPos (PnoSwarm_t *pno, float *newPos, UINT8 *idxPerturb
       pnoi->SetFitness(pnoi, pno->unitArray->GetPower(pno->unitArray->ctx, i));
     }
     
-    __assert(pnoi->ComputePos == dbgComputePosSwarm)
     newPos[i] = pnoi->ComputePos(pnoi, &oPerturbed);
     if (oPerturbed)
     {
