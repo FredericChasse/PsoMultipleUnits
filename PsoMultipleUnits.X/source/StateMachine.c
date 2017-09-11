@@ -80,7 +80,6 @@ AlgoInterface_t *algo;
 UnitArrayInterface_t   *algoArray
                       ,*mainArray
                       ;
-PerturbInterface_t *perturb;
 
 CodecInterface_t *codec;
 
@@ -238,6 +237,8 @@ void StateInit(void)
   InitSpi();
   InitWdt();
   
+  ShutdownLedDriver();    // We don't need it for the MFCs
+  
 //  // Init digital potentiometers AD8403
   InitPot(0);
   InitPot(1);
@@ -246,7 +247,6 @@ void StateInit(void)
   
   mainArray = (UnitArrayInterface_t *)  UnitArrayInterface();
   algoArray = (UnitArrayInterface_t *)  UnitArrayInterface();
-  perturb   = (PerturbInterface_t   *)  PerturbInterface  ();
   codec     = (CodecInterface_t     *)  CodecInterface    ();
   algo      = (AlgoInterface_t      *)  NULL;
   
@@ -260,8 +260,6 @@ void StateInit(void)
   algoArray->Init(algoArray->ctx, 1);
   
   StartInterrupts();
-  
-  perturb->Init(perturb->ctx, 500);
   
   while(oAcqOngoing);
   nSamples = 0;
@@ -327,17 +325,9 @@ void StateAcq(void)
       break;
       
     case DECODER_RET_MSG_NEW_PERTURB:
-      memcpy(&perturbPayload, &retBuf[0], sizeOfSetPerturbPayloadBase);
-      memcpy(&perturbPayload.units[0], &retBuf[sizeOfSetPerturbPayloadBase], perturbPayload.nUnits);  // UINT8 buffer
-      perturb->SetNewPerturb(perturb->ctx, perturbPayload.units, perturbPayload.nUnits, perturbPayload.amplitude, perturbPayload.iteration);
       break;
       
     case DECODER_RET_MSG_INIT_PERTURB:
-      memcpy(&initPerturbPayload, &retBuf[0], sizeOfInitPerturbPayloadBase);
-      for (i = 0; i < N_UNITS_TOTAL; i++)
-      {
-        perturb->SetUnitIntensity(perturb->ctx, i, initPerturbPayload.amplitude);
-      }
       break;
       
       
@@ -468,7 +458,6 @@ void StateAcq(void)
         {
           algoArray->RemoveUnitFromArray(algoArray->ctx, 0);
         }
-        perturb->Reset(perturb->ctx);
       }
       break;
       
@@ -553,7 +542,6 @@ void StateCompute(void)
   
   DBG2_ON();
   algo->Run(algo->ctx);
-  perturb->Run(perturb->ctx);
   ResetFilterValues();
   Adc.EnableInterrupts();
   DBG2_OFF();

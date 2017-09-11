@@ -163,144 +163,15 @@ inline void ComputeMeanAdcValues (void)
     }
   }
   
-//  while(cellVoltRaw[i][1] > 0)
-//  {
-//    i++;
-//  }
-//  while((cellVoltRaw[i][1] == 0) && (cellVoltRaw[i+1][1] == 0) && (cellVoltRaw[i+2][1] == 0))
-//  {
-//    i++;
-//  }
-//  i+=3;
-//  
-//  for (i = i; i < N_SAMPLES_PER_ADC_READ; i++)
-//  {
-//    maxVal = MAX(maxVal, cellVoltRaw[i][1]);
-//    if (cellVoltRaw[i][1] == 0)
-//    {
-//      break;
-//    }
-//  }
-  
   for (j = 0; j < N_UNITS_TOTAL; j++)
   {
     for (i = N_SAMPLES_TO_DROP; i < N_SAMPLES_PER_ADC_READ; i++)
     {
-      maxVal[j] = MAX(maxVal[j], cellVoltRaw[i][j]);
-    }
-    halfMaxVal[j] = maxVal[j] >> 1;
-    
-    for (i = N_SAMPLES_TO_DROP; i < N_SAMPLES_PER_ADC_READ; i++)
-    {
-      if (cellVoltRaw[i][j] < halfMaxVal[j])
-      {
-        cellVoltRaw[i][j] = 0;
-      }
-      else
-      {
-        cellVoltRaw[i][j] = maxVal[j];
-      }
-    }
-  
-    if (cellVoltRaw[N_SAMPLES_TO_DROP][j] == 0)
-    {
-      firstVal[j] = maxVal[j];
-      lastVal[j] = 0;
-    }
-    else
-    {
-      firstVal[j] = 0;
-      lastVal[j] = maxVal[j];
-    }
-  
-    for (i = N_SAMPLES_TO_DROP; i < N_SAMPLES_PER_ADC_READ; i++)
-    {
-      if ( (cellVoltRaw[i][j] == firstVal[j]) && (cellVoltRaw[i+1][j] == lastVal[j]))
-      {
-        iStart[j] = i+1;
-        break;
-      }
-    }
-    for (i = N_SAMPLES_PER_ADC_READ - 2; i > N_SAMPLES_TO_DROP; i--)
-    {
-      if ((cellVoltRaw[i][j] == firstVal[j]) && (cellVoltRaw[i+1][j] == lastVal[j]))
-      {
-        iEnd[j] = i+1;
-        break;
-      }
-    }
-  
-    for (i = iStart[j]; i < iEnd[j]; i++)
-    {
       meanCellRaw[j] += cellVoltRaw[i][j];
     }
     
-    divider[j] = iEnd[j] - iStart[j];
-    
-    meanCellRaw[j] = (meanCellRaw[j] / divider[j]);
+    meanCellRaw[j] = meanCellRaw[j] / N_TOTAL_SAMPLES;
   }
-  
-//  if (divider == 256)
-//  {
-//    meanCellRaw[ 0] = meanCellRaw[ 0] >> 8;
-//    meanCellRaw[ 1] = meanCellRaw[ 1] >> 8;
-//    meanCellRaw[ 2] = meanCellRaw[ 2] >> 8;
-//    meanCellRaw[ 3] = meanCellRaw[ 3] >> 8;
-//
-//    meanCellRaw[ 4] = meanCellRaw[ 4] >> 8;
-//    meanCellRaw[ 5] = meanCellRaw[ 5] >> 8;
-//    meanCellRaw[ 6] = meanCellRaw[ 6] >> 8;
-//    meanCellRaw[ 7] = meanCellRaw[ 7] >> 8;
-//
-//    meanCellRaw[ 8] = meanCellRaw[ 8] >> 8;
-//    meanCellRaw[ 9] = meanCellRaw[ 9] >> 8;
-//    meanCellRaw[10] = meanCellRaw[10] >> 8;
-//    meanCellRaw[11] = meanCellRaw[11] >> 8;
-//
-//    meanCellRaw[12] = meanCellRaw[12] >> 8;
-//    meanCellRaw[13] = meanCellRaw[13] >> 8;
-//    meanCellRaw[14] = meanCellRaw[14] >> 8;
-//  }
-//  else
-//  {
-//    meanCellRaw[ 0] = (meanCellRaw[ 0] / divider);
-//    meanCellRaw[ 1] = (meanCellRaw[ 1] / divider);
-//    meanCellRaw[ 2] = (meanCellRaw[ 2] / divider);
-//    meanCellRaw[ 3] = (meanCellRaw[ 3] / divider);
-//
-//    meanCellRaw[ 4] = (meanCellRaw[ 4] / divider);
-//    meanCellRaw[ 5] = (meanCellRaw[ 5] / divider);
-//    meanCellRaw[ 6] = (meanCellRaw[ 6] / divider);
-//    meanCellRaw[ 7] = (meanCellRaw[ 7] / divider);
-//
-//    meanCellRaw[ 8] = (meanCellRaw[ 8] / divider);
-//    meanCellRaw[ 9] = (meanCellRaw[ 9] / divider);
-//    meanCellRaw[10] = (meanCellRaw[10] / divider);
-//    meanCellRaw[11] = (meanCellRaw[11] / divider);
-//
-//    meanCellRaw[12] = (meanCellRaw[12] / divider);
-//    meanCellRaw[13] = (meanCellRaw[13] / divider);
-//    meanCellRaw[14] = (meanCellRaw[14] / divider);
-//    
-//    meanCellRaw[ 0] = (float) meanCellRaw[ 0] / (float) divider + 0.5f;
-//    meanCellRaw[ 1] = (float) meanCellRaw[ 1] / (float) divider + 0.5f;
-//    meanCellRaw[ 2] = (float) meanCellRaw[ 2] / (float) divider + 0.5f;
-//    meanCellRaw[ 3] = (float) meanCellRaw[ 3] / (float) divider + 0.5f;
-//
-//    meanCellRaw[ 4] = (float) meanCellRaw[ 4] / (float) divider + 0.5f;
-//    meanCellRaw[ 5] = (float) meanCellRaw[ 5] / (float) divider + 0.5f;
-//    meanCellRaw[ 6] = (float) meanCellRaw[ 6] / (float) divider + 0.5f;
-//    meanCellRaw[ 7] = (float) meanCellRaw[ 7] / (float) divider + 0.5f;
-//
-//    meanCellRaw[ 8] = (float) meanCellRaw[ 8] / (float) divider + 0.5f;
-//    meanCellRaw[ 9] = (float) meanCellRaw[ 9] / (float) divider + 0.5f;
-//    meanCellRaw[10] = (float) meanCellRaw[10] / (float) divider + 0.5f;
-//    meanCellRaw[11] = (float) meanCellRaw[11] / (float) divider + 0.5f;
-//
-//    meanCellRaw[12] = (float) meanCellRaw[12] / (float) divider + 0.5f;
-//    meanCellRaw[13] = (float) meanCellRaw[13] / (float) divider + 0.5f;
-//    meanCellRaw[14] = (float) meanCellRaw[14] / (float) divider + 0.5f;
-//  }
 
   if (oSmoothData)  // Smoothing function
   {
