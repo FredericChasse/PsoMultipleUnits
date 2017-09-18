@@ -17,6 +17,7 @@
 #include "UnitArray.h"
 #include "Unit.h"
 #include "LinkedList.h"
+#include "StateMachine.h"   // For debugging
 
 
 // Private definitions
@@ -129,10 +130,8 @@ void _UnitArray_SetUnitPosIdx (UnitArray_t *array, UINT8 idx, UINT8 pos)
 
 void _UnitArray_SetUnitPos (UnitArray_t *array, UINT8 idx, float pos)
 {
-  if (idx < array->nUnits)
-  {
-    array->units[idx]->SetPos(array->units[idx]->ctx, pos);
-  }
+  __assert(idx < array->nUnits);
+  array->units[idx]->SetPos(array->units[idx]->ctx, pos);
 }
 
 

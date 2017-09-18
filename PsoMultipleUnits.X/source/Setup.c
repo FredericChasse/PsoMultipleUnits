@@ -332,7 +332,7 @@ void InitAdc(void)
   // Hardware config.
   //================================================
   UINT32 configHardware = ADC_VREF_EXT_AVSS         // Vref+ external and Vref- is AVss
-                        | ADC_SAMPLES_PER_INT_15;    // 15 sample/interrupt
+                        | ADC_SAMPLES_PER_INT_12;    // 12 sample/interrupt
   //================================================
 
   // Port config.

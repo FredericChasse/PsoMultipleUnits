@@ -71,12 +71,9 @@ void _Unit_Init (Unit_t *unit)
   if (!unit->oFirstSetupDone)
   {
     unit->oFirstSetupDone = 1;
-    SetPot(unit->potNum, 0);
-    unit->pos = potRealValues[POT_MIN_INDEX];
-    unit->posIdx = POT_MIN_INDEX;
-    unit->minPos = potRealValues[POT_MIN_INDEX];
-    unit->minPosIdx = POT_MIN_INDEX;
-    unit->maxPos = potRealValues[POT_MAX_INDEX];   // 402.9412 Ohms
+    unit->pos = potRealValues[unit->minPosIdx];
+    unit->posIdx = unit->minPosIdx;
+    SetPot(unit->potNum, unit->posIdx);
   }
 }
 
@@ -184,12 +181,12 @@ const UnitInterface_t * UnitInterface(UINT8 id)
       _units[i].adcNum              = unitAdcs[i];
       _units[i].potNum              = unitPots[i];
       _units[i].id                  = i;
-      _units[i].pos                 = potRealValues[POT_MIN_INDEX];
-      _units[i].posIdx              = POT_MIN_INDEX;
-      _units[i].minPos              = potRealValues[POT_MIN_INDEX];
-      _units[i].minPosIdx           = POT_MIN_INDEX;
-      _units[i].maxPos              = MAX_POT_VALUE;
+      _units[i].posIdx              = unitsMinPosIdx[i];
+      _units[i].pos                 = potRealValues[unitsMinPosIdx[i]];
+      _units[i].minPosIdx           = unitsMinPosIdx[i];
+      _units[i].minPos              = potRealValues[unitsMinPosIdx[i]];
       _units[i].maxPosIdx           = POT_MAX_INDEX;
+      _units[i].maxPos              = MAX_POT_VALUE;
       _units[i].power               = 0;
       _units[i].oFirstSetupDone     = 0;
     }

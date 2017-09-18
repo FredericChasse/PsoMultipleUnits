@@ -250,8 +250,8 @@ void _Swarm_ComputeGbest (PsoSwarm_t *s)
 
 void _Swarm_RandomizeAllParticles (PsoSwarm_t *s)
 {
-  UINT8 idxMin = ComputePotValueFloat2Dec(s->param.posMin);
-  UINT8 idxMax = ComputePotValueFloat2Dec(s->param.posMax);
+  UINT8 idxMin = s->param.posMinIdx;
+  UINT8 idxMax = s->param.posMaxIdx;
   UINT8 range = idxMax - idxMin;
 //  UINT8 range = POT_MAX_INDEX - POT_MIN_INDEX;
   UINT8 sectionLength = (float) range / (float) s->nParticles + 0.5f;
@@ -304,7 +304,7 @@ void _Swarm_RandomizeCertainParticles (PsoSwarm_t *s, UINT8 *idx, UINT8 nParticl
     
 //    tmpPos = Rng_GetRandFloat() * range;
 //    tmpPos = MIN(MAX(s->param.posMin, tmpPos), s->param.posMax);
-    potIdx = Rng_GetRandBoundedUint32(POT_MIN_INDEX, POT_MAX_INDEX);
+    potIdx = Rng_GetRandBoundedUint32(s->param.posMinIdx, s->param.posMaxIdx);
     tmpPos = potRealValues[potIdx];
     
     p->SetPos(p->ctx, tmpPos);

@@ -18,6 +18,7 @@
 #define __UNIT_MAPPING_H__
 
 #include "Setup.h"
+#include "Potentiometer.h"
 
 
 #define UNIT_0_ADC    (2)
@@ -64,6 +65,40 @@ extern const UINT8 unitPots[N_UNITS_TOTAL];
 #define UNIT_11_PWM   (15)
 
 extern const UINT8 unitsPwms[N_UNITS_TOTAL];
+
+
+#define GLOBAL_MIN_POS_IDX    (POT_MIN_INDEX)
+#define UNIT_0_MIN_POS_IDX    (58)
+#define UNIT_1_MIN_POS_IDX    (32)
+#define UNIT_2_MIN_POS_IDX    (32)
+#define UNIT_3_MIN_POS_IDX    (58)
+#define UNIT_4_MIN_POS_IDX    (GLOBAL_MIN_POS_IDX)
+#define UNIT_5_MIN_POS_IDX    (GLOBAL_MIN_POS_IDX)
+#define UNIT_6_MIN_POS_IDX    (GLOBAL_MIN_POS_IDX)
+#define UNIT_7_MIN_POS_IDX    (GLOBAL_MIN_POS_IDX)
+#define UNIT_8_MIN_POS_IDX    (GLOBAL_MIN_POS_IDX)
+#define UNIT_9_MIN_POS_IDX    (GLOBAL_MIN_POS_IDX)
+#define UNIT_10_MIN_POS_IDX   (GLOBAL_MIN_POS_IDX)
+#define UNIT_11_MIN_POS_IDX   (GLOBAL_MIN_POS_IDX)
+
+extern const UINT8 unitsMinPosIdx[N_UNITS_TOTAL];
+
+
+#define GLOBAL_MIN_POS        (MIN_POT_VALUE)
+#define UNIT_0_MIN_POS        (277.4510f)
+#define UNIT_1_MIN_POS        (175.4902f)
+#define UNIT_2_MIN_POS        (175.4902f)
+#define UNIT_3_MIN_POS        (277.4510f)
+#define UNIT_4_MIN_POS        (GLOBAL_MIN_POS)
+#define UNIT_5_MIN_POS        (GLOBAL_MIN_POS)
+#define UNIT_6_MIN_POS        (GLOBAL_MIN_POS)
+#define UNIT_7_MIN_POS        (GLOBAL_MIN_POS)
+#define UNIT_8_MIN_POS        (GLOBAL_MIN_POS)
+#define UNIT_9_MIN_POS        (GLOBAL_MIN_POS)
+#define UNIT_10_MIN_POS       (GLOBAL_MIN_POS)
+#define UNIT_11_MIN_POS       (GLOBAL_MIN_POS)
+
+extern const float unitsMinPos[N_UNITS_TOTAL];
 
 
 #endif // __UNIT_MAPPING_H__

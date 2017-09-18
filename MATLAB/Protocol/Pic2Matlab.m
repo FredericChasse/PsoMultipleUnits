@@ -39,9 +39,10 @@ N_UNITS_TOTAL             = 12;
 
 N_LARGE_SAMPLES           = 4;
 
-POT_MIN_INDEX             = 90;
+POT_MIN_INDEX             = 0;
 POT_MAX_INDEX             = 255;
-CHARAC_N_ITERATIONS       = POT_MAX_INDEX - POT_MIN_INDEX + 1;
+CHARAC_POS_INCREMENT      = 4;
+CHARAC_N_ITERATIONS       = ceil((POT_MAX_INDEX - POT_MIN_INDEX + 1) / CHARAC_POS_INCREMENT);
 
 
 
@@ -90,9 +91,9 @@ fopen(port);
 delimiter = PROTOCOL_DELIMITER;
 typeOfMsg = NEW_RNG_SEED;
 lengthOfPayload = typecast(uint16(16), 'uint8');
-% [seed1, seed2] = GenerateNewSeeds;
-seed1 = uint64(10829063425906870008);
-seed2 = uint64(5557013956166326609);
+[seed1, seed2] = GenerateNewSeeds;
+% seed1 = uint64(10829063425906870008);
+% seed2 = uint64(5557013956166326609);
 seeds = typecast([seed1, seed2], 'uint8');
 
 buf = [delimiter, typeOfMsg, lengthOfPayload, seeds];
@@ -115,8 +116,8 @@ nPerturbs = 0;
 % Start algo
 typeOfMsg = START_ACQ;
 startAlgoChar = PROTOCOL_START_ALGO;
-algo = CHARACTERIZATION;
-% algo = CLASSIC_PSO;
+% algo = CHARACTERIZATION;
+algo = CLASSIC_PSO;
 % algo = PARALLEL_PSO;
 % algo = PARALLEL_PSO_MULTI_SWARM;
 % algo = MULTI_UNIT;
@@ -127,7 +128,7 @@ algo = CHARACTERIZATION;
 % units = uint8(3:1:10);
 % units = uint8([3:6 11:14]);
 % units = uint8(0:1:14);
-units = uint8([0:1:2]);
+units = uint8([0:1:3]);
 unitsMem = units;
 nUnits = uint8(length(units));
 % lengthOfPayload = fliplr(typecast(uint16(3 + nUnits), 'uint8'));
@@ -141,7 +142,7 @@ if algo == CHARACTERIZATION
   nIterations = CHARAC_N_ITERATIONS;
 elseif algo == CLASSIC_PSO
   oSendDebugData = uint8(0);
-  nIterations = 140;
+  nIterations = 50;
 elseif algo == PARALLEL_PSO
   oSendDebugData = uint8(0);
   nIterations = 100;
@@ -188,21 +189,19 @@ pPowMem = [];
 adcMem = [];
 
 tic
-wbh = waitbar(0, ['Iteration : ' num2str(0) '/' num2str(nIterations)]);  % Waitbar handle
+wbh_iteration = waitbar(0, ['Iteration : ' num2str(0) '/' num2str(nIterations)]);  % Waitbar handle for iteration
+wbh_sample = waitbar(1, ['Sample : ' num2str(1) '/' num2str(N_LARGE_SAMPLES)]);  % Waitbar handle for current sample
+pos_wbh_sample = get(wbh_sample, 'position');
+pos_wbh_sample = [pos_wbh_sample(1), pos_wbh_sample(2)-pos_wbh_sample(4)-20,pos_wbh_sample(3),pos_wbh_sample(4)];
+set(wbh_sample, 'position', pos_wbh_sample);
 
 currentSample = 0;
 
-figure
-subplot(2,1,1)
-title('Rext')
-hold on
-subplot(2,1,2)
-title('Pout')
-hold on
+fig = figure;
 
 iIteration = 0;
 while iIteration <= nIterations
-  waitbar(iIteration/nIterations, wbh, ['Iteration: ' num2str(iIteration) '/' num2str(nIterations)])
+  waitbar(iIteration/nIterations, wbh_iteration, ['Iteration: ' num2str(iIteration) '/' num2str(nIterations)])
   buf = fread(port, SIZE_OF_PROTOCOL_HEADER);
   delimiter = buf(1);
   typeOfMsg = buf(2);
@@ -227,10 +226,27 @@ while iIteration <= nIterations
     posMem = [posMem positions];
     powMem = [powMem powers];
     
+    figure(fig)
+    clf
+    nData = length(positions);
+    figLegend = cell.empty;
+    for j = 1 : nData
+      subplot(2,1,1)
+      hold on
+      plot(tsMem, posMem(j:nData:end))
+      subplot(2,1,2)
+      hold on
+      plot(tsMem, powMem(j:nData:end))
+      figLegend{j} = ['Unit ' num2str(j)];
+    end
     subplot(2,1,1)
-    plot(timestamp, positions)
+    title('Rext')
+    legend(figLegend)
     subplot(2,1,2)
-    plot(timestamp, powers)
+    title('Pout')
+    legend(figLegend)
+    drawnow;
+    waitbar(currentSample/N_LARGE_SAMPLES, wbh_sample, ['Sample: ' num2str(currentSample) '/' num2str(N_LARGE_SAMPLES)])
     
   elseif typeOfMsg == PSO_DATA
     swarmIteration = double(typecast(uint8(buf(1:2)'), 'uint16'));
@@ -289,7 +305,8 @@ while iIteration <= nIterations
   end
 end
 toc
-close(wbh)
+close(wbh_iteration)
+close(wbh_sample)
 
 % Stop algo
 typeOfMsg = STOP_ACQ;

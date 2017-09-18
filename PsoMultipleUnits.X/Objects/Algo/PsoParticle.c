@@ -553,7 +553,7 @@ void _Particle_InitPos (PsoParticle_t *p, PsoSwarmInterface_t *swarm)
   PsoSwarmParam_t param;
   swarm->GetParam(swarm->ctx, &param);
   p->pos.prevPos = p->pos.curPos;
-  potIdx = Rng_GetRandBoundedUint32(POT_MIN_INDEX, POT_MAX_INDEX);
+  potIdx = Rng_GetRandBoundedUint32(param.posMinIdx, param.posMaxIdx);
 //  p->pos.curPos = Rng_GetRandFloat() * (param.posMax - param.posMin) + param.posMin;
 //  p->pos.curPos = MIN(MAX(param.posMin, p->pos.curPos), param.posMax);
   p->pos.curPos = potRealValues[potIdx];

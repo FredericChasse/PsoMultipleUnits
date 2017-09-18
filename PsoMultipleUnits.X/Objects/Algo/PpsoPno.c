@@ -187,6 +187,8 @@ INT8 _PpsoPno_Init (PpsoPno_t *pso, UnitArrayInterface_t *unitArray)
     
    ,.posMin                 = minPos
    ,.posMax                 = maxPos
+   ,.posMinIdx              = minPosIdx
+   ,.posMaxIdx              = maxPosIdx
    ,.minParticles           = 3
    ,.perturbAmp             = 1*POT_STEP_VALUE
 //   ,.perturbAmp             = 2*POT_STEP_VALUE
@@ -595,10 +597,7 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
     {
       array = swarm->GetUnitArray(swarm->ctx);
       __assert(array);
-      for (iUnit = 0; iUnit < allIdxPerturbedSize[idx]; iUnit++)
-      {
-        idxPerturbed[nPerturbed++] = array->GetUnitId(array->ctx, allIdxPerturbed[idx][iUnit]);
-      }
+      idxPerturbed[nPerturbed++] = array->GetUnitId(array->ctx, 0);
       
       swarm->Release(swarm->ctx);
       _PpsoPno_ShiftSeqSwarmsLeft(pso, i);

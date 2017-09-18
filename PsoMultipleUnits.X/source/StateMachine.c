@@ -491,11 +491,11 @@ void StateCompute(void)
   {
     positions[i]  = algoArray->GetPos(algoArray->ctx, i);
     id = algoArray->GetUnitId(algoArray->ctx, i);
-    powers[i] = ComputeCellPower(unitAdcs[id], algoArray->GetUnitPosIdx(algoArray->ctx, i));
+    powers[i] = ComputeCellPower(id, algoArray->GetUnitPosIdx(algoArray->ctx, i));
     algoArray->SetPower(algoArray->ctx, i, powers[i]);
     if (oDbgAdc)
     {
-      powers[i] = (float) sCellValues.cells[unitAdcs[id]].cellVolt_mV / 1000.0f;
+      powers[i] = (float) sCellValues.cells[id].cellVolt_mV / 1000.0f;
     } 
  }
   

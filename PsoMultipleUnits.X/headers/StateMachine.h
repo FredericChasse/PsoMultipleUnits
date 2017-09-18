@@ -112,7 +112,7 @@ struct sCell
 
 struct sAllCells
 {
-  struct sCell cells[16];
+  struct sCell cells[N_UNITS_TOTAL];
 };
 
 #endif	/* __STATE_MACHINE_H__ */

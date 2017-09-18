@@ -46,6 +46,8 @@ typedef struct
   float         c2;
   float         posMin;
   float         posMax;
+  UINT8         posMinIdx;
+  UINT8         posMaxIdx;
   float         omega;
   float         perturbAmp;
   float         sentinelMargin;

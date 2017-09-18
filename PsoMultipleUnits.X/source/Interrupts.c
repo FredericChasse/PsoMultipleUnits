@@ -32,10 +32,10 @@ volatile BOOL  oAdcReady    = 0
               ,oTimer3Ready = 0
               ,oAcqOngoing  = 0
               ;
-volatile UINT16 adcValues[15];
+volatile UINT16 adcValues[N_UNITS_TOTAL];
 
 extern volatile UINT16 nSamples;
-extern volatile UINT16 cellVoltRaw[N_SAMPLES_PER_ADC_READ][15];
+extern volatile UINT16 cellVoltRaw[N_SAMPLES_PER_ADC_READ][N_UNITS_TOTAL];
 
 
 /*******************************************************************************

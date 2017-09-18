@@ -27,7 +27,7 @@
 // Public definitions
 //==============================================================================
 #define POT_MAX_INDEX   (255)   // 1050 Ohms
-#define POT_MIN_INDEX   (90)    // 402.9412 Ohms
+#define POT_MIN_INDEX   (0)    // 402.9412 Ohms
 
 //#define MAX_POT_VALUE   9.55k +9.56k+9.53k+9.54k
 //#define MAX_POT_VALUE   9545
@@ -35,7 +35,7 @@
 //#define WIPER_VALUE     (51.7 + 50.9 + 52.3 + 50.2) / 4
 //#define WIPER_VALUE     51
 #define WIPER_VALUE     (50.0f)
-#define MIN_POT_VALUE   (402.9412f)
+#define MIN_POT_VALUE   (0.0f)
 //#define MID_VALUE       4.79k+4.88k+4.79k+4.79k
 //#define MID_VALUE       4800
 #define MID_VALUE       (545.30f)
