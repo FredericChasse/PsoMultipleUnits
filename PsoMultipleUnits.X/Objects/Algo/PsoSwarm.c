@@ -52,6 +52,7 @@ void    _Swarm_ShiftParticlesLeft         (PsoSwarm_t *s, UINT8 idxToShift);
 INT8    _Swarm_Init                       (PsoSwarm_t *s, UnitArrayInterface_t *unitArray, PsoSwarmParam_t *param, UINT8 id);
 void    _Swarm_ComputeGbest               (PsoSwarm_t *s);
 void    _Swarm_RandomizeAllParticles      (PsoSwarm_t *s);
+void    _Swarm_RandomizeParticlesSpeed    (PsoSwarm_t *s);
 void    _Swarm_RandomizeCertainParticles  (PsoSwarm_t *s, UINT8 *idx, UINT8 nParticlesToRandomize);
 INT8    _Swarm_AddParticle                (PsoSwarm_t *s, PsoParticleInterface_t *p);
 void *  _Swarm_GetParticle                (PsoSwarm_t *s, UINT8 idx);
@@ -152,6 +153,8 @@ INT8 _Swarm_Init (PsoSwarm_t *s, UnitArrayInterface_t *unitArray, PsoSwarmParam_
   
   _Swarm_RandomizeAllParticles(s);
   
+  _Swarm_RandomizeParticlesSpeed(s);
+  
   return 0;
 }
 
@@ -245,6 +248,17 @@ void _Swarm_ComputeGbest (PsoSwarm_t *s)
   s->gbest.prevPos = s->gbest.curPos;
   s->gbest.curFitness = max;
   s->gbest.curPos = s->particles[iBest]->GetPos(s->particles[iBest]->ctx);
+}
+
+
+void _Swarm_RandomizeParticlesSpeed (PsoSwarm_t *s)
+{
+  UINT8 i;
+  
+  for (i = 0; i < s->nParticles; i++)
+  {
+    s->particles[i]->InitSpeed(s->particles[i]->ctx, &_swarms_if[s->linkKey]);
+  }
 }
 
 
@@ -713,6 +727,7 @@ const PsoSwarmInterface_t * PsoSwarmInterface (void)
       _swarms_if[i].GetParticleSpeed            = (PsoSwarmGetParticleSpeed_fct)          &_Swarm_GetParticleSpeed;
       _swarms_if[i].UpdateParticlesFitness      = (PsoSwarmUpdateParticlesFitness_fct)    &_Swarm_UpdateParticlesFitness;
       _swarms_if[i].SetParticlePos              = (PsoSwarmSetParticlePos_fct)            &_Swarm_SetParticlePos;
+      _swarms_if[i].RandomizeParticlesSpeed     = (PsoSwarmRandomizeParticlesSpeed_fct)   &_Swarm_RandomizeParticlesSpeed;
       
       // Init the linked list
       _swarmsNodes[i].ctx = (void *) &_swarms_if[i];

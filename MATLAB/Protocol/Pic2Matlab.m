@@ -83,15 +83,15 @@ delimiter = PROTOCOL_DELIMITER;
 typeOfMsg = NEW_RNG_SEED;
 lengthOfPayload = typecast(uint16(16), 'uint8');
 % [seed1, seed2] = GenerateNewSeeds;
-seed1 = uint64(10829063425906870008);
-seed2 = uint64(5557013956166326609);
+seed1 = uint64(18073167594556639095);
+seed2 = uint64(2049787875638757461);
 seeds = typecast([seed1, seed2], 'uint8');
 
 buf = [delimiter, typeOfMsg, lengthOfPayload, seeds];
 fwrite(port, buf);
 
 % Initial intensity
-initLedIntensity = 150;
+initLedIntensity = 250;
 delimiter = PROTOCOL_DELIMITER;
 typeOfMsg = INIT_PERTURB;
 lengthOfPayload = typecast(uint16(2), 'uint8');
@@ -144,8 +144,8 @@ startAlgoChar = PROTOCOL_START_ALGO;
 % algo = PARALLEL_PSO_MULTI_SWARM;
 % algo = MULTI_UNIT;
 % algo = EXTREMUM_SEEKING;
-% algo = PPSO_PNO;
-algo = PNO;
+algo = PPSO_PNO;
+% algo = PNO;
 % algo = DEBUG_ADC;
 % units = uint8(3:1:10);
 % units = uint8([3:6 11:14]);
@@ -165,20 +165,19 @@ if algo == CHARACTERIZATION
 %   nIterations = 60;
 elseif algo == CLASSIC_PSO
   oSendDebugData = uint8(0);
-  nIterations = 140;
+  nIterations = 200;
 elseif algo == PARALLEL_PSO
   oSendDebugData = uint8(0);
-  nIterations = 100;
+  nIterations = 200;
 elseif algo == PARALLEL_PSO_MULTI_SWARM
   oSendDebugData = uint8(0);
   nIterations = 130;
 elseif algo == PPSO_PNO
   oSendDebugData = uint8(1);
-  nIterations = 220;
-%   nIterations = 60;
+  nIterations = 200;
 elseif algo == PNO
   oSendDebugData = uint8(0);
-  nIterations = 220;
+  nIterations = 200;
 elseif algo == DEBUG_ADC
   oSendDebugData = uint8(1);
   nIterations = 25;

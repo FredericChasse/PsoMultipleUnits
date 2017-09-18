@@ -170,20 +170,22 @@ INT8 _PpsoPno_Init (PpsoPno_t *pso, UnitArrayInterface_t *unitArray)
   
   pso->classifier = (ClassifierInterface_t *) ClassifierInterface();
   __assert(pso->classifier);
-  pso->classifier->Init(pso->classifier->ctx, unitArray, 3*POT_STEP_VALUE);
+  pso->classifier->Init(pso->classifier->ctx, unitArray, 4*POT_STEP_VALUE);
   
   pso->unitArray->GetPosLimits(pso->unitArray->ctx, &minPos, &maxPos);
+//  maxPos = 550;
   minPosIdx = ComputePotValueFloat2Dec(minPos);
   maxPosIdx = ComputePotValueFloat2Dec(maxPos);
+//  maxPos = potRealValues[maxPosIdx];
   
   const PsoSwarmParam_t _swarmParam = 
   {    
-//    .c1                     = 0.8
-//   ,.c2                     = 1.5
-//   ,.omega                  = 0.4
     .c1                     = 1
    ,.c2                     = 2
-   ,.omega                  = 0.3
+   ,.omega                  = 0.4
+//    .c1                     = 1
+//   ,.c2                     = 2
+//   ,.omega                  = 0.3
     
    ,.posMin                 = minPos
    ,.posMax                 = maxPos
@@ -595,10 +597,7 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
     {
       array = swarm->GetUnitArray(swarm->ctx);
       __assert(array);
-      for (iUnit = 0; iUnit < allIdxPerturbedSize[idx]; iUnit++)
-      {
-        idxPerturbed[nPerturbed++] = array->GetUnitId(array->ctx, allIdxPerturbed[idx][iUnit]);
-      }
+      idxPerturbed[nPerturbed++] = array->GetUnitId(array->ctx, 0);
       
       swarm->Release(swarm->ctx);
       _PpsoPno_ShiftSeqSwarmsLeft(pso, i);
