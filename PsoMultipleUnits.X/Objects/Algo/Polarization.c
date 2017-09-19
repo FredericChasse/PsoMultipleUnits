@@ -28,6 +28,13 @@
 // Private definitions
 //==============================================================================
 
+typedef enum
+{
+  POLAR_FORWARD
+ ,POLAR_BACKWARD
+ ,POLAR_STOP
+} PolarDirection_t;
+
 typedef struct
 {
   UnitArrayInterface_t *unitArray;
@@ -43,7 +50,7 @@ typedef struct
   UINT16 maxPosIdx[N_UNITS_TOTAL];
   float  minPos[N_UNITS_TOTAL];
   float  maxPos[N_UNITS_TOTAL];
-  INT8   direction[N_UNITS_TOTAL];
+  PolarDirection_t direction[N_UNITS_TOTAL];
   UINT16 finalPosIdx[N_UNITS_TOTAL];
   float  finalPos[N_UNITS_TOTAL];
 } Polar_t;
@@ -75,7 +82,7 @@ Polar_t _polar =
  ,.maxPosIdx      = {POT_MAX_INDEX}
  ,.minPos         = {MIN_POT_VALUE}
  ,.maxPos         = {MAX_POT_VALUE}
- ,.direction      = {1}
+ ,.direction      = {POLAR_FORWARD}
  ,.finalPos       = {MIN_POT_VALUE}
  ,.finalPosIdx    = {POT_MIN_INDEX}
 };
@@ -117,6 +124,7 @@ INT8 _Polar_Init (Polar_t *p, UnitArrayInterface_t *unitArray)
     p->currentPosIdx[i] = p->minPosIdx[i];
     p->finalPosIdx[i]   = unitsOptPosIdx[unitId];
     p->finalPos[i]      = potRealValues[p->finalPosIdx[i]];
+    p->direction[i]     = POLAR_FORWARD;
     
     unitArray->SetPosIdx(unitArray->ctx, i, p->currentPosIdx[i]);
   }
@@ -154,7 +162,7 @@ INT8 _Polar_Run (Polar_t *p)
       switch (p->direction[i])
       {
         // Going up
-        case 1:
+        case POLAR_FORWARD:
           tmpIdx = p->currentPosIdx[i] + p->posIncrement;
           p->currentPosIdx[i] = MIN(tmpIdx, p->maxPosIdx[i]);
           p->currentPos[i] = potRealValues[p->currentPosIdx[i]];
@@ -163,12 +171,12 @@ INT8 _Polar_Run (Polar_t *p)
 
           if (p->currentPosIdx[i] == p->maxPosIdx[i])
           {
-            p->direction[i] = -1;
+            p->direction[i] = POLAR_BACKWARD;
           }
           break;
           
         // Going down
-        case -1:
+        case POLAR_BACKWARD:
           tmpIdx = (INT16) p->currentPosIdx[i] - (INT16) p->posIncrement;
           p->currentPosIdx[i] = MAX(tmpIdx, (INT16) p->minPosIdx[i]);
           p->currentPos[i] = potRealValues[p->currentPosIdx[i]];
@@ -177,12 +185,12 @@ INT8 _Polar_Run (Polar_t *p)
 
           if (p->currentPosIdx[i] == p->minPosIdx[i])
           {
-            p->direction[i] = 0;
+            p->direction[i] = POLAR_STOP;
           }
           break;
           
         // Stay still
-        case 0:
+        case POLAR_STOP:
         default:
           p->currentPosIdx[i] = p->finalPosIdx[i];
           p->currentPos[i]    = p->finalPos[i];
