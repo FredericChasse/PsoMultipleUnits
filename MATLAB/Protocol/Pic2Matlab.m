@@ -79,11 +79,11 @@ end
 % port.BytesAvailableFcn = {@myCallback};
 
 port.BaudRate = 115200;
-% port.BaudRate = 9600;
 port.DataBits = 8;
 port.Parity = 'none';
 port.StopBits = 1;
 port.Terminator = '';
+port.Timeout = 20;
 
 % Connect to instrument object, port.
 fopen(port);
@@ -178,11 +178,11 @@ fwrite(port, buf);
 
 %% Algo run
 
-nSolarCells = double(nUnits);
+nUnitsDouble = double(nUnits);
 
-tsMem  = [];
-posMem = [];
-powMem = [];
+tsMem  = zeros(1,nIterations*nUnitsDouble);
+posMem = zeros(1,nIterations*nUnitsDouble*N_LARGE_SAMPLES);
+powMem = zeros(1,nIterations*nUnitsDouble*N_LARGE_SAMPLES);
 
 sIteration = [];
 pSpeedMem = [];
@@ -203,6 +203,7 @@ currentSample = 0;
 fig = figure;
 
 iIteration = 0;
+iTotalSample = 0;
 while iIteration <= nIterations
   waitbar(iIteration/nIterations, wbh_iteration, ['Iteration: ' num2str(iIteration) '/' num2str(nIterations)])
   buf = fread(port, SIZE_OF_PROTOCOL_HEADER);
@@ -225,9 +226,10 @@ while iIteration <= nIterations
     positions = data(1:end/2);
     powers = data(end/2+1:end);
   
-    tsMem  = [tsMem timestamp];
-    posMem = [posMem positions];
-    powMem = [powMem powers];
+    iTotalSample = iTotalSample + 1;
+    tsMem(iTotalSample) = timestamp;
+    posMem( (iTotalSample - 1)*nUnitsDouble + 1 : iTotalSample*nUnitsDouble ) = double(positions);
+    powMem( (iTotalSample - 1)*nUnitsDouble + 1 : iTotalSample*nUnitsDouble ) = double(powers);
     
     figure(fig)
     clf
@@ -236,18 +238,20 @@ while iIteration <= nIterations
     for j = 1 : nData
       subplot(2,1,1)
       hold on
-      plot(tsMem, posMem(j:nData:end))
+      tmpPos = posMem(j:nData:end);
+      plot(tsMem(1:iTotalSample), tmpPos(1:iTotalSample))
       subplot(2,1,2)
       hold on
-      plot(tsMem, powMem(j:nData:end))
+      tmpPow = powMem(j:nData:end);
+      plot(tsMem(1:iTotalSample), tmpPow(1:iTotalSample))
       figLegend{j} = ['Unit ' num2str(j)];
     end
     subplot(2,1,1)
     title('Rext')
-    legend(figLegend)
+    legend(figLegend, 'Location', 'northwest')
     subplot(2,1,2)
     title('Pout')
-    legend(figLegend)
+    legend(figLegend, 'Location', 'northwest')
     drawnow;
     waitbar(currentSample/N_LARGE_SAMPLES, wbh_sample, ['Sample: ' num2str(currentSample) '/' num2str(N_LARGE_SAMPLES)])
     
