@@ -255,7 +255,7 @@ void StateInit(void)
   mainArray->Init(mainArray->ctx, 0);
   for (i = 0; i < N_UNITS_TOTAL; i++)
   {
-    mainArray->SetPos(mainArray->ctx, i, potRealValues[0]);
+    mainArray->SetPosIdx(mainArray->ctx, i, unitsMinPosIdx[i]);
   }
   algoArray->Init(algoArray->ctx, 1);
   

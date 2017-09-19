@@ -229,7 +229,7 @@ void _Swarm_SetSteadyState (PsoSwarm_t *s)
 void _Swarm_ComputeGbest (PsoSwarm_t *s)
 {
   float max = 0, temp, fitness;
-  UINT8 i, iBest;
+  UINT8 i, iBest = 0;
   for (i = 0; i < s->nParticles; i++)
   {
     temp = max;

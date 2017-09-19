@@ -19,6 +19,7 @@
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 #include "..\headers\Potentiometer.h"
+#include "UnitMapping.h"
 
 
 //==============================================================================
@@ -211,6 +212,14 @@ inline INT8 SetPot (UINT8 numPot, UINT8 value)
   if (numPot > 15)
   {
     return -1;
+  }
+  
+  if (  ((numPot == UNIT_0_POT) && (value < UNIT_0_MIN_POS_IDX)) 
+     || ((numPot == UNIT_1_POT) && (value < UNIT_1_MIN_POS_IDX)) 
+     || ((numPot == UNIT_2_POT) && (value < UNIT_2_MIN_POS_IDX)) 
+     || ((numPot == UNIT_3_POT) && (value < UNIT_3_MIN_POS_IDX)) )
+  {
+    LED1_ON();
   }
   
   UINT8 pot = numPot >> 2;

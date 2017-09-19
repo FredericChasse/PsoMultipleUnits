@@ -72,6 +72,10 @@ extern const UINT8 unitsPwms[N_UNITS_TOTAL];
 #define UNIT_1_MIN_POS_IDX    (32)
 #define UNIT_2_MIN_POS_IDX    (32)
 #define UNIT_3_MIN_POS_IDX    (58)
+//#define UNIT_0_MIN_POS_IDX    (13)
+//#define UNIT_1_MIN_POS_IDX    (14)
+//#define UNIT_2_MIN_POS_IDX    (18)
+//#define UNIT_3_MIN_POS_IDX    (11)
 #define UNIT_4_MIN_POS_IDX    (GLOBAL_MIN_POS_IDX)
 #define UNIT_5_MIN_POS_IDX    (GLOBAL_MIN_POS_IDX)
 #define UNIT_6_MIN_POS_IDX    (GLOBAL_MIN_POS_IDX)
@@ -89,6 +93,10 @@ extern const UINT8 unitsMinPosIdx[N_UNITS_TOTAL];
 #define UNIT_1_MIN_POS        (175.4902f)
 #define UNIT_2_MIN_POS        (175.4902f)
 #define UNIT_3_MIN_POS        (277.4510f)
+//#define UNIT_0_MIN_POS        (100.9804f)
+//#define UNIT_1_MIN_POS        (104.9020f)
+//#define UNIT_2_MIN_POS        (120.5882f)
+//#define UNIT_3_MIN_POS        (93.1373f)
 #define UNIT_4_MIN_POS        (GLOBAL_MIN_POS)
 #define UNIT_5_MIN_POS        (GLOBAL_MIN_POS)
 #define UNIT_6_MIN_POS        (GLOBAL_MIN_POS)
@@ -102,8 +110,8 @@ extern const float unitsMinPos[N_UNITS_TOTAL];
 
 
 #define UNIT_0_OPT_POS_IDX    (82)    /* 371.5686 */
-#define UNIT_1_OPT_POS_IDX    (36)    /* 191.1765 */
-#define UNIT_2_OPT_POS_IDX    (49)    /* 242.1569 */
+#define UNIT_1_OPT_POS_IDX    (39)    /* 202.9412 */
+#define UNIT_2_OPT_POS_IDX    (51)    /* 250.0000 */
 #define UNIT_3_OPT_POS_IDX    (80)    /* 363.7255 */
 #define UNIT_4_OPT_POS_IDX    (100)
 #define UNIT_5_OPT_POS_IDX    (100)

@@ -40,7 +40,7 @@ SIZE_OF_PROTOCOL_HEADER   = 4;
 
 N_UNITS_TOTAL             = 12;
 
-N_LARGE_SAMPLES           = 4;
+N_LARGE_SAMPLES           = 225;
 
 POT_MIN_INDEX             = 0;
 POT_MAX_INDEX             = 255;
@@ -95,8 +95,8 @@ delimiter = PROTOCOL_DELIMITER;
 typeOfMsg = NEW_RNG_SEED;
 lengthOfPayload = typecast(uint16(16), 'uint8');
 [seed1, seed2] = GenerateNewSeeds;
-% seed1 = uint64(10829063425906870008);
-% seed2 = uint64(5557013956166326609);
+% seed1 = uint64(8953600373395350691);
+% seed2 = uint64(2617340978991672905);
 seeds = typecast([seed1, seed2], 'uint8');
 
 buf = [delimiter, typeOfMsg, lengthOfPayload, seeds];
@@ -197,7 +197,7 @@ adcMem = [];
 
 tic
 wbh_iteration = waitbar(0, ['Iteration : ' num2str(0) '/' num2str(nIterations)]);  % Waitbar handle for iteration
-wbh_sample = waitbar(1, ['Sample : ' num2str(1) '/' num2str(N_LARGE_SAMPLES)]);  % Waitbar handle for current sample
+wbh_sample = waitbar(1/4, ['Sample : ' num2str(1) '/' num2str(N_LARGE_SAMPLES)]);  % Waitbar handle for current sample
 pos_wbh_sample = get(wbh_sample, 'position');
 pos_wbh_sample = [pos_wbh_sample(1), pos_wbh_sample(2)-pos_wbh_sample(4)-20,pos_wbh_sample(3),pos_wbh_sample(4)];
 set(wbh_sample, 'position', pos_wbh_sample);
@@ -207,6 +207,7 @@ currentSample = 0;
 fig = figure;
 
 iIteration = 0;
+oDoPlot = 1;
 iTotalSample = 0;
 while iIteration <= nIterations
   waitbar(iIteration/nIterations, wbh_iteration, ['Iteration: ' num2str(iIteration) '/' num2str(nIterations)])
@@ -219,9 +220,11 @@ while iIteration <= nIterations
   buf = fread(port, lengthOfPayload, 'uint8');
   if typeOfMsg == UNITS_DATA
     currentSample = currentSample + 1;
+    waitbar(currentSample/N_LARGE_SAMPLES, wbh_sample, ['Sample: ' num2str(currentSample) '/' num2str(N_LARGE_SAMPLES)])
     if currentSample >= N_LARGE_SAMPLES
       iIteration = iIteration + 1;
       currentSample = 0;
+      oDoPlot = 1;
     end
     timestamp = typecast(typecast(uint8(buf(1:4)'), 'uint32'), 'single');
     nUnits = buf(5);
@@ -235,29 +238,31 @@ while iIteration <= nIterations
     posMem( (iTotalSample - 1)*nUnitsDouble + 1 : iTotalSample*nUnitsDouble ) = double(positions);
     powMem( (iTotalSample - 1)*nUnitsDouble + 1 : iTotalSample*nUnitsDouble ) = double(powers);
     
-    figure(fig)
-    clf
-    nData = length(positions);
-    figLegend = cell.empty;
-    for j = 1 : nData
+    if oDoPlot == 1
+%       oDoPlot = 0;
+      figure(fig)
+      clf
+      nData = length(positions);
+      figLegend = cell.empty;
+      for j = 1 : nData
+        subplot(2,1,1)
+        hold on
+        tmpPos = posMem(j:nData:end);
+        plot(tsMem(1:iTotalSample), tmpPos(1:iTotalSample))
+        subplot(2,1,2)
+        hold on
+        tmpPow = powMem(j:nData:end);
+        plot(tsMem(1:iTotalSample), tmpPow(1:iTotalSample))
+        figLegend{j} = ['Unit ' num2str(j)];
+      end
       subplot(2,1,1)
-      hold on
-      tmpPos = posMem(j:nData:end);
-      plot(tsMem(1:iTotalSample), tmpPos(1:iTotalSample))
+      title('Rext')
+      legend(figLegend, 'Location', 'northwest')
       subplot(2,1,2)
-      hold on
-      tmpPow = powMem(j:nData:end);
-      plot(tsMem(1:iTotalSample), tmpPow(1:iTotalSample))
-      figLegend{j} = ['Unit ' num2str(j)];
+      title('Pout')
+      legend(figLegend, 'Location', 'northwest')
+      drawnow;
     end
-    subplot(2,1,1)
-    title('Rext')
-    legend(figLegend, 'Location', 'northwest')
-    subplot(2,1,2)
-    title('Pout')
-    legend(figLegend, 'Location', 'northwest')
-    drawnow;
-    waitbar(currentSample/N_LARGE_SAMPLES, wbh_sample, ['Sample: ' num2str(currentSample) '/' num2str(N_LARGE_SAMPLES)])
     
   elseif typeOfMsg == PSO_DATA
     swarmIteration = double(typecast(uint8(buf(1:2)'), 'uint16'));
