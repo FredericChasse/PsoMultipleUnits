@@ -7,7 +7,7 @@ delete(f);
 
 %% Constants
 
-PROTOCOL_DELIMITER        = uint8(126);
+PROTOCOL_DELIMITER        = uint8(hex2dec( '7E' ));
 
 % Output
 NEW_RNG_SEED              = uint8(hex2dec( '00' ));
@@ -120,7 +120,7 @@ nPerturbs = 0;
 typeOfMsg = START_ACQ;
 startAlgoChar = PROTOCOL_START_ALGO;
 % algo = CHARACTERIZATION;
-algo = CLASSIC_PSO;
+% algo = CLASSIC_PSO;
 % algo = PARALLEL_PSO;
 % algo = PARALLEL_PSO_MULTI_SWARM;
 % algo = MULTI_UNIT;
@@ -128,6 +128,7 @@ algo = CLASSIC_PSO;
 % algo = PPSO_PNO;
 % algo = PNO;
 % algo = DEBUG_ADC;
+algo = POLARIZATION;
 % units = uint8(3:1:10);
 % units = uint8([3:6 11:14]);
 % units = uint8(0:1:14);
@@ -162,6 +163,9 @@ elseif algo == PNO
 elseif algo == DEBUG_ADC
   oSendDebugData = uint8(1);
   nIterations = 25;
+elseif algo == POLARIZATION
+  oSendDebugData = uint8(0);
+  nIterations = 60;
 else
   oSendDebugData = uint8(0);
   nIterations = 20;

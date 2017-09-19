@@ -117,4 +117,21 @@ extern const float unitsMinPos[N_UNITS_TOTAL];
 extern const UINT8 unitsOptPosIdx[N_UNITS_TOTAL];
 
 
+#define GLOBAL_MAX_POS_IDX    (POT_MAX_INDEX)
+#define UNIT_0_MAX_POS_IDX    (141)   /* 602.9412 */
+#define UNIT_1_MAX_POS_IDX    (141)   /* 602.9412 */
+#define UNIT_2_MAX_POS_IDX    (141)   /* 602.9412 */
+#define UNIT_3_MAX_POS_IDX    (141)   /* 602.9412 */
+#define UNIT_4_MAX_POS_IDX    (GLOBAL_MAX_POS_IDX)
+#define UNIT_5_MAX_POS_IDX    (GLOBAL_MAX_POS_IDX)
+#define UNIT_6_MAX_POS_IDX    (GLOBAL_MAX_POS_IDX)
+#define UNIT_7_MAX_POS_IDX    (GLOBAL_MAX_POS_IDX)
+#define UNIT_8_MAX_POS_IDX    (GLOBAL_MAX_POS_IDX)
+#define UNIT_9_MAX_POS_IDX    (GLOBAL_MAX_POS_IDX)
+#define UNIT_10_MAX_POS_IDX   (GLOBAL_MAX_POS_IDX)
+#define UNIT_11_MAX_POS_IDX   (GLOBAL_MAX_POS_IDX)
+
+extern const UINT8 unitsMaxPosIdx[N_UNITS_TOTAL];
+
+
 #endif // __UNIT_MAPPING_H__

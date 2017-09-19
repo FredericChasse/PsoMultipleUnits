@@ -97,6 +97,7 @@ INT8 _Polar_Init (Polar_t *p, UnitArrayInterface_t *unitArray)
 {
   UINT8 i = 0;
   UINT8 minPosIdx, maxPosIdx;
+  UINT8 unitId;
   
   p->timeElapsed    = 0;
   p->currentSample  = 0;
@@ -106,13 +107,15 @@ INT8 _Polar_Init (Polar_t *p, UnitArrayInterface_t *unitArray)
   for (i = 0; i < p->nUnits; i++)
   {
     unitArray->GetUnitLimitsIdx(unitArray->ctx, i, &minPosIdx, &maxPosIdx);
+    unitId = unitArray->GetUnitId(unitArray->ctx, i);
     p->minPosIdx[i]     = minPosIdx;
-    p->maxPosIdx[i]     = maxPosIdx;
-    p->minPos[i]        = potRealValues[minPosIdx];
-    p->maxPos[i]        = potRealValues[maxPosIdx];
+//    p->maxPosIdx[i]     = maxPosIdx;
+    p->maxPosIdx[i]     = unitsMaxPosIdx[unitId];   // Shortcut
+    p->minPos[i]        = potRealValues[p->minPosIdx[i]];
+    p->maxPos[i]        = potRealValues[p->maxPosIdx[i]];
     p->currentPos[i]    = p->minPos[i];
     p->currentPosIdx[i] = p->minPosIdx[i];
-    p->finalPosIdx[i]   = unitsOptPosIdx[unitArray->GetUnitId(unitArray->ctx, i)];
+    p->finalPosIdx[i]   = unitsOptPosIdx[unitId];
     p->finalPos[i]      = potRealValues[p->finalPosIdx[i]];
     
     unitArray->SetPosIdx(unitArray->ctx, i, p->currentPosIdx[i]);
