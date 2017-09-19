@@ -9,26 +9,29 @@ delete(f);
 
 PROTOCOL_DELIMITER        = uint8(126);
 
-NEW_RNG_SEED              = uint8(0);
-START_ACQ                 = uint8(1);
-STOP_ACQ                  = uint8(2);
-SET_PERTURB               = uint8(3);
-SET_DEBUG_DATA            = uint8(4);
-INIT_PERTURB              = uint8(5);
-UNITS_DATA                = uint8(6);
-PSO_DATA                  = uint8(7);
-ADC_DATA                  = uint8(8);
-PPSO_PNO_DATA             = uint8(9);
+% Output
+NEW_RNG_SEED              = uint8(hex2dec( '00' ));
+START_ACQ                 = uint8(hex2dec( '01' ));
+STOP_ACQ                  = uint8(hex2dec( '02' ));
+SET_PERTURB               = uint8(hex2dec( '03' ));
+SET_DEBUG_DATA            = uint8(hex2dec( '04' ));
+INIT_PERTURB              = uint8(hex2dec( '05' ));
+% Input
+UNITS_DATA                = uint8(hex2dec( '10' ));
+PSO_DATA                  = uint8(hex2dec( '11' ));
+ADC_DATA                  = uint8(hex2dec( '12' ));
+PPSO_PNO_DATA             = uint8(hex2dec( '13' ));
 
-CLASSIC_PSO               = uint8(0);
-PARALLEL_PSO              = uint8(1);
-PARALLEL_PSO_MULTI_SWARM  = uint8(2);
-MULTI_UNIT                = uint8(3);
-EXTREMUM_SEEKING          = uint8(4);
-CHARACTERIZATION          = uint8(5);
-PPSO_PNO                  = uint8(6);
-PNO                       = uint8(7);
-DEBUG_ADC                 = uint8(8);
+CLASSIC_PSO               = uint8(hex2dec( '00' ));
+PARALLEL_PSO              = uint8(hex2dec( '01' ));
+PARALLEL_PSO_MULTI_SWARM  = uint8(hex2dec( '02' ));
+MULTI_UNIT                = uint8(hex2dec( '03' ));
+EXTREMUM_SEEKING          = uint8(hex2dec( '04' ));
+CHARACTERIZATION          = uint8(hex2dec( '05' ));
+PPSO_PNO                  = uint8(hex2dec( '06' ));
+PNO                       = uint8(hex2dec( '07' ));
+DEBUG_ADC                 = uint8(hex2dec( '08' ));
+POLARIZATION              = uint8(hex2dec( '09' ));
 
 PROTOCOL_START_ALGO       = uint8('!' - 0);
 PROTOCOL_STOP_ALGO        = uint8('x' - 0);

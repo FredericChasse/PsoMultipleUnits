@@ -40,15 +40,16 @@ typedef struct
 
 // Private prototypes
 //==============================================================================
-void  _Unit_Init          (Unit_t *unit);
-INT8  _Unit_SetPos        (Unit_t *unit, float pos);
-INT8  _Unit_SetPosWithIdx (Unit_t *unit, UINT8 idx);
-float _Unit_GetPos        (Unit_t *unit);
-float _Unit_GetPower      (Unit_t *unit);
-UINT8 _Unit_GetId         (Unit_t *unit);
-UINT8 _Unit_GetPosIdx     (Unit_t *unit);
-void  _Unit_GetPosLimits  (Unit_t *unit, float *minPos, float *maxPos);
-void  _Unit_SetPower      (Unit_t *unit, float power);
+void  _Unit_Init            (Unit_t *unit);
+INT8  _Unit_SetPos          (Unit_t *unit, float pos);
+INT8  _Unit_SetPosWithIdx   (Unit_t *unit, UINT8 idx);
+float _Unit_GetPos          (Unit_t *unit);
+float _Unit_GetPower        (Unit_t *unit);
+UINT8 _Unit_GetId           (Unit_t *unit);
+UINT8 _Unit_GetPosIdx       (Unit_t *unit);
+void  _Unit_GetPosLimits    (Unit_t *unit, float *minPos, float *maxPos);
+void  _Unit_GetPosLimitsIdx (Unit_t *unit, UINT8 *minPos, UINT8 *maxPos);
+void  _Unit_SetPower        (Unit_t *unit, float power);
 
 
 // Private variables
@@ -131,6 +132,13 @@ void _Unit_GetPosLimits (Unit_t *unit, float *minPos, float *maxPos)
 }
 
 
+void _Unit_GetPosLimitsIdx (Unit_t *unit, UINT8 *minPos, UINT8 *maxPos)
+{
+  *minPos = unit->minPosIdx;
+  *maxPos = unit->maxPosIdx;
+}
+
+
 float _Unit_GetPos (Unit_t *unit)
 {
   return unit->pos;
@@ -167,16 +175,17 @@ const UnitInterface_t * UnitInterface(UINT8 id)
     
     for (i = 0; i < N_UNITS_TOTAL; i++)
     {
-      _units_if[i].ctx            = (void *)                &_units[i];
-      _units_if[i].GetId          = (UnitGetId_fct)         &_Unit_GetId;
-      _units_if[i].GetPos         = (UnitGetPos_fct)        &_Unit_GetPos;
-      _units_if[i].GetPosIdx      = (UnitGetPosIdx_fct)     &_Unit_GetPosIdx;
-      _units_if[i].GetPosLimits   = (UnitGetPosLimits_fct)  &_Unit_GetPosLimits;
-      _units_if[i].GetPower       = (UnitGetPower_fct)      &_Unit_GetPower;
-      _units_if[i].Init           = (UnitInit_fct)          &_Unit_Init;
-      _units_if[i].SetPos         = (UnitSetPos_fct)        &_Unit_SetPos;
-      _units_if[i].SetPosWithIdx  = (UnitSetPosWithIdx_fct) &_Unit_SetPosWithIdx;
-      _units_if[i].SetPower       = (UnitSetPower_fct)      &_Unit_SetPower;
+      _units_if[i].ctx              = (void *)                    &_units[i];
+      _units_if[i].GetId            = (UnitGetId_fct)             &_Unit_GetId;
+      _units_if[i].GetPos           = (UnitGetPos_fct)            &_Unit_GetPos;
+      _units_if[i].GetPosIdx        = (UnitGetPosIdx_fct)         &_Unit_GetPosIdx;
+      _units_if[i].GetPosLimits     = (UnitGetPosLimits_fct)      &_Unit_GetPosLimits;
+      _units_if[i].GetPower         = (UnitGetPower_fct)          &_Unit_GetPower;
+      _units_if[i].Init             = (UnitInit_fct)              &_Unit_Init;
+      _units_if[i].SetPos           = (UnitSetPos_fct)            &_Unit_SetPos;
+      _units_if[i].SetPosWithIdx    = (UnitSetPosWithIdx_fct)     &_Unit_SetPosWithIdx;
+      _units_if[i].SetPower         = (UnitSetPower_fct)          &_Unit_SetPower;
+      _units_if[i].GetPosLimitsIdx  = (UnitGetPosLimitsIdx_fct)   &_Unit_GetPosLimitsIdx;
       
       _units[i].adcNum              = unitAdcs[i];
       _units[i].potNum              = unitPots[i];

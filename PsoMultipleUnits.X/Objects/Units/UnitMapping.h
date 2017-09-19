@@ -101,4 +101,20 @@ extern const UINT8 unitsMinPosIdx[N_UNITS_TOTAL];
 extern const float unitsMinPos[N_UNITS_TOTAL];
 
 
+#define UNIT_0_OPT_POS_IDX    (82)    /* 371.5686 */
+#define UNIT_1_OPT_POS_IDX    (36)    /* 191.1765 */
+#define UNIT_2_OPT_POS_IDX    (49)    /* 242.1569 */
+#define UNIT_3_OPT_POS_IDX    (80)    /* 363.7255 */
+#define UNIT_4_OPT_POS_IDX    (100)
+#define UNIT_5_OPT_POS_IDX    (100)
+#define UNIT_6_OPT_POS_IDX    (100)
+#define UNIT_7_OPT_POS_IDX    (100)
+#define UNIT_8_OPT_POS_IDX    (100)
+#define UNIT_9_OPT_POS_IDX    (100)
+#define UNIT_10_OPT_POS_IDX   (100)
+#define UNIT_11_OPT_POS_IDX   (100)
+
+extern const UINT8 unitsOptPosIdx[N_UNITS_TOTAL];
+
+
 #endif // __UNIT_MAPPING_H__

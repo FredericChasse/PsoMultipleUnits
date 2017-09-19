@@ -30,6 +30,7 @@ typedef UINT8 (*UnitArrayGetNUnits_fct)           (void *ctx);
 typedef void* (*UnitArrayGetUnitHandle_fct)       (void *ctx, UINT8 idx);
 typedef void  (*UnitArrayRelease_fct)             (void *ctx);
 typedef void  (*UnitArrayGetPosLimits_fct)        (void *ctx, float *minPos, float *maxPos);
+typedef void  (*UnitArrayGetUnitLimitsIdx_fct)    (void *ctx, UINT8 id, UINT8 *minPos, UINT8 *maxPos);
 typedef void  (*UnitArraySetPower_fct)            (void *ctx, UINT8 idx, float power);
 typedef UINT8 (*UnitArrayGetUnitPosIdx_fct)       (void *ctx, UINT8 idx);
 typedef UINT8 (*UnitArrayGetUnidId_fct)           (void *ctx, UINT8 idx);
@@ -49,6 +50,7 @@ typedef struct UnitArrayInterface
   UnitArrayGetUnitHandle_fct        GetUnitHandle;
   UnitArrayRelease_fct              Release;
   UnitArrayGetPosLimits_fct         GetPosLimits;
+  UnitArrayGetUnitLimitsIdx_fct     GetUnitLimitsIdx;
   UnitArraySetPower_fct             SetPower;
   UnitArrayGetUnitPosIdx_fct        GetUnitPosIdx;
   UnitArrayGetUnidId_fct            GetUnitId;

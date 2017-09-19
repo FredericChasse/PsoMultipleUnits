@@ -31,6 +31,7 @@
 
 typedef enum
 {
+  // Input
   NEW_RNG_SEED  = 0x00
  ,START_ACQ     = 0x01
  ,END_ACQ       = 0x02
@@ -38,10 +39,11 @@ typedef enum
  ,SET_DBG_DATA  = 0x04
  ,INIT_PERTURB  = 0x05
   
- ,UNITS_DATA    = 0x06
- ,PSO_DATA      = 0x07
- ,ADC_DATA      = 0x08
- ,PPSO_PNO_DATA = 0x09
+  // Output
+ ,UNITS_DATA    = 0x10
+ ,PSO_DATA      = 0x11
+ ,ADC_DATA      = 0x12
+ ,PPSO_PNO_DATA = 0x13
 } ProtocolMsgType_t;
 
 typedef struct
@@ -96,6 +98,7 @@ typedef enum
  ,PPSO_PNO                  = 0x06
  ,PNO_CLASSIC               = 0x07
  ,DEBUG_ADC                 = 0x08
+ ,POLARIZATION              = 0x09
 } ProtocolTypeOfAlgo_t;
 
 #define PROTOCOL_START_ALGO   ('!')

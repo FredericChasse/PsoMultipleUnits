@@ -47,6 +47,7 @@ UINT8 _UnitArray_GetNUnits            (UnitArray_t *array);
 void* _UnitArray_GetUnitHandle        (UnitArray_t *array, UINT8 idx);
 void  _UnitArray_Release              (UnitArray_t *array);
 void  _UnitArray_GetPosLimits         (UnitArray_t *array, float *minPos, float *maxPos);
+void  _UnitArray_GetUnitLimitsIdx     (UnitArray_t *array, UINT8 id, UINT8 *minPos, UINT8 *maxPos);
 void  _UnitArray_SetPower             (UnitArray_t *array, UINT8 idx, float power);
 UINT8 _UnitArray_GetUnitPosIdx        (UnitArray_t *array, UINT8 idx);
 UINT8 _UnitArray_GetUnitId            (UnitArray_t *array, UINT8 idx);
@@ -96,6 +97,12 @@ void _UnitArray_SetPower (UnitArray_t *array, UINT8 idx, float power)
 void _UnitArray_GetPosLimits (UnitArray_t *array, float *minPos, float *maxPos)
 {
   array->units[0]->GetPosLimits(array->units[0]->ctx, minPos, maxPos);
+}
+
+
+void _UnitArray_GetUnitLimitsIdx (UnitArray_t *array, UINT8 id, UINT8 *minPos, UINT8 *maxPos)
+{
+  array->units[id]->GetPosLimitsIdx(array->units[id]->ctx, minPos, maxPos);
 }
 
 
@@ -265,6 +272,7 @@ const UnitArrayInterface_t * UnitArrayInterface(void)
       _arrays_if[i].GetUnitHandle       = (UnitArrayGetUnitHandle_fct)        &_UnitArray_GetUnitHandle;
       _arrays_if[i].Release             = (UnitArrayRelease_fct)              &_UnitArray_Release;
       _arrays_if[i].GetPosLimits        = (UnitArrayGetPosLimits_fct)         &_UnitArray_GetPosLimits;
+      _arrays_if[i].GetUnitLimitsIdx    = (UnitArrayGetUnitLimitsIdx_fct)     &_UnitArray_GetUnitLimitsIdx;
       _arrays_if[i].SetPower            = (UnitArraySetPower_fct)             &_UnitArray_SetPower;
       _arrays_if[i].GetUnitPosIdx       = (UnitArrayGetUnitPosIdx_fct)        &_UnitArray_GetUnitPosIdx;
       _arrays_if[i].GetUnitId           = (UnitArrayGetUnidId_fct)            &_UnitArray_GetUnitId;

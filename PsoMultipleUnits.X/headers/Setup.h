@@ -98,15 +98,15 @@ void StartInterrupts  (void);
 
 #define N_UNITS_TOTAL (12u)
 
-#define ADC_TIMER_PERIOD          (10)
+#define ADC_TIMER_PERIOD          (100)
 #define ADC_TIMER_SCALE           (SCALE_MS)
 #define ADC_TIMER_SCALE_FLOAT     (TIMER_SCALE_MS)
 #define N_SAMPLES_PER_ADC_READ    (10)     // Number of samples / ADC value
-#define N_SAMPLES_TO_DROP         (1)      // Ignore n first samples
+#define N_SAMPLES_TO_DROP         (0)      // Ignore n first samples
 #define N_TOTAL_SAMPLES           (N_SAMPLES_PER_ADC_READ - N_SAMPLES_TO_DROP)
 
 //#define N_LARGE_SAMPLES_FOR_ALGO  (1200)    // 12 * 0.025 * 10 = 3 seconds; 3 * 1200 = 3600 seconds = 1 hour
-#define N_LARGE_SAMPLES_FOR_ALGO  (4)    // 12 * 0.025 * 10 = 3 seconds; 3 * 4 = 12 seconds
+#define N_LARGE_SAMPLES_FOR_ALGO  (225)    // 12 * 0.025 * 10 = 3 seconds; 3 * 4 = 12 seconds
 
 #define SAMPLING_TIME_FLOAT       (ADC_TIMER_SCALE_FLOAT * ADC_TIMER_PERIOD * N_SAMPLES_PER_ADC_READ * N_UNITS_TOTAL)
 #define LARGE_SAMPLING_TIME_FLOAT (ADC_TIMER_SCALE_FLOAT * ADC_TIMER_PERIOD * N_SAMPLES_PER_ADC_READ * N_UNITS_TOTAL * N_LARGE_SAMPLES_FOR_ALGO)

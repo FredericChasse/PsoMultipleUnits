@@ -372,6 +372,17 @@ void StateAcq(void)
             nSamples = 0;
             break;
             
+          case POLARIZATION:
+            oAlgoIsPso      = 0;
+            oAlgoIsPpsoPno  = 0;
+            oDbgAdc         = 0;
+            oSessionActive  = 1;
+            algo = (AlgoInterface_t *) PolarizationInterface();
+            algo->Init(algo->ctx, algoArray);
+            while(oAcqOngoing);
+            nSamples = 0;
+            break;
+            
           case PARALLEL_PSO:
             oAlgoIsPso      = 1;
             oAlgoIsPpsoPno  = 0;

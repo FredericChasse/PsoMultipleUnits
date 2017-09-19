@@ -32,21 +32,23 @@ typedef float (*UnitGetPos_fct)         (void *ctx);
 typedef float (*UnitGetPower_fct)       (void *ctx);
 typedef UINT8 (*UnitGetId_fct)          (void *ctx);
 typedef void  (*UnitGetPosLimits_fct)   (void *ctx, float *minPos, float *maxPos);
+typedef void  (*UnitGetPosLimitsIdx_fct)(void *ctx, UINT8 *minPos, UINT8 *maxPos);
 typedef void  (*UnitSetPower_fct)       (void *ctx, float power);
 typedef UINT8 (*UnitGetPosIdx_fct)      (void *ctx);
 
 typedef struct
 {
-  void                 *ctx;
-  UnitInit_fct          Init;
-  UnitSetPos_fct        SetPos;
-  UnitSetPosWithIdx_fct SetPosWithIdx;
-  UnitGetPos_fct        GetPos;
-  UnitGetPower_fct      GetPower;
-  UnitGetId_fct         GetId;
-  UnitGetPosLimits_fct  GetPosLimits;
-  UnitSetPower_fct      SetPower;
-  UnitGetPosIdx_fct     GetPosIdx;
+  void                   *ctx;
+  UnitInit_fct            Init;
+  UnitSetPos_fct          SetPos;
+  UnitSetPosWithIdx_fct   SetPosWithIdx;
+  UnitGetPos_fct          GetPos;
+  UnitGetPower_fct        GetPower;
+  UnitGetId_fct           GetId;
+  UnitGetPosLimits_fct    GetPosLimits;
+  UnitGetPosLimitsIdx_fct GetPosLimitsIdx;
+  UnitSetPower_fct        SetPower;
+  UnitGetPosIdx_fct       GetPosIdx;
 } UnitInterface_t;
 
 

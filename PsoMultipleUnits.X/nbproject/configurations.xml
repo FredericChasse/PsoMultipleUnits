@@ -24,6 +24,10 @@
         <itemPath>Objects/Algo/PnoSwarm.c</itemPath>
         <itemPath>Objects/Algo/PnoSwarm.h</itemPath>
       </logicalFolder>
+      <logicalFolder name="f7" displayName="Polarization" projectFiles="true">
+        <itemPath>Objects/Algo/Polarization.c</itemPath>
+        <itemPath>Objects/Algo/Polarization.h</itemPath>
+      </logicalFolder>
       <logicalFolder name="f5" displayName="PpsoPno" projectFiles="true">
         <itemPath>Objects/Algo/PpsoPno.c</itemPath>
         <itemPath>Objects/Algo/PpsoPno.h</itemPath>

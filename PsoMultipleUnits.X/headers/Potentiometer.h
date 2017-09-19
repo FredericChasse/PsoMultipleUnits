@@ -26,7 +26,7 @@
 
 // Public definitions
 //==============================================================================
-#define POT_MAX_INDEX   (255)   // 1050 Ohms
+#define POT_MAX_INDEX   (255)   // 700.9804 Ohms
 #define POT_MIN_INDEX   (0)    // 402.9412 Ohms
 
 //#define MAX_POT_VALUE   9.55k +9.56k+9.53k+9.54k
