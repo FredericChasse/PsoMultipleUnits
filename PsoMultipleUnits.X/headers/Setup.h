@@ -78,6 +78,9 @@ void StartInterrupts  (void);
 #define DBG0_OFF()      Port.C.ClearBits(BIT_13)  // GPIO0 RC13
 #define DBG1_OFF()      Port.C.ClearBits(BIT_14)  // GPIO1 RC14
 #define DBG2_OFF()      Port.E.ClearBits(BIT_4)   // GPIO2 RE4
+#define DBG0_TOGGLE()   Port.C.ToggleBits(BIT_13) // GPIO0 RC13
+#define DBG1_TOGGLE()   Port.C.ToggleBits(BIT_14) // GPIO1 RC14
+#define DBG2_TOGGLE()   Port.E.ToggleBits(BIT_4)  // GPIO2 RE4
 
 #define U_MATLAB      UART6
 #define U_DBG         UART3
@@ -105,9 +108,10 @@ void StartInterrupts  (void);
 #define N_SAMPLES_TO_DROP         (0)      // Ignore n first samples
 #define N_TOTAL_SAMPLES           (N_SAMPLES_PER_ADC_READ - N_SAMPLES_TO_DROP)
 
-//#define N_LARGE_SAMPLES_FOR_ALGO  (1200)    // 12 * 0.025 * 10 = 3 seconds; 3 * 1200 = 3600 seconds = 1 hour
-//#define N_LARGE_SAMPLES_FOR_ALGO  (300)    // 12 * 0.025 * 10 = 3 seconds; 3 * 4 = 12 seconds
-#define N_LARGE_SAMPLES_FOR_ALGO  (225)    // 12 * 0.025 * 10 = 3 seconds; 3 * 4 = 12 seconds
+//#define N_LARGE_SAMPLES_FOR_ALGO  (10)    // 12 * 0.001 * 10 = 0.12 seconds; 0.12 * 10 = 1.2 seconds
+//#define N_LARGE_SAMPLES_FOR_ALGO  (300)    // 12 * 0.100 * 10 = 12 seconds; 12 * 300 = 3600 seconds = 60 minutes =  1 hour
+#define N_LARGE_SAMPLES_FOR_ALGO  (300)    // 12 * 0.0001 * 10 = 0.012 seconds; 0.012 * 300 = 3.6 seconds
+#define N_LARGE_SAMPLES_FOR_ALGO  (300)    // 12 * 0.001 * 10 = 0.12 seconds; 0.12 * 300 = 36 seconds
 
 #define SAMPLING_TIME_FLOAT       (ADC_TIMER_SCALE_FLOAT * ADC_TIMER_PERIOD * N_SAMPLES_PER_ADC_READ * N_UNITS_TOTAL)
 #define LARGE_SAMPLING_TIME_FLOAT (ADC_TIMER_SCALE_FLOAT * ADC_TIMER_PERIOD * N_SAMPLES_PER_ADC_READ * N_UNITS_TOTAL * N_LARGE_SAMPLES_FOR_ALGO)

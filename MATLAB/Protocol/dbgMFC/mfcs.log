@@ -1,0 +1,24 @@
+Circuit: * C:\Users\frede\Documents\GitHub\PsoMultipleUnits\MATLAB\Protocol\dbgMFC\mfcs.asc
+
+R3: both pins shorted together -- ignoring.
+Direct Newton iteration for .op point succeeded.
+.step r1=100
+.step r1=300
+
+Date: Fri Sep 22 13:29:31 2017
+Total elapsed time: 25.546 seconds.
+
+tnom = 27
+temp = 27
+method = modified trap
+totiter = 4000037
+traniter = 4000034
+tranpoints = 2000018
+accept = 2000018
+rejected = 0
+matrix size = 3
+fillins = 0
+solver = Normal
+Matrix Compiler1: 50 bytes object code size  0.0/0.0/[0.0]
+Matrix Compiler2: 175 bytes object code size  0.1/0.0/[0.0]
+

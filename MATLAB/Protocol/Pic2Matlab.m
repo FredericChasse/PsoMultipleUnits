@@ -40,7 +40,7 @@ SIZE_OF_PROTOCOL_HEADER   = 4;
 
 N_UNITS_TOTAL             = 12;
 
-N_LARGE_SAMPLES           = 225;
+N_LARGE_SAMPLES           = 300;
 
 POT_MIN_INDEX             = 0;
 POT_MAX_INDEX             = 255;
@@ -207,7 +207,8 @@ currentSample = 0;
 fig = figure;
 
 iIteration = 0;
-oDoPlot = 1;
+% oDoPlot = 1;
+oDoPlot = 0;
 iTotalSample = 0;
 while iIteration <= nIterations
   waitbar(iIteration/nIterations, wbh_iteration, ['Iteration: ' num2str(iIteration) '/' num2str(nIterations)])
@@ -239,7 +240,7 @@ while iIteration <= nIterations
     powMem( (iTotalSample - 1)*nUnitsDouble + 1 : iTotalSample*nUnitsDouble ) = double(powers);
     
     if oDoPlot == 1
-%       oDoPlot = 0;
+      oDoPlot = 0;
       figure(fig)
       clf
       nData = length(positions);
