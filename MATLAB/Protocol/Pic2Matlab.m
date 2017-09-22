@@ -82,16 +82,16 @@ fopen(port);
 delimiter = PROTOCOL_DELIMITER;
 typeOfMsg = NEW_RNG_SEED;
 lengthOfPayload = typecast(uint16(16), 'uint8');
-% [seed1, seed2] = GenerateNewSeeds;
-seed1 = uint64(18073167594556639095);
-seed2 = uint64(2049787875638757461);
+[seed1, seed2] = GenerateNewSeeds;
+% seed1 = uint64(18073167594556639095);
+% seed2 = uint64(2049787875638757461);
 seeds = typecast([seed1, seed2], 'uint8');
 
 buf = [delimiter, typeOfMsg, lengthOfPayload, seeds];
 fwrite(port, buf);
 
 % Initial intensity
-initLedIntensity = 250;
+initLedIntensity = 325;
 delimiter = PROTOCOL_DELIMITER;
 typeOfMsg = INIT_PERTURB;
 lengthOfPayload = typecast(uint16(2), 'uint8');
@@ -101,17 +101,18 @@ buf = [delimiter, typeOfMsg, lengthOfPayload, payload];
 fwrite(port, buf);
 
 % Perturb
-nPerturbs = 1;
-% nPerturbs = 0;
+% nPerturbs = 1;
+nPerturbs = 0;
 
 if nPerturbs > 0
   perturbAmps = zeros(1, nPerturbs);
   perturbUnits = cell(1, nPerturbs);
   perturbIterations = zeros(1, nPerturbs);
-  perturbAmps(1) = 350;
+  perturbAmps(1) = 325;
 %   perturbUnits{1} = 0:1:3;
-  perturbUnits{1} = [0:1:4 7:1:14];
+%   perturbUnits{1} = [0:1:4 7:1:14];
 %   perturbUnits{1} = [0:1:14];
+  perturbUnits{1} = [0, 2, 4, 7:14];
   perturbIterations(1) = 50;
 end
 
@@ -138,19 +139,20 @@ end
 % Start algo
 typeOfMsg = START_ACQ;
 startAlgoChar = PROTOCOL_START_ALGO;
-% algo = CHARACTERIZATION;
+algo = CHARACTERIZATION;
 % algo = CLASSIC_PSO;
 % algo = PARALLEL_PSO;
 % algo = PARALLEL_PSO_MULTI_SWARM;
 % algo = MULTI_UNIT;
 % algo = EXTREMUM_SEEKING;
-algo = PPSO_PNO;
+% algo = PPSO_PNO;
 % algo = PNO;
 % algo = DEBUG_ADC;
 % units = uint8(3:1:10);
 % units = uint8([3:6 11:14]);
-% units = uint8(0:1:14);
-units = uint8([0:1:4 7:1:14]);
+units = uint8(0:1:14);
+% units = uint8([0, 2, 4, 7:14]);
+% units = uint8([0:1:4 7:1:14]);
 unitsMem = units;
 nUnits = uint8(length(units));
 % lengthOfPayload = fliplr(typecast(uint16(3 + nUnits), 'uint8'));
@@ -168,7 +170,7 @@ elseif algo == CLASSIC_PSO
   nIterations = 200;
 elseif algo == PARALLEL_PSO
   oSendDebugData = uint8(0);
-  nIterations = 200;
+  nIterations = 100;
 elseif algo == PARALLEL_PSO_MULTI_SWARM
   oSendDebugData = uint8(0);
   nIterations = 130;
@@ -575,7 +577,7 @@ if nPerturbs > 0
 %   fprintf(['Unit\tS0\t\t\t\tPrecision\t\tConvergence\t\tEfficiency\tJoules\n']);
   fprintf(['Unit\tLED PWM\t\tRopt\t\tPrecision\tSS @ ±' num2str(uint16(oscAmp*100)) '%%\tEfficiency\tmJoules\t\tConv. time\tConvergence power [mW]\n']);
   for iUnit = 1 : nUnits
-    fprintf([num2str(uint16(iUnit)) '\t\t'])
+    fprintf([num2str(unitsMem(iUnit)) '\t\t'])
     if (initLedIntensity < 100)
       fprintf(' ')
     end
@@ -602,7 +604,7 @@ if nPerturbs > 0
 %   fprintf(['Unit\tS0\t\t\t\tPrecision\t\tConvergence\t\tEfficiency\tJoules\n']);
   fprintf(['Unit\tLED PWM\t\tRopt\t\tPrecision\tSS @ ±' num2str(uint16(oscAmp*100)) '%%\tEfficiency\tmJoules\t\tConv. time\tConvergence power [mW]\n']);
   for iUnit = 1 : nUnits
-    fprintf([num2str(uint16(iUnit)) '\t\t'])
+    fprintf([num2str(unitsMem(iUnit)) '\t\t'])
     if (initLedIntensity + perturbAmps(1)) < 100
       fprintf(' ')
     end
