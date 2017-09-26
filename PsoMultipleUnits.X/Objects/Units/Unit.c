@@ -72,8 +72,8 @@ void _Unit_Init (Unit_t *unit)
   if (!unit->oFirstSetupDone)
   {
     unit->oFirstSetupDone = 1;
-    unit->pos = potRealValues[unit->minPosIdx];
-    unit->posIdx = unit->minPosIdx;
+    unit->posIdx = 100;
+    unit->pos = potRealValues[unit->posIdx];
     SetPot(unit->potNum, unit->posIdx);
   }
 }

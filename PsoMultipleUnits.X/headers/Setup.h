@@ -109,9 +109,9 @@ void StartInterrupts  (void);
 #define N_TOTAL_SAMPLES           (N_SAMPLES_PER_ADC_READ - N_SAMPLES_TO_DROP)
 
 //#define N_LARGE_SAMPLES_FOR_ALGO  (10)    // 12 * 0.001 * 10 = 0.12 seconds; 0.12 * 10 = 1.2 seconds
-//#define N_LARGE_SAMPLES_FOR_ALGO  (300)    // 12 * 0.100 * 10 = 12 seconds; 12 * 300 = 3600 seconds = 60 minutes =  1 hour
-#define N_LARGE_SAMPLES_FOR_ALGO  (300)    // 12 * 0.0001 * 10 = 0.012 seconds; 0.012 * 300 = 3.6 seconds
-#define N_LARGE_SAMPLES_FOR_ALGO  (300)    // 12 * 0.001 * 10 = 0.12 seconds; 0.12 * 300 = 36 seconds
+#define N_LARGE_SAMPLES_FOR_ALGO  (300)    // 12 * 0.100 * 10 = 12 seconds; 12 * 300 = 3600 seconds = 60 minutes =  1 hour
+//#define N_LARGE_SAMPLES_FOR_ALGO  (300)    // 12 * 0.0001 * 10 = 0.012 seconds; 0.012 * 300 = 3.6 seconds
+//#define N_LARGE_SAMPLES_FOR_ALGO  (300)    // 12 * 0.001 * 10 = 0.12 seconds; 0.12 * 300 = 36 seconds
 
 #define SAMPLING_TIME_FLOAT       (ADC_TIMER_SCALE_FLOAT * ADC_TIMER_PERIOD * N_SAMPLES_PER_ADC_READ * N_UNITS_TOTAL)
 #define LARGE_SAMPLING_TIME_FLOAT (ADC_TIMER_SCALE_FLOAT * ADC_TIMER_PERIOD * N_SAMPLES_PER_ADC_READ * N_UNITS_TOTAL * N_LARGE_SAMPLES_FOR_ALGO)
