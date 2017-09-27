@@ -465,6 +465,12 @@ void StateAcq(void)
         {
           algoArray->RemoveUnitFromArray(algoArray->ctx, 0);
         }
+        
+        nUnits = mainArray->GetNUnits(mainArray->ctx);
+        for (i = 0; i < nUnits; i++)
+        {
+          mainArray->SetPosIdx(mainArray->ctx, i, 100);   // Placing every unit at ~400 Ohms
+        }
       }
       break;
       

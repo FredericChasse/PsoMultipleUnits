@@ -194,8 +194,8 @@ const UnitInterface_t * UnitInterface(UINT8 id)
       _units[i].pos                 = potRealValues[unitsMinPosIdx[i]];
       _units[i].minPosIdx           = unitsMinPosIdx[i];
       _units[i].minPos              = potRealValues[unitsMinPosIdx[i]];
-      _units[i].maxPosIdx           = POT_MAX_INDEX;
-      _units[i].maxPos              = MAX_POT_VALUE;
+      _units[i].maxPosIdx           = unitsMaxPosIdx[i];
+      _units[i].maxPos              = potRealValues[_units[i].maxPosIdx];
       _units[i].power               = 0;
       _units[i].oFirstSetupDone     = 0;
     }
