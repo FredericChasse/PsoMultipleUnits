@@ -1,9 +1,4 @@
-clear
-close all
 
-% Next 2 lines are to close any open waitbar
-f = findall(0,'tag','TMWWaitbar');
-delete(f);
 
 %% Constants
 
@@ -91,6 +86,7 @@ fopen(port);
 
 %% Send Stop Algo
 
+delimiter = PROTOCOL_DELIMITER;
 typeOfMsg = STOP_ACQ;
 % lengthOfPayload = fliplr(typecast(uint16(1), 'uint8'));
 lengthOfPayload = typecast(uint16(1), 'uint8');

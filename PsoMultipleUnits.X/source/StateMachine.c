@@ -469,7 +469,7 @@ void StateAcq(void)
         nUnits = mainArray->GetNUnits(mainArray->ctx);
         for (i = 0; i < nUnits; i++)
         {
-          mainArray->SetPosIdx(mainArray->ctx, i, 100);   // Placing every unit at ~400 Ohms
+          mainArray->SetPosIdx(mainArray->ctx, i, unitsOptPosIdx[i]);   // Placing every unit at around their optimum
         }
       }
       break;

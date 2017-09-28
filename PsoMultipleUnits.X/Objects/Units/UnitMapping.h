@@ -68,9 +68,9 @@ extern const UINT8 unitsPwms[N_UNITS_TOTAL];
 
 
 #define GLOBAL_MIN_POS_IDX    (POT_MIN_INDEX)
-#define UNIT_0_MIN_POS_IDX    (10)
-#define UNIT_1_MIN_POS_IDX    (8)
-#define UNIT_2_MIN_POS_IDX    (13)
+#define UNIT_0_MIN_POS_IDX    (3)
+#define UNIT_1_MIN_POS_IDX    (0)
+#define UNIT_2_MIN_POS_IDX    (6)
 #define UNIT_3_MIN_POS_IDX    (GLOBAL_MIN_POS_IDX)
 #define UNIT_4_MIN_POS_IDX    (GLOBAL_MIN_POS_IDX)
 #define UNIT_5_MIN_POS_IDX    (GLOBAL_MIN_POS_IDX)
@@ -85,9 +85,9 @@ extern const UINT8 unitsMinPosIdx[N_UNITS_TOTAL];
 
 
 #define GLOBAL_MIN_POS        (MIN_POT_VALUE)
-#define UNIT_0_MIN_POS        (89.2157f)
-#define UNIT_1_MIN_POS        (81.3725f)
-#define UNIT_2_MIN_POS        (100.9804f)
+#define UNIT_0_MIN_POS        (61.7647f)
+#define UNIT_1_MIN_POS        (50.0f)
+#define UNIT_2_MIN_POS        (73.5294f)
 #define UNIT_3_MIN_POS        (GLOBAL_MIN_POS)
 #define UNIT_4_MIN_POS        (GLOBAL_MIN_POS)
 #define UNIT_5_MIN_POS        (GLOBAL_MIN_POS)
@@ -101,10 +101,10 @@ extern const UINT8 unitsMinPosIdx[N_UNITS_TOTAL];
 extern const float unitsMinPos[N_UNITS_TOTAL];
 
 
-#define UNIT_0_OPT_POS_IDX    (82)    /* 371.5686 */
-#define UNIT_1_OPT_POS_IDX    (39)    /* 202.9412 */
-#define UNIT_2_OPT_POS_IDX    (51)    /* 250.0000 */
-#define UNIT_3_OPT_POS_IDX    (80)    /* 363.7255 */
+#define UNIT_0_OPT_POS_IDX    (11)    /* 93.1373 */
+#define UNIT_1_OPT_POS_IDX    (10)    /* 89.2157 */
+#define UNIT_2_OPT_POS_IDX    (15)    /* 108.8235 */
+#define UNIT_3_OPT_POS_IDX    (100)
 #define UNIT_4_OPT_POS_IDX    (100)
 #define UNIT_5_OPT_POS_IDX    (100)
 #define UNIT_6_OPT_POS_IDX    (100)
@@ -118,10 +118,10 @@ extern const UINT8 unitsOptPosIdx[N_UNITS_TOTAL];
 
 
 #define GLOBAL_MAX_POS_IDX    (POT_MAX_INDEX)
-#define UNIT_0_MAX_POS_IDX    (141)   /* 602.9412 */
-#define UNIT_1_MAX_POS_IDX    (141)   /* 602.9412 */
-#define UNIT_2_MAX_POS_IDX    (141)   /* 602.9412 */
-#define UNIT_3_MAX_POS_IDX    (141)   /* 602.9412 */
+#define UNIT_0_MAX_POS_IDX    (39)   /* 202.9412 */
+#define UNIT_1_MAX_POS_IDX    (39)   /* 202.9412 */
+#define UNIT_2_MAX_POS_IDX    (39)   /* 202.9412 */
+#define UNIT_3_MAX_POS_IDX    (GLOBAL_MAX_POS_IDX)
 #define UNIT_4_MAX_POS_IDX    (GLOBAL_MAX_POS_IDX)
 #define UNIT_5_MAX_POS_IDX    (GLOBAL_MAX_POS_IDX)
 #define UNIT_6_MAX_POS_IDX    (GLOBAL_MAX_POS_IDX)

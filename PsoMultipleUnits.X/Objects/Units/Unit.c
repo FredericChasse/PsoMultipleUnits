@@ -72,7 +72,7 @@ void _Unit_Init (Unit_t *unit)
   if (!unit->oFirstSetupDone)
   {
     unit->oFirstSetupDone = 1;
-    unit->posIdx = 100;
+    unit->posIdx = unitsOptPosIdx[unit->id];
     unit->pos = potRealValues[unit->posIdx];
     SetPot(unit->potNum, unit->posIdx);
   }
@@ -187,9 +187,9 @@ const UnitInterface_t * UnitInterface(UINT8 id)
       _units_if[i].SetPower         = (UnitSetPower_fct)          &_Unit_SetPower;
       _units_if[i].GetPosLimitsIdx  = (UnitGetPosLimitsIdx_fct)   &_Unit_GetPosLimitsIdx;
       
+      _units[i].id                  = i;
       _units[i].adcNum              = unitAdcs[i];
       _units[i].potNum              = unitPots[i];
-      _units[i].id                  = i;
       _units[i].posIdx              = unitsMinPosIdx[i];
       _units[i].pos                 = potRealValues[unitsMinPosIdx[i]];
       _units[i].minPosIdx           = unitsMinPosIdx[i];

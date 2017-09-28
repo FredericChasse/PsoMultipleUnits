@@ -266,7 +266,7 @@ INT8 _ParallelPso_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
    ,.posMaxIdx              = maxPosIdx
    ,.minParticles           = 3
    ,.perturbAmp             = 15.7
-   ,.sentinelMargin         = 0.05
+   ,.sentinelMargin         = 0.15
    ,.type                   = PSO_SWARM_TYPE_PARALLEL_PSO
    ,.nSamplesForSteadyState = STEADY_STATE_MAX_SAMPLES
    ,.steadyStateOscAmp      = 0.01
