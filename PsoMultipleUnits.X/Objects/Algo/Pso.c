@@ -257,8 +257,8 @@ INT8 _ParallelPso_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
   maxPosIdx = ComputePotValueFloat2Dec(maxPos);
   const PsoSwarmParam_t swarmParam = 
   {
-    .c1                     = 1
-   ,.c2                     = 2
+    .c1                     = 0.9
+   ,.c2                     = 1.7
    ,.omega                  = 0.4
    ,.posMin                 = minPos
    ,.posMax                 = maxPos

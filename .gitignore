@@ -8,8 +8,10 @@
 *.sdb
 *.obj.dmp
 html/
+/nbproject/private/
 nbproject/private/
 nbproject\private\
+\nbproject\private\
 nbproject/Package-*.bash
 nbproject\Package-*.bash
 build/
