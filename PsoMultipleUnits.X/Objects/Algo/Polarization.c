@@ -77,7 +77,7 @@ Polar_t _polar =
  ,.nUnits         = 0
  ,.currentPosIdx  = {POT_MIN_INDEX}
  ,.currentPos     = {MIN_POT_VALUE}
- ,.posIncrement   = 4
+ ,.posIncrement   = 1
  ,.minPosIdx      = {POT_MIN_INDEX}
  ,.maxPosIdx      = {POT_MAX_INDEX}
  ,.minPos         = {MIN_POT_VALUE}
@@ -117,7 +117,7 @@ INT8 _Polar_Init (Polar_t *p, UnitArrayInterface_t *unitArray)
     unitId = unitArray->GetUnitId(unitArray->ctx, i);
     p->minPosIdx[i]     = minPosIdx;
 //    p->maxPosIdx[i]     = maxPosIdx;
-    p->maxPosIdx[i]     = unitsMaxPosIdx[unitId];   // Shortcut
+    p->maxPosIdx[i]     = 13;   // Shortcut, 100.9804
     p->minPos[i]        = potRealValues[p->minPosIdx[i]];
     p->maxPos[i]        = potRealValues[p->maxPosIdx[i]];
     p->currentPos[i]    = p->minPos[i];

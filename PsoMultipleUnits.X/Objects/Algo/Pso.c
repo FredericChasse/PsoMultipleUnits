@@ -303,8 +303,8 @@ INT8 _Pso1d_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
   maxPosIdx = ComputePotValueFloat2Dec(maxPos);
   PsoSwarmParam_t swarmParam = 
   {
-    .c1                     = 1
-   ,.c2                     = 2
+    .c1                     = 0.9
+   ,.c2                     = 1.7
    ,.omega                  = 0.4
    ,.posMin                 = minPos
    ,.posMax                 = maxPos
@@ -312,10 +312,10 @@ INT8 _Pso1d_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
    ,.posMaxIdx              = maxPosIdx
    ,.minParticles           = 3
    ,.perturbAmp             = 15.7
-   ,.sentinelMargin         = 0.05
+   ,.sentinelMargin         = 0.15
    ,.type                   = PSO_SWARM_TYPE_PSO_1D
    ,.nSamplesForSteadyState = STEADY_STATE_MAX_SAMPLES
-   ,.steadyStateOscAmp      = 0.01
+   ,.steadyStateOscAmp      = 0.05
    ,.iteration              = 0
    ,.currentParticle        = 0
   };
