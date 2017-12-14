@@ -49,6 +49,8 @@ typedef struct
   UINT8 nInstances;
   PnoParam_t param[N_UNITS_TOTAL];
   PnoInstanceInterface_t *instances[N_UNITS_TOTAL];
+  UINT32 nSamplesForAcq;
+  UINT32 currentSample;
 } Pno_t;
 
 
@@ -73,6 +75,8 @@ Pno_t _pno =
  ,.timeElapsed    = 0
  ,.nInstances     = 0
  ,.param          = {0}
+ ,.nSamplesForAcq = N_LARGE_SAMPLES_FOR_ALGO
+ ,.currentSample  = 0
 };
 
 const AlgoInterface_t _pno_if = 
@@ -93,6 +97,7 @@ INT8 _Pno_Init (Pno_t *pno, UnitArrayInterface_t *unitArray)
 {
   UINT8 i = 0;
   
+  pno->currentSample  = 0;
   pno->timeElapsed    = 0;
   pno->iteration      = 0;
   pno->unitArray      = unitArray;
@@ -107,7 +112,7 @@ INT8 _Pno_Init (Pno_t *pno, UnitArrayInterface_t *unitArray)
   for (i = 0; i < pno->nInstances; i++)
   {
     pno->instances[i] = (PnoInstanceInterface_t *) PnoInstanceInterface(PNO_CLASSIC);
-    pno->param[i].delta_int = 3;
+    pno->param[i].delta_int = 2;
     pno->param[i].delta = pno->param[i].delta_int*POT_STEP_VALUE;
     pno->param[i].uinit_int = 6;  // 73.5294
     pno->param[i].uinit = potRealValues[pno->param[i].uinit_int];
@@ -157,20 +162,26 @@ INT8 _Pno_Run (Pno_t *pno)
   BOOL oFirstIteration = pno->iteration == 0 ? 1 : 0;
   
   pno->timeElapsed += pno->sampleTime;
-  pno->iteration++;
   
-  for (i = 0; i < pno->nInstances; i++)
+  if (++pno->currentSample >= pno->nSamplesForAcq)
   {
-    pnoi = pno->instances[i];
+    pno->currentSample = 0;
     
-    pnoi->SetFitness(pnoi, pno->unitArray->GetPower(pno->unitArray->ctx, i));
-    if (oFirstIteration)
+    pno->iteration++;
+  
+    for (i = 0; i < pno->nInstances; i++)
     {
+      pnoi = pno->instances[i];
+
       pnoi->SetFitness(pnoi, pno->unitArray->GetPower(pno->unitArray->ctx, i));
+      if (oFirstIteration)
+      {
+        pnoi->SetFitness(pnoi, pno->unitArray->GetPower(pno->unitArray->ctx, i));
+      }
+
+      newPos = pnoi->ComputePos(pnoi, &dummy);
+      pno->unitArray->SetPosIdx(pno->unitArray->ctx, i, newPos);
     }
-    
-    newPos = pnoi->ComputePos(pnoi, &dummy);
-    pno->unitArray->SetPosIdx(pno->unitArray->ctx, i, newPos);
   }
   
   return 0;

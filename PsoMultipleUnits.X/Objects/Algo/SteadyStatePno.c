@@ -92,7 +92,7 @@ BOOL SteadyStatePno_CheckForSteadyState (SteadyStatePno_t *ss)
   min  = _SteadyStatePno_GetMinSamples (ss);
   max  = _SteadyStatePno_GetMaxSamples (ss);
   upper = max - mean;
-  lower = min - max;
+  lower = min - mean;
   if (  ( ABS(upper) / mean >= (ss->oscAmp*ss->delta) )
      || ( ABS(lower) / mean >= (ss->oscAmp*ss->delta) ) )
   {
