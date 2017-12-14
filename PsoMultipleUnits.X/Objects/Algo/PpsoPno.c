@@ -45,7 +45,7 @@ typedef struct
   ProtocolPpsoPnoDataPayload_t classifierGroups;
 } PpsoPno_t;
 
-#define SEND_DEBUG_DATA_TO_UART
+//#define SEND_DEBUG_DATA_TO_UART
 //#define SEND_ALGO_STEP_TO_UART
 
 typedef enum

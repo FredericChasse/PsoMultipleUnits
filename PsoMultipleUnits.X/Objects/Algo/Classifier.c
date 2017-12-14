@@ -236,11 +236,63 @@ INT16 _Classifier_Classify (Classifier_t *c, UINT8 *idx, UINT8 nIdx, UINT8 *grou
     }
   }
   
+  
   tmpIdx = 0;
   for (i = 0; i < nGroups; i++)
   {
     memcpy(&groups[tmpIdx], &tmpGroups[i][0], lengths[i]);
     tmpIdx += lengths[i];
+  }
+  
+  // Merge groups with less than 3 units
+  iGroup = 0;
+  tmpIdx = 0;
+  for (iGroup = 0; iGroup < nGroups; iGroup++)
+  {
+    if (lengths[iGroup] < 3)
+    {
+      if ( (iGroup > 0) && (iGroup < (nGroups - 1)) )   // Not first or last group
+      {
+        if ( (groups[tmpIdx] - groups[tmpIdx -1]) < (groups[tmpIdx+lengths[iGroup]] - groups[tmpIdx+lengths[iGroup] - 1]) )
+        {
+          lengths[iGroup-1] += lengths[iGroup];
+          for (i = iGroup; i < nGroups - 1; i++)
+          {
+            lengths[i] = lengths[i + 1];
+          }
+          nGroups--;
+          iGroup--;   // To test this new group
+        }
+        else
+        {
+          lengths[iGroup] += lengths[iGroup + 1];
+          for (i = iGroup + 1; i < nGroups; i++)
+          {
+            lengths[i] = lengths[i + 1];
+          }
+          nGroups--;
+        }
+      }
+      else if (iGroup == 0)
+      {
+        lengths[iGroup] += lengths[iGroup + 1];
+        for (i = iGroup + 1; i < nGroups; i++)
+        {
+          lengths[i] = lengths[i + 1];
+        }
+        nGroups--;
+        iGroup--;   // To test this new group
+      }
+      else  // iGroup == (nGroups - 1)
+      {
+        lengths[iGroup-1] += lengths[iGroup];
+        for (i = iGroup; i < nGroups - 1; i++)
+        {
+          lengths[i] = lengths[i + 1];
+        }
+        nGroups--;
+      }
+    }
   }
   
   return nGroups;
