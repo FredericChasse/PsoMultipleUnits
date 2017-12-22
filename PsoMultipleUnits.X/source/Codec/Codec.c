@@ -263,7 +263,7 @@ UINT8 _Codec_CodeNewUnitsMsg (Codec_t *c, ProtocolUnitsDataPayload_t *newMsg)
   
   memcpy(&buf.buffer[buf.length], newMsg->powers, length);
   buf.length += length;
-  
+
   while(Uart.PutTxFifoBuffer(c->uartChannel, &buf) < 0);
   
   return 0;

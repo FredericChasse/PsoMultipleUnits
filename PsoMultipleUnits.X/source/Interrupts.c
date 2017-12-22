@@ -35,7 +35,9 @@ volatile BOOL  oAdcReady    = 0
 volatile UINT16 adcValues[15];
 
 extern volatile UINT16 nSamples;
-extern volatile UINT16 cellVoltRaw[N_SAMPLES_PER_ADC_READ][15];
+extern volatile UINT16 cellVoltRaw[N_SAMPLES_PER_ADC_READ][N_UNITS_TOTAL];
+extern volatile UINT32 cellVoltRawMean[N_UNITS_TOTAL];
+volatile UINT32 cellVoltRawMeanTemp[N_UNITS_TOTAL];
 
 
 /*******************************************************************************
@@ -71,14 +73,33 @@ void __ISR(_TIMER_2_VECTOR, T2_INTERRUPT_PRIORITY) Timer2InterruptHandler(void)
 //=============================================
 // Configure the Timer 3 interrupt handler
 //=============================================
+volatile INT64 time_ns;
+volatile BOOL oDbgToggle = 0;
 void __ISR(_TIMER_3_VECTOR, T3_INTERRUPT_PRIORITY) Timer3InterruptHandler(void)
 {
+//  DBG0_TOGGLE();
+//  DBG0_ON();
   oTimer3Ready = 1;
 
   // Increment the number of overflows from this timer. Used primarily by Input Capture
   Timer.Var.nOverflows[2]++;
 
   mT3ClearIntFlag();
+//  if (!oDbgToggle)
+//  {
+//    Timer.Tic();
+//    oDbgToggle ^= 1;
+//  }
+//  else
+//  {
+//    time_ns = Timer.Toc();
+//    if (time_ns >= 0)
+//    {
+//      LED1_ON();
+//    }
+//    oDbgToggle ^= 1;
+//  }
+//  DBG0_ON();
 }
 
 //=============================================
@@ -286,25 +307,10 @@ void __ISR(_UART_6_VECTOR, U6_INTERRUPT_PRIORITY) Uart6InterruptHandler(void)
 //=============================================
 void __ISR(_ADC_VECTOR, ADC_INTERRUPT_PRIO) AdcInterruptHandler(void)
 {
-  DBG0_ON();
-//  static BOOL oFirst = 1;
-//  static UINT32 coreTick;
-//  static INT32 time;
-//  
-//  if (oFirst)
-//  {
-//    coreTick = Timer.Tic(200000, SCALE_NS);
-//    oFirst = 0;
-//  }
-//  else
-//  {
-//    time = Timer.Toc(200000, coreTick);
-//    oFirst = 1;
-//  }
+  const UINT8 memcpySize = N_UNITS_TOTAL * 4;
   
-//  Adc.Read();               // Read the enabled channels and puts them in Adc.Var.adcReadValues[]
-//  oAdcReady = 1;
   oAcqOngoing = 1;
+  
   cellVoltRaw[nSamples][ 0] = ReadADC10( 0);
   cellVoltRaw[nSamples][ 1] = ReadADC10( 1);
   cellVoltRaw[nSamples][ 2] = ReadADC10( 2);
@@ -320,23 +326,32 @@ void __ISR(_ADC_VECTOR, ADC_INTERRUPT_PRIO) AdcInterruptHandler(void)
   cellVoltRaw[nSamples][12] = ReadADC10(12);
   cellVoltRaw[nSamples][13] = ReadADC10(13);
   cellVoltRaw[nSamples][14] = ReadADC10(14);
+//  cellVoltRawMeanTemp[ 0] += ReadADC10( 0);
+//  cellVoltRawMeanTemp[ 1] += ReadADC10( 1);
+//  cellVoltRawMeanTemp[ 2] += ReadADC10( 2);
+//  cellVoltRawMeanTemp[ 3] += ReadADC10( 3);
+//  cellVoltRawMeanTemp[ 4] += ReadADC10( 4);
+//  cellVoltRawMeanTemp[ 5] += ReadADC10( 5);
+//  cellVoltRawMeanTemp[ 6] += ReadADC10( 6);
+//  cellVoltRawMeanTemp[ 7] += ReadADC10( 7);
+//  cellVoltRawMeanTemp[ 8] += ReadADC10( 8);
+//  cellVoltRawMeanTemp[ 9] += ReadADC10( 9);
+//  cellVoltRawMeanTemp[10] += ReadADC10(10);
+//  cellVoltRawMeanTemp[11] += ReadADC10(11);
+//  cellVoltRawMeanTemp[12] += ReadADC10(12);
+//  cellVoltRawMeanTemp[13] += ReadADC10(13);
+//  cellVoltRawMeanTemp[14] += ReadADC10(14);
+  
   INTClearFlag(INT_AD1);    // Clear the ADC conversion done interrupt Flag
   
-//  GetAdcValues();
-//  memcpy((void *) &cellVoltRaw[nSamples][0], (void *) &Adc.Var.adcReadValues[1], 30);  // sizeof(UINT16) * 15 = 30
-  nSamples++;
-//  if (nSamples == N_SAMPLES_TO_START)
-//  {
-//    oAdcReady = 1;
-//  }
-  if (nSamples >= N_SAMPLES_PER_ADC_READ)
+  if (++nSamples >= N_SAMPLES_PER_ADC_READ)
   {
     nSamples = 0;
     oAdcReady = 1;
+    memcpy((void *) cellVoltRawMean, (void *) cellVoltRawMeanTemp, memcpySize);
+    memset((void *) cellVoltRawMeanTemp, 0, memcpySize);
   }
   oAcqOngoing = 0;
-  
-  DBG0_OFF();
 }
 //=============================================
 

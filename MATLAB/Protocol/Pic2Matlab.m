@@ -1,5 +1,5 @@
 clear
-close all
+% close all
 
 % Next 2 lines are to close any open waitbar
 f = findall(0,'tag','TMWWaitbar');
@@ -91,7 +91,7 @@ buf = [delimiter, typeOfMsg, lengthOfPayload, seeds];
 fwrite(port, buf);
 
 % Initial intensity
-initLedIntensity = 325;
+initLedIntensity = 500;
 delimiter = PROTOCOL_DELIMITER;
 typeOfMsg = INIT_PERTURB;
 lengthOfPayload = typecast(uint16(2), 'uint8');
@@ -148,9 +148,11 @@ algo = CHARACTERIZATION;
 % algo = PPSO_PNO;
 % algo = PNO;
 % algo = DEBUG_ADC;
+
 % units = uint8(3:1:10);
 % units = uint8([3:6 11:14]);
 units = uint8(0:1:14);
+% units = uint8(11:1:14);
 % units = uint8([0, 2, 4, 7:14]);
 % units = uint8([0:1:4 7:1:14]);
 unitsMem = units;
@@ -199,11 +201,12 @@ fwrite(port, buf);
 
 %% Algo run
 
-nSolarCells = double(nUnits);
-
-tsMem  = [];
-posMem = [];
-powMem = [];
+% tsMem  = [];
+% posMem = [];
+% powMem = [];
+tsMem  = zeros(1, nIterations);
+posMem = zeros(1, nIterations * double(nUnits));
+powMem = zeros(1, nIterations * double(nUnits));
 
 sIteration = [];
 pSpeedMem = [];
@@ -216,6 +219,7 @@ tic
 wbh = waitbar(0, ['Iteration : ' num2str(0) '/' num2str(nIterations)]);  % Waitbar handle
 
 iIteration = 0;
+idx = 1;
 while iIteration <= nIterations
   waitbar(iIteration/nIterations, wbh, ['Iteration: ' num2str(iIteration) '/' num2str(nIterations)])
   buf = fread(port, SIZE_OF_PROTOCOL_HEADER);
@@ -234,10 +238,12 @@ while iIteration <= nIterations
     positions = data(1:end/2);
     powers = data(end/2+1:end);
   
-    tsMem  = [tsMem timestamp];
-    posMem = [posMem positions];
-    powMem = [powMem powers];
-    
+%     tsMem  = [tsMem timestamp];
+%     posMem = [posMem positions];
+%     powMem = [powMem powers];
+    tsMem(iIteration) = timestamp;
+    posMem((iIteration-1)*double(nUnits)+1 : (iIteration)*double(nUnits)) = positions;
+    powMem((iIteration-1)*double(nUnits)+1 : (iIteration)*double(nUnits)) = powers;
   elseif typeOfMsg == PSO_DATA
     swarmIteration = double(typecast(uint8(buf(1:2)'), 'uint16'));
     nParticles = buf(3);

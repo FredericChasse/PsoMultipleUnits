@@ -78,6 +78,9 @@ void StartInterrupts  (void);
 #define DBG0_OFF()      Port.C.ClearBits(BIT_13)  // GPIO0 RC13
 #define DBG1_OFF()      Port.C.ClearBits(BIT_14)  // GPIO1 RC14
 #define DBG2_OFF()      Port.E.ClearBits(BIT_4)   // GPIO2 RE4
+#define DBG0_TOGGLE()   Port.C.ToggleBits(BIT_13)
+#define DBG1_TOGGLE()   Port.C.ToggleBits(BIT_14)
+#define DBG2_TOGGLE()   Port.E.ToggleBits(BIT_4)
 
 #define U_MATLAB      UART6
 #define U_DBG         UART3
@@ -98,12 +101,12 @@ void StartInterrupts  (void);
 
 #define N_UNITS_TOTAL (15u)
 
-#define ADC_TIMER_PERIOD        (1)
+#define ADC_TIMER_PERIOD        (3)
 #define ADC_TIMER_SCALE         (SCALE_US)
 #define ADC_TIMER_SCALE_FLOAT   (TIMER_SCALE_US)
-#define N_SAMPLES_PER_ADC_READ  (2000)     // Number of samples / ADC value
+#define N_SAMPLES_PER_ADC_READ  (600)     // Number of samples / ADC value
 #define N_SAMPLES_TO_START      (N_SAMPLES_PER_ADC_READ)
-#define N_SAMPLES_TO_DROP       (100)      // Ignore n first samples
+#define N_SAMPLES_TO_DROP       (30)
 #define N_TOTAL_SAMPLES         (N_SAMPLES_PER_ADC_READ - N_SAMPLES_TO_DROP)
 
 #define SAMPLING_TIME_FLOAT     (ADC_TIMER_SCALE_FLOAT * ADC_TIMER_PERIOD * N_SAMPLES_PER_ADC_READ * N_UNITS_TOTAL)

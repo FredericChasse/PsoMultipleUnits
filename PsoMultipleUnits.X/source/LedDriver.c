@@ -188,8 +188,11 @@ inline void InitLedDriver (void)
   
   // prescale value = 25MHz / (4096 * freq) - 1; -> freq in Hz
   // -> freq = 25MHz / (4096 * (prescale+1))
-  prescaleReg.value = 3;                // PWM frequency of 1526 Hz
+//  prescaleReg.value = 3;                // PWM frequency of 1526 Hz
 //  prescaleReg.value = 5;                // PWM frequency of 1017.25 Hz
+//  prescaleReg.value = 15;                // PWM frequency of 381.47 Hz
+  prescaleReg.value = 19;                // PWM frequency of 305.18 Hz
+//  prescaleReg.value = 14;                // PWM frequency of 406.90 Hz
 //  prescaleReg.value = 11;                // PWM frequency of 508.63 Hz
 //  prescaleReg.value = 60;                // PWM frequency of 100 Hz
 //  prescaleReg.value = 121;                // PWM frequency of 50 Hz

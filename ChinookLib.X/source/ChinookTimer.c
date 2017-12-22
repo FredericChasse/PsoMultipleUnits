@@ -19,8 +19,8 @@ static inline INT32         TimerReadValue                (TimerNum_t numTimer);
 static inline INT64         TimerReadOverflows            (TimerNum_t numTimer);
 static inline INT8          TimerSetInterruptPriority     (TimerNum_t numTimer, UINT8 priority);
 static inline INT8          TimerOpenTimer1WithExtClk     (UINT16 periodInCounts, UINT32 freqOfExtClkInHertz, TimerPrescaler_t prescaler);
-static inline INT32         TimerToc                      (UINT32 period, UINT32 coreTickRate);
-static inline UINT32        TimerTic                      (UINT32 period, TimerScale_t scale);
+static inline INT8          TimerTic                      (void);
+static inline INT64         TimerToc                      (void);
 
 /*
  * Public structure of functions for the Timer
@@ -122,52 +122,46 @@ static inline void TimerDelayMs(UINT32 delayMs)
 }
 
 
-static inline INT32 TimerToc(UINT32 period, UINT32 coreTickRate)
+BOOL _oTicInvoked = 0;
+static inline INT8 TimerTic()
 {
-  UINT32 tok = ReadCoreTimer();
+  
+  if (_oTicInvoked)
+  {
+    return -1;
+  }
+  
+  _oTicInvoked = 1;
+
+  mCTClearIntFlag();
+  WriteCoreTimer(0);
+  OpenCoreTimer(0xFFFFFFFF);
+
+  return 0;
+}
+
+
+static inline INT64 TimerToc()
+{
+  if (!_oTicInvoked)
+  {
+    return -1;
+  }
+  _oTicInvoked = 0;
+  
+  INT64 tok = ReadCoreTimer();
 
   if (mCTGetIntFlag())  // An overflow has occured, period is too small
   {
     CloseCoreTimer();
     mCTClearIntFlag();
-    return -1;
+    return -2;
   }
   else
   {
     CloseCoreTimer();
-    return ( (float) period * tok / coreTickRate ) + 0.5;
+    return tok * 25;
   }
-}
-
-
-static inline UINT32 TimerTic(UINT32 period, TimerScale_t scale)
-{
-  UINT32 coreTickRate;
-
-  switch (scale)
-  {
-    case SCALE_S :
-      coreTickRate = CORE_TICK_RATE * TIMER_SCALE_S * period;
-      break;
-
-    case SCALE_MS :
-      coreTickRate = CORE_TICK_RATE * TIMER_SCALE_MS * period;
-      break;
-
-    case SCALE_US :
-      coreTickRate = CORE_TICK_RATE * TIMER_SCALE_US * period;
-      break;
-
-    case SCALE_NS :
-      coreTickRate = CORE_TICK_RATE * TIMER_SCALE_NS * period;
-      break;
-  }
-
-  mCTClearIntFlag();
-  WriteCoreTimer(0);
-  OpenCoreTimer(coreTickRate);
-
-  return coreTickRate;
 }
 
 

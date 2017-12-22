@@ -24,7 +24,7 @@
 //==============================================================================
 
 #define MIN_LED_INTENSITY   (0)
-#define MAX_LED_INTENSITY   (500)
+#define MAX_LED_INTENSITY   (600)
 
 #define N_PERTURB_TOTAL     (10)
 

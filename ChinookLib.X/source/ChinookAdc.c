@@ -77,7 +77,8 @@ static inline INT8 AdcOpen(UINT32 samplingClk, UINT32 configHardware, UINT32 con
     configHardware  |= (ADC_OFFSET_CAL_DISABLE | ADC_SCAN_ON | ADC_ALT_BUF_OFF | ADC_ALT_INPUT_OFF);
   }
   
-  UINT32 config3 = ADC_CONV_CLK_INTERNAL_RC | ADC_SAMPLE_TIME_12;
+//  UINT32 config3 = ADC_CONV_CLK_INTERNAL_RC | ADC_SAMPLE_TIME_1;
+  UINT32 config3 = ADC_CONV_CLK_SYSTEM | ADC_SAMPLE_TIME_12;
 
   // Configure and open ADC
   //============================================================================

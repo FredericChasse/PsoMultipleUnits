@@ -59,6 +59,10 @@ void InitTimer(void)
 //  timerCounterValue = Timer.Open(TIMER_3, 50, SCALE_MS);   // Timer used for ADC
 //  timerCounterValue = Timer.Open(TIMER_3, 1, SCALE_MS);   // Timer used for ADC
   timerCounterValue = Timer.Open(TIMER_3, ADC_TIMER_PERIOD, ADC_TIMER_SCALE);   // Timer used for ADC
+  
+//  OpenTimer3(T3_ON | T3_SOURCE_INT | T3_PS_1_1, 40);
+//  Timer.Var.timerPeriodInTime[2] = 1;
+//  Timer.Var.timerScale[2] = SCALE_US;
   if (timerCounterValue < 0)
   {
     LED1_ON();
@@ -402,6 +406,7 @@ void StartInterrupts(void)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   Timer.EnableInterrupt(TIMER_1);
 //  Timer.EnableInterrupt(TIMER_2);
+//  err = Timer.EnableInterrupt(TIMER_3);
   err = Timer.DisableInterrupt(TIMER_3);
   if (err < 0)
   {

@@ -63,8 +63,6 @@ sUartFifoBuffer_t matlabData =
   ,.maxBufSize = UART_LINE_BUFFER_LENGTH
 };
 
-//BOOL oSmoothData = 1;
-BOOL oSmoothData = 0;
 BOOL oDbgAdc = 0;
 UINT8 oSendAdcData = 0;
 
@@ -84,20 +82,22 @@ PerturbInterface_t *perturb;
 
 CodecInterface_t *codec;
 
-UINT8 oSendPsoDbgData = 1;
+UINT8 oSendPsoDbgData = 0;
 BOOL oAlgoIsPso = 0;
 BOOL oAlgoIsPpsoPno = 0;
 
 UINT8 dbgIdx = 0;
 float dbgPos[3] = {320.5882,410.7843,948.0392};
-BOOL oDbgBtn = 0;
 
 extern volatile BOOL oAcqOngoing;
 
 UINT32 coreTickRate;
 INT32 time;
+INT32 time;
 
 extern UINT16 dbgAdcData[N_TOTAL_SAMPLES];
+
+extern volatile UINT32 cellVoltRawMeanTemp[N_UNITS_TOTAL];
 
 
 //==============================================================================
@@ -262,12 +262,13 @@ void StateInit(void)
   StartInterrupts();
   
   perturb->Init(perturb->ctx, 500);
+//  perturb->Init(perturb->ctx, 0);
   
   while(oAcqOngoing);
+  memset((void *) cellVoltRawMeanTemp, 0, N_UNITS_TOTAL*4);
   nSamples = 0;
   
 }
-
 
 //===============================================================
 // Name     : StateAcq
@@ -276,6 +277,9 @@ void StateInit(void)
 void StateAcq(void)
 {
   float dbg; UINT8 idx;
+  
+  INT64 time_us, time_ns;
+  
   //==================================================================
   // ADC READ
   // Check cells voltage
@@ -285,9 +289,20 @@ void StateAcq(void)
     oAdcReady = 0;
     
     Adc.DisableInterrupts();
+    
+//    Timer.Tic();
+    
     ComputeMeanAdcValues();
+    
+//    if ((time_ns = Timer.Toc()) >= 0)
+//    {
+//      time_us = time_ns / 1000;
+//      LED2_ON();
+//    }
+    
     if (oSessionActive)
     {
+//      Timer.Tic();
       oNewSample = 1;   // Go to StateCompute
     }
     else
@@ -312,7 +327,14 @@ void StateAcq(void)
   ProtocolInitPerturbPayload_t initPerturbPayload;
   perturbPayload.units = units;
   UINT8 i;
+  
+//  Timer.Tic();
   ret = codec->DecoderFsmStep(codec->ctx, retBuf);
+//  if ((time_ns = Timer.Toc()) >= 0)
+//  {
+//    time_us = time_ns / 1000;
+//    LED2_ON();
+//  }
   switch (ret)
   {
     case DECODER_RET_MSG_RNG_SEED:
@@ -361,6 +383,7 @@ void StateAcq(void)
             algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PSO_1D);
             algo->Init(algo->ctx, algoArray);
             while(oAcqOngoing);
+            memset((void *) cellVoltRawMeanTemp, 0, N_UNITS_TOTAL*4);
             nSamples = 0;
             break;
             
@@ -372,6 +395,7 @@ void StateAcq(void)
             algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PARALLEL_PSO_MULTI_SWARM);
             algo->Init(algo->ctx, algoArray);
             while(oAcqOngoing);
+            memset((void *) cellVoltRawMeanTemp, 0, N_UNITS_TOTAL*4);
             nSamples = 0;
             break;
             
@@ -383,6 +407,7 @@ void StateAcq(void)
             algo = (AlgoInterface_t *) CharacterizationInterface();
             algo->Init(algo->ctx, algoArray);
             while(oAcqOngoing);
+            memset((void *) cellVoltRawMeanTemp, 0, N_UNITS_TOTAL*4);
             nSamples = 0;
             break;
             
@@ -394,6 +419,7 @@ void StateAcq(void)
             algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PARALLEL_PSO);
             algo->Init(algo->ctx, algoArray);
             while(oAcqOngoing);
+            memset((void *) cellVoltRawMeanTemp, 0, N_UNITS_TOTAL*4);
             nSamples = 0;
             break;
             
@@ -405,6 +431,7 @@ void StateAcq(void)
             algo = (AlgoInterface_t *) ExtremumSeekingInterface();
             algo->Init(algo->ctx, algoArray);
             while(oAcqOngoing);
+            memset((void *) cellVoltRawMeanTemp, 0, N_UNITS_TOTAL*4);
             nSamples = 0;
             break;
             
@@ -416,6 +443,7 @@ void StateAcq(void)
             algo = (AlgoInterface_t *) PpsoPnoInterface();
             algo->Init(algo->ctx, algoArray);
             while(oAcqOngoing);
+            memset((void *) cellVoltRawMeanTemp, 0, N_UNITS_TOTAL*4);
             nSamples = 0;
             break;
             
@@ -427,6 +455,7 @@ void StateAcq(void)
             algo = (AlgoInterface_t *) PnoInterface();
             algo->Init(algo->ctx, algoArray);
             while(oAcqOngoing);
+            memset((void *) cellVoltRawMeanTemp, 0, N_UNITS_TOTAL*4);
             nSamples = 0;
             break;
             
@@ -438,6 +467,7 @@ void StateAcq(void)
             algo = (AlgoInterface_t *) DebugAdcInterface();
             algo->Init(algo->ctx, algoArray);
             while(oAcqOngoing);
+            memset((void *) cellVoltRawMeanTemp, 0, N_UNITS_TOTAL*4);
             nSamples = 0;
             break;
             
@@ -470,6 +500,7 @@ void StateAcq(void)
         }
         perturb->Reset(perturb->ctx);
       }
+      
       break;
       
     default:
@@ -487,7 +518,6 @@ void StateAcq(void)
 void StateCompute(void)
 {  
   oNewSample = 0;
-//  UINT32 coreTickRate = Timer.Tic(200000, SCALE_US);
   
   UINT8 i, id;
   float  positions[N_UNITS_TOTAL]
@@ -503,6 +533,30 @@ void StateCompute(void)
   ProtocolAdcDataPayload_t      newAdcPayload   = {0};
   ProtocolPpsoPnoDataPayload_t  newPpsoPnoPayload = {0};
   
+//  static BOOL oToggle = 0;
+  INT64 time_us;
+  INT64 time_ns;
+//  if (!oToggle) {
+//    Timer.Tic();
+//    oToggle ^= 1;
+//  }
+//  else
+//  {
+//    totalTime_ns = Timer.Toc();   // To get microseconds
+//    if (totalTime_ns < 0)
+//    {
+//      LED1_ON();
+//    }
+//    else
+//    {
+//      totalTime_us = totalTime_ns / 1000;
+//      LED2_ON();
+//    }
+//    oToggle ^= 1;
+//  }
+  
+//  Timer.Tic();
+  
   for (i = 0; i < nUnits; i++)
   {
     positions[i]  = algoArray->GetPos(algoArray->ctx, i);
@@ -513,7 +567,15 @@ void StateCompute(void)
     {
       powers[i] = (float) sCellValues.cells[unitAdcs[id]].cellVolt_mV / 1000.0f;
     } 
- }
+  }
+  
+//  if ((time_ns = Timer.Toc()) >= 0)
+//  {
+//    time_us = time_ns / 1000;
+//    LED2_ON();
+//  }
+  
+//  Timer.Tic();
   
   newUnitsPayload.timestamp_ms = algo->GetTimeElapsed(algo->ctx);
   newUnitsPayload.nData        = 1;
@@ -551,12 +613,29 @@ void StateCompute(void)
     codec->CodeNewAdcMsg(codec->ctx, &newAdcPayload);
   }
   
-  DBG2_ON();
+//  if ((time_ns = Timer.Toc()) >= 0)
+//  {
+//    time_us = time_ns / 1000;
+//    LED2_ON();
+//  }
+  
+//  Timer.Tic();
+  
   algo->Run(algo->ctx);
   perturb->Run(perturb->ctx);
-  ResetFilterValues();
+  
+//  if ((time_ns = Timer.Toc()) >= 0)
+//  {
+//    time_us = time_ns / 1000;
+//    LED2_ON();
+//  }
+  
+//  time_ns = Timer.Toc();
+//  if (time_ns >= 0)
+//  {
+//    LED1_ON();
+//  }
   Adc.EnableInterrupts();
-  DBG2_OFF();
   
 }
 

@@ -112,7 +112,6 @@ INT8 _Charac_Run (Charac_t *c)
     for (i = 0; i < c->nUnits; i++)
     {
       c->unitArray->SetPos(c->unitArray->ctx, i, potRealValues[c->currentPosIdx]);
-//      c->unitArray->SetPos(c->unitArray->ctx, i, potRealValues[1]);
     }
   }
   

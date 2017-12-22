@@ -152,7 +152,7 @@ struct sChinookTimer
    * @Return      UINT32 coreTickRate\n
    *              Necessary for using function Timer.Toc().
    */
-  UINT32 (*Tic) (UINT32 period, TimerScale_t scale);
+  INT8 (*Tic) (void);
 
 
   /**
@@ -189,7 +189,7 @@ struct sChinookTimer
    *              the time spent between the functions Timer.Tic() and Timer.Toc().
    *              The scale of the value is the same as entered in function Timer.Tic().
    */
-  INT32 (*Toc) (UINT32 period, UINT32 coreTickRate);
+  INT64 (*Toc) (void);
 
 
   /**
