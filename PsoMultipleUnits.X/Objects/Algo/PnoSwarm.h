@@ -76,6 +76,6 @@ typedef struct
 
 const PnoSwarmInterface_t * PnoSwarmInterface (void);
 
-
+size_t PnoSwarm_GetNUsedSwarms (void);
 
 #endif // __PNO_SWARM_H__

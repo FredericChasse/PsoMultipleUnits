@@ -34,6 +34,9 @@
 #include "Protocol.h"
 #include "Rng.h"
 #include "MathFunctions.h"
+#include "PsoParticle.h"
+#include "PnoSwarm.h"
+#include "PnoInstance.h"
 
 
 extern volatile BOOL   oAdcReady
@@ -277,6 +280,7 @@ void StateInit(void)
 void StateAcq(void)
 {
   float dbg; UINT8 idx;
+  sUartLineBuffer_t dbgBuf = {0};
   
   INT64 time_us, time_ns;
   
@@ -286,6 +290,7 @@ void StateAcq(void)
   //==================================================================
   if (oAdcReady)
   {
+//    DBG0_ON();
     oAdcReady = 0;
     
     Adc.DisableInterrupts();
@@ -307,6 +312,7 @@ void StateAcq(void)
     }
     else
     {
+//      DBG0_OFF();
       Adc.EnableInterrupts();
     }
   }
@@ -383,8 +389,11 @@ void StateAcq(void)
             algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PSO_1D);
             algo->Init(algo->ctx, algoArray);
             while(oAcqOngoing);
+            Adc.DisableInterrupts();
+            Timer.DelayMs(10);
             memset((void *) cellVoltRawMeanTemp, 0, N_UNITS_TOTAL*4);
             nSamples = 0;
+            Adc.EnableInterrupts();
             break;
             
           case PARALLEL_PSO_MULTI_SWARM:
@@ -395,8 +404,11 @@ void StateAcq(void)
             algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PARALLEL_PSO_MULTI_SWARM);
             algo->Init(algo->ctx, algoArray);
             while(oAcqOngoing);
+            Adc.DisableInterrupts();
+            Timer.DelayMs(10);
             memset((void *) cellVoltRawMeanTemp, 0, N_UNITS_TOTAL*4);
             nSamples = 0;
+            Adc.EnableInterrupts();
             break;
             
           case CHARACTERIZATION:
@@ -407,8 +419,11 @@ void StateAcq(void)
             algo = (AlgoInterface_t *) CharacterizationInterface();
             algo->Init(algo->ctx, algoArray);
             while(oAcqOngoing);
+            Adc.DisableInterrupts();
+            Timer.DelayMs(10);
             memset((void *) cellVoltRawMeanTemp, 0, N_UNITS_TOTAL*4);
             nSamples = 0;
+            Adc.EnableInterrupts();
             break;
             
           case PARALLEL_PSO:
@@ -419,8 +434,11 @@ void StateAcq(void)
             algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PARALLEL_PSO);
             algo->Init(algo->ctx, algoArray);
             while(oAcqOngoing);
+            Adc.DisableInterrupts();
+            Timer.DelayMs(10);
             memset((void *) cellVoltRawMeanTemp, 0, N_UNITS_TOTAL*4);
             nSamples = 0;
+            Adc.EnableInterrupts();
             break;
             
           case EXTREMUM_SEEKING:
@@ -431,8 +449,11 @@ void StateAcq(void)
             algo = (AlgoInterface_t *) ExtremumSeekingInterface();
             algo->Init(algo->ctx, algoArray);
             while(oAcqOngoing);
+            Adc.DisableInterrupts();
+            Timer.DelayMs(10);
             memset((void *) cellVoltRawMeanTemp, 0, N_UNITS_TOTAL*4);
             nSamples = 0;
+            Adc.EnableInterrupts();
             break;
             
           case PPSO_PNO:
@@ -443,8 +464,11 @@ void StateAcq(void)
             algo = (AlgoInterface_t *) PpsoPnoInterface();
             algo->Init(algo->ctx, algoArray);
             while(oAcqOngoing);
+            Adc.DisableInterrupts();
+            Timer.DelayMs(10);
             memset((void *) cellVoltRawMeanTemp, 0, N_UNITS_TOTAL*4);
             nSamples = 0;
+            Adc.EnableInterrupts();
             break;
             
           case PNO_CLASSIC:
@@ -455,8 +479,11 @@ void StateAcq(void)
             algo = (AlgoInterface_t *) PnoInterface();
             algo->Init(algo->ctx, algoArray);
             while(oAcqOngoing);
+            Adc.DisableInterrupts();
+            Timer.DelayMs(10);
             memset((void *) cellVoltRawMeanTemp, 0, N_UNITS_TOTAL*4);
             nSamples = 0;
+            Adc.EnableInterrupts();
             break;
             
           case DEBUG_ADC:
@@ -467,8 +494,11 @@ void StateAcq(void)
             algo = (AlgoInterface_t *) DebugAdcInterface();
             algo->Init(algo->ctx, algoArray);
             while(oAcqOngoing);
+            Adc.DisableInterrupts();
+            Timer.DelayMs(10);
             memset((void *) cellVoltRawMeanTemp, 0, N_UNITS_TOTAL*4);
             nSamples = 0;
+            Adc.EnableInterrupts();
             break;
             
           default:
@@ -492,13 +522,29 @@ void StateAcq(void)
         oAlgoIsPso     = 0;
         oAlgoIsPpsoPno  = 0;
         oDbgAdc        = 0;
+        __assert(algo, "algo->Release(algo->ctx);");
         algo->Release(algo->ctx);
+        __assert(algoArray, "nUnits = algoArray->GetNUnits(algoArray->ctx);");
         nUnits = algoArray->GetNUnits(algoArray->ctx);
         for (i = 0; i < nUnits; i++)
         {
           algoArray->RemoveUnitFromArray(algoArray->ctx, 0);
         }
+        __assert(perturb, "perturb->Reset(perturb->ctx);");
         perturb->Reset(perturb->ctx);
+        
+        Timer.DelayMs(10);
+        
+//        dbgBuf.length = sprintf(dbgBuf.buffer, "Used arrays = %i\n\r", UnitArray_GetNUsedArrays());
+//        while(Uart.PutTxFifoBuffer(U_DBG, &dbgBuf) < 0);
+//        dbgBuf.length = sprintf(dbgBuf.buffer, "Used PSO swarms = %i\n\r", PsoSwarm_GetNUsedSwarms());
+//        while(Uart.PutTxFifoBuffer(U_DBG, &dbgBuf) < 0);
+//        dbgBuf.length = sprintf(dbgBuf.buffer, "Used PSO particles = %i\n\r", PsoParticle_GetNUsedParticles());
+//        while(Uart.PutTxFifoBuffer(U_DBG, &dbgBuf) < 0);
+//        dbgBuf.length = sprintf(dbgBuf.buffer, "Used P&O swarms = %i\n\r", PnoSwarm_GetNUsedSwarms());
+//        while(Uart.PutTxFifoBuffer(U_DBG, &dbgBuf) < 0);
+//        dbgBuf.length = sprintf(dbgBuf.buffer, "Used P&O instances = %i\n\r", PnoInstance_GetNUsedInstances());
+//        while(Uart.PutTxFifoBuffer(U_DBG, &dbgBuf) < 0);
       }
       
       break;
@@ -533,30 +579,6 @@ void StateCompute(void)
   ProtocolAdcDataPayload_t      newAdcPayload   = {0};
   ProtocolPpsoPnoDataPayload_t  newPpsoPnoPayload = {0};
   
-//  static BOOL oToggle = 0;
-  INT64 time_us;
-  INT64 time_ns;
-//  if (!oToggle) {
-//    Timer.Tic();
-//    oToggle ^= 1;
-//  }
-//  else
-//  {
-//    totalTime_ns = Timer.Toc();   // To get microseconds
-//    if (totalTime_ns < 0)
-//    {
-//      LED1_ON();
-//    }
-//    else
-//    {
-//      totalTime_us = totalTime_ns / 1000;
-//      LED2_ON();
-//    }
-//    oToggle ^= 1;
-//  }
-  
-//  Timer.Tic();
-  
   for (i = 0; i < nUnits; i++)
   {
     positions[i]  = algoArray->GetPos(algoArray->ctx, i);
@@ -569,19 +591,10 @@ void StateCompute(void)
     } 
   }
   
-//  if ((time_ns = Timer.Toc()) >= 0)
-//  {
-//    time_us = time_ns / 1000;
-//    LED2_ON();
-//  }
-  
-//  Timer.Tic();
-  
   newUnitsPayload.timestamp_ms = algo->GetTimeElapsed(algo->ctx);
   newUnitsPayload.nData        = 1;
   newUnitsPayload.nUnits       = nUnits;
   newUnitsPayload.positions    = positions;
-//  newUnitsPayload.powers       = powers;
   newUnitsPayload.powers       = powers;
   
   codec->CodeNewUnitsMsg(codec->ctx, &newUnitsPayload);
@@ -613,28 +626,10 @@ void StateCompute(void)
     codec->CodeNewAdcMsg(codec->ctx, &newAdcPayload);
   }
   
-//  if ((time_ns = Timer.Toc()) >= 0)
-//  {
-//    time_us = time_ns / 1000;
-//    LED2_ON();
-//  }
-  
-//  Timer.Tic();
-  
   algo->Run(algo->ctx);
   perturb->Run(perturb->ctx);
   
-//  if ((time_ns = Timer.Toc()) >= 0)
-//  {
-//    time_us = time_ns / 1000;
-//    LED2_ON();
-//  }
-  
-//  time_ns = Timer.Toc();
-//  if (time_ns >= 0)
-//  {
-//    LED1_ON();
-//  }
+//  DBG0_OFF();
   Adc.EnableInterrupts();
   
 }
@@ -647,7 +642,8 @@ void StateCompute(void)
 //===============================================================
 void StateError(void)
 {
-  INTDisableInterrupts();   // Disable all interrupts of the system.
+  Timer.DelayMs(1000);
+//  INTDisableInterrupts();   // Disable all interrupts of the system.
   
   LED1_ON();
   LED2_OFF();

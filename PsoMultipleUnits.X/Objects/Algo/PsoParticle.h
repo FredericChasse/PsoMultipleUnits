@@ -92,6 +92,6 @@ typedef struct
 
 const PsoParticleInterface_t * PsoParticleInterface (void);
 
-
+size_t PsoParticle_GetNUsedParticles (void);
 
 #endif // __PSO_PARTICLE_H__

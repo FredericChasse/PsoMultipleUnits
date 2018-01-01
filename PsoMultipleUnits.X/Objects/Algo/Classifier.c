@@ -172,6 +172,14 @@ INT16 _Classifier_Classify (Classifier_t *c, UINT8 *idx, UINT8 nIdx, UINT8 *grou
   UINT8 idxSorted[N_UNITS_TOTAL];
   UINT8 tmpGroups[N_UNITS_TOTAL][N_UNITS_TOTAL];
   
+  if (nIdx <= 3)  // Only one group
+  {
+    memcpy(groups, idx, nIdx);
+    lengths[0] = nIdx;
+    nGroups = 1;
+    return nGroups;
+  }
+  
   for (i = 0; i < nIdx; i++)
   {
     optPosSorted[i] = c->optPos[c->unitsIdToIdx[idx[i]]].curPos;
@@ -236,7 +244,6 @@ INT16 _Classifier_Classify (Classifier_t *c, UINT8 *idx, UINT8 nIdx, UINT8 *grou
     }
   }
   
-  
   tmpIdx = 0;
   for (i = 0; i < nGroups; i++)
   {
@@ -244,16 +251,53 @@ INT16 _Classifier_Classify (Classifier_t *c, UINT8 *idx, UINT8 nIdx, UINT8 *grou
     tmpIdx += lengths[i];
   }
   
-  // Merge groups with less than 3 units
-  iGroup = 0;
-  tmpIdx = 0;
-  for (iGroup = 0; iGroup < nGroups; iGroup++)
+  if (nGroups > 1)
   {
-    if (lengths[iGroup] < 3)
+    // Merge groups with less than 3 units
+    iGroup = 0;
+    tmpIdx = 0;
+    for (iGroup = 0; iGroup < nGroups; iGroup++)
     {
-      if ( (iGroup > 0) && (iGroup < (nGroups - 1)) )   // Not first or last group
+      if (lengths[iGroup] < 3)
       {
-        if ( (groups[tmpIdx] - groups[tmpIdx -1]) < (groups[tmpIdx+lengths[iGroup]] - groups[tmpIdx+lengths[iGroup] - 1]) )
+        if ( (iGroup > 0) && (iGroup < (nGroups - 1)) )   // Not first or last group
+        {
+          if (    (optPosSorted[tmpIdx] - optPosSorted[tmpIdx -1]) 
+                < (optPosSorted[tmpIdx+lengths[iGroup]] - optPosSorted[tmpIdx+lengths[iGroup] - 1]) 
+//          if (    (optPosSorted[groups[tmpIdx]] - optPosSorted[groups[tmpIdx -1]]) 
+//                < (optPosSorted[groups[tmpIdx+lengths[iGroup]]] - optPosSorted[groups[tmpIdx+lengths[iGroup] - 1]]) 
+             )
+          {
+            lengths[iGroup-1] += lengths[iGroup];
+            for (i = iGroup; i < nGroups - 1; i++)
+            {
+              lengths[i] = lengths[i + 1];
+            }
+            nGroups--;
+            iGroup--;   // To test this new group
+          }
+          else
+          {
+            lengths[iGroup] += lengths[iGroup + 1];
+            for (i = iGroup + 1; i < nGroups; i++)
+            {
+              lengths[i] = lengths[i + 1];
+            }
+            nGroups--;
+            iGroup--;   // To test this new group
+          }
+        }
+        else if (iGroup == 0)
+        {
+          lengths[iGroup] += lengths[iGroup + 1];
+          for (i = iGroup + 1; i < nGroups; i++)
+          {
+            lengths[i] = lengths[i + 1];
+          }
+          nGroups--;
+          iGroup--;   // To test this new group
+        }
+        else  // iGroup == (nGroups - 1)
         {
           lengths[iGroup-1] += lengths[iGroup];
           for (i = iGroup; i < nGroups - 1; i++)
@@ -263,34 +307,10 @@ INT16 _Classifier_Classify (Classifier_t *c, UINT8 *idx, UINT8 nIdx, UINT8 *grou
           nGroups--;
           iGroup--;   // To test this new group
         }
-        else
-        {
-          lengths[iGroup] += lengths[iGroup + 1];
-          for (i = iGroup + 1; i < nGroups; i++)
-          {
-            lengths[i] = lengths[i + 1];
-          }
-          nGroups--;
-        }
       }
-      else if (iGroup == 0)
+      else
       {
-        lengths[iGroup] += lengths[iGroup + 1];
-        for (i = iGroup + 1; i < nGroups; i++)
-        {
-          lengths[i] = lengths[i + 1];
-        }
-        nGroups--;
-        iGroup--;   // To test this new group
-      }
-      else  // iGroup == (nGroups - 1)
-      {
-        lengths[iGroup-1] += lengths[iGroup];
-        for (i = iGroup; i < nGroups - 1; i++)
-        {
-          lengths[i] = lengths[i + 1];
-        }
-        nGroups--;
+        tmpIdx += lengths[iGroup];
       }
     }
   }

@@ -87,7 +87,18 @@ inline INT8 FifoRead (sUartFifoBuffer_t *fifo, UINT8 *data);
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-#define __assert(__val)    { if ((__val) == NULL) { StateError(); } }
+sUartLineBuffer_t __assert_buf__;
+#define __assert(__val, __errMsg)   { do                                                                \
+                                      {                                                                 \
+                                        if ((__val) == NULL)                                            \
+                                        {                                                               \
+                                            memcpy(__assert_buf__.buffer, __errMsg, sizeof(__errMsg));  \
+                                            __assert_buf__.length = sizeof(__errMsg);                   \
+                                            while(Uart.PutTxFifoBuffer(U_DBG, &__assert_buf__) < 0);    \
+                                            StateError();                                               \
+                                        }                                                               \
+                                      } while(0);                                                       \
+                                    }
 
 
 //==============================================================================

@@ -222,7 +222,7 @@ void _PnoInstance_SetFitness (PnoInstance_t *pnoi, float fitness)
 void _PnoInstance_Release (PnoInstance_t *pnoi)
 {
   Node_t *node = LinkedList_FindNode(&_usedInstances, pnoi);
-  __assert(node);
+  __assert(node, "_PnoInstance_Release");
   LinkedList_RemoveNode(node->list, node);
   LinkedList_AddToEnd(&_unusedInstances, node);
   
@@ -259,7 +259,7 @@ const PnoInstanceInterface_t * PnoInstanceInterface (PnoType_t type)
   UINT8 i;
   Node_t *temp;
   
-  if (type > PNO_SWARM)
+  if (type > PNO_TYPE_SWARM)
   {
     return NULL;
   }
@@ -315,7 +315,7 @@ const PnoInstanceInterface_t * PnoInstanceInterface (PnoType_t type)
   LinkedList_AddToEnd(&_usedInstances, temp);
   
   
-  if (type == PNO_CLASSIC)
+  if (type == PNO_TYPE_CLASSIC)
   {
     ((PnoInstance_t *) temp->ctx)->base.ComputePos = (PnoiComputePos_fct) &_PnoInstance_ComputePosClassic;
   }
@@ -324,4 +324,9 @@ const PnoInstanceInterface_t * PnoInstanceInterface (PnoType_t type)
     ((PnoInstance_t *) temp->ctx)->base.ComputePos = (PnoiComputePos_fct) &_PnoInstance_ComputePosSwarm;
   }
   return temp->ctx;
+}
+
+size_t PnoInstance_GetNUsedInstances (void)
+{
+  return _usedInstances.count;
 }

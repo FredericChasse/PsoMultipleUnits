@@ -77,29 +77,12 @@ volatile INT64 time_ns;
 volatile BOOL oDbgToggle = 0;
 void __ISR(_TIMER_3_VECTOR, T3_INTERRUPT_PRIORITY) Timer3InterruptHandler(void)
 {
-//  DBG0_TOGGLE();
-//  DBG0_ON();
   oTimer3Ready = 1;
 
   // Increment the number of overflows from this timer. Used primarily by Input Capture
   Timer.Var.nOverflows[2]++;
 
   mT3ClearIntFlag();
-//  if (!oDbgToggle)
-//  {
-//    Timer.Tic();
-//    oDbgToggle ^= 1;
-//  }
-//  else
-//  {
-//    time_ns = Timer.Toc();
-//    if (time_ns >= 0)
-//    {
-//      LED1_ON();
-//    }
-//    oDbgToggle ^= 1;
-//  }
-//  DBG0_ON();
 }
 
 //=============================================
@@ -111,6 +94,14 @@ void __ISR(_TIMER_4_VECTOR, T4_INTERRUPT_PRIORITY) Timer4InterruptHandler(void)
   Timer.Var.nOverflows[3]++;
 
   mT4ClearIntFlag();
+  
+  const UINT8 nToggles = 20;
+  static toggleCount = 0;
+  LED1_TOGGLE();
+  if (++toggleCount == nToggles)
+  {
+    Timer.DisableInterrupt(TIMER_4);
+  }
 }
 
 //=============================================
@@ -122,6 +113,14 @@ void __ISR(_TIMER_5_VECTOR, T5_INTERRUPT_PRIORITY) Timer5InterruptHandler(void)
   Timer.Var.nOverflows[4]++;
 
   mT5ClearIntFlag();
+  
+  const UINT8 nToggles = 20;
+  static toggleCount = 0;
+  LED2_TOGGLE();
+  if (++toggleCount == nToggles)
+  {
+    Timer.DisableInterrupt(TIMER_5);
+  }
 }
 
 
@@ -346,10 +345,11 @@ void __ISR(_ADC_VECTOR, ADC_INTERRUPT_PRIO) AdcInterruptHandler(void)
   
   if (++nSamples >= N_SAMPLES_PER_ADC_READ)
   {
+//    DBG1_TOGGLE();
     nSamples = 0;
     oAdcReady = 1;
-    memcpy((void *) cellVoltRawMean, (void *) cellVoltRawMeanTemp, memcpySize);
-    memset((void *) cellVoltRawMeanTemp, 0, memcpySize);
+//    memcpy((void *) cellVoltRawMean, (void *) cellVoltRawMeanTemp, memcpySize);
+//    memset((void *) cellVoltRawMeanTemp, 0, memcpySize);
   }
   oAcqOngoing = 0;
 }

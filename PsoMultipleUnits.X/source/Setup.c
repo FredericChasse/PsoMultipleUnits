@@ -36,7 +36,8 @@
 //==============================================================================
 //	Variable Declaration
 //==============================================================================
-
+static BOOL _oLed1ToggleSequence = 0;
+static BOOL _oLed2ToggleSequence = 0;
 
 //==============================================================================
 //	INIT FUNCTIONS
@@ -57,18 +58,15 @@ void InitTimer(void)
   timerCounterValue = Timer.Open(TIMER_1, 1000, SCALE_MS);   // Open Timer 1 with a period of 1000 ms
 //  timerCounterValue = Timer.Open(TIMER_2, 500, SCALE_US);   // Open Timer 2 with a period of 500 us
 //  timerCounterValue = Timer.Open(TIMER_3, 50, SCALE_MS);   // Timer used for ADC
-//  timerCounterValue = Timer.Open(TIMER_3, 1, SCALE_MS);   // Timer used for ADC
   timerCounterValue = Timer.Open(TIMER_3, ADC_TIMER_PERIOD, ADC_TIMER_SCALE);   // Timer used for ADC
-  
-//  OpenTimer3(T3_ON | T3_SOURCE_INT | T3_PS_1_1, 40);
-//  Timer.Var.timerPeriodInTime[2] = 1;
-//  Timer.Var.timerScale[2] = SCALE_US;
   if (timerCounterValue < 0)
   {
     LED1_ON();
   }
 //  timerCounterValue = Timer.Open(TIMER_4, 500, SCALE_MS);   // Open Timer 4 with a period of 500 ms
 //  timerCounterValue = Timer.Open(TIMER_5, 500, SCALE_US);   // Open Timer 5 with a period of 500 us
+  timerCounterValue = Timer.Open(TIMER_4, 50, SCALE_MS);   // Timer used for toggling LED1
+  timerCounterValue = Timer.Open(TIMER_5, 50, SCALE_MS);   // Timer used for toggling LED2
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //	Configure timer interrupts
@@ -81,8 +79,8 @@ void InitTimer(void)
   {
     LED1_ON();
   }
-//  Timer.ConfigInterrupt(TIMER_4, TIMER4_INTERRUPT_PRIORITY, TIMER4_INTERRUPT_SUBPRIORITY); // Sets the priority of the TIMER_4 to the values specified in Interrupt.h
-//  Timer.ConfigInterrupt(TIMER_5, TIMER5_INTERRUPT_PRIORITY, TIMER5_INTERRUPT_SUBPRIORITY); // Sets the priority of the TIMER_5 to the values specified in Interrupt.h
+  Timer.ConfigInterrupt(TIMER_4, TIMER4_INTERRUPT_PRIORITY, TIMER4_INTERRUPT_SUBPRIORITY); // Sets the priority of the TIMER_4 to the values specified in Interrupt.h
+  Timer.ConfigInterrupt(TIMER_5, TIMER5_INTERRUPT_PRIORITY, TIMER5_INTERRUPT_SUBPRIORITY); // Sets the priority of the TIMER_5 to the values specified in Interrupt.h
 
 }
 
@@ -248,12 +246,12 @@ void InitPorts(void)
   if (RCONbits.BOR)
   {
     RCONCLR = _RCON_BOR_MASK;
+    _oLed2ToggleSequence = 1;
   }
   if (RCONbits.SWR)
   {
     RCONCLR = _RCON_SWR_MASK;
-    Port.F.SetPinsDigitalOut(BIT_0);  // LED1
-    LED1_ON();
+    _oLed1ToggleSequence = 1;
   }
 //=================================================================
 }
@@ -412,8 +410,22 @@ void StartInterrupts(void)
   {
     LED1_ON();
   }
-//  Timer.EnableInterrupt(TIMER_4);
-//  Timer.EnableInterrupt(TIMER_5);
+  if (_oLed1ToggleSequence)
+  {
+    Timer.EnableInterrupt(TIMER_4);
+  }
+  else
+  {
+    Timer.DisableInterrupt(TIMER_4);
+  }
+  if (_oLed2ToggleSequence)
+  {
+    Timer.EnableInterrupt(TIMER_5);
+  }
+  else
+  {
+    Timer.DisableInterrupt(TIMER_5);
+  }
 
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

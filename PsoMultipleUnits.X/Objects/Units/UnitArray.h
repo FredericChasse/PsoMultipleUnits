@@ -58,5 +58,6 @@ typedef struct UnitArrayInterface
 
 const UnitArrayInterface_t * UnitArrayInterface(void);
 
+size_t UnitArray_GetNUsedArrays (void);
 
 #endif // __UNIT_ARRAY_H__

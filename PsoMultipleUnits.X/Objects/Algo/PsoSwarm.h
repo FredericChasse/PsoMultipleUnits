@@ -128,6 +128,6 @@ typedef struct
 
 const PsoSwarmInterface_t * PsoSwarmInterface (void);
 
-
+size_t PsoSwarm_GetNUsedSwarms (void);
 
 #endif // __PSO_SWARM_H__

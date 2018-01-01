@@ -89,8 +89,8 @@ INT8 _PnoSwarm_Init (PnoSwarm_t *pno, UnitArrayInterface_t *unitArray, PnoSwarmP
   
   for (i = 0; i < pno->nInstances; i++)
   {
-    pno->instances[i] = (PnoInstanceInterface_t *) PnoInstanceInterface(PNO_SWARM);
-    __assert(pno->instances[i]);
+    pno->instances[i] = (PnoInstanceInterface_t *) PnoInstanceInterface(PNO_TYPE_SWARM);
+    __assert(pno->instances[i], "_PnoSwarm_Init");
     memcpy(&pno->param[i], param, sizeof(PnoSwarmParam_t));
     
     pno->instances[i]->Init(pno->instances[i], pno->param[i].delta_int, pno->param[i].uinit_int, pno->param[i].umin_int, pno->param[i].umax_int, pno->param[i].perturbOsc);
@@ -108,6 +108,8 @@ void _PnoSwarm_Release (PnoSwarm_t *pno)
   {
     pno->instances[i]->Release(pno->instances[i]);
   }
+  pno->unitArray->Release(pno->unitArray->ctx);
+  
   pno->nInstances     = 0;
   pno->unitArray      = NULL;
   pno->id             = 0;
@@ -134,10 +136,10 @@ UINT8 _PnoSwarm_ComputeAllPos (PnoSwarm_t *pno, float *newPos, UINT8 *idxPerturb
   for (i = 0; i < pno->nInstances; i++)
   {
     pnoi = pno->instances[i];
-    __assert(pnoi);
+    __assert(pnoi, "_PnoSwarm_ComputeAllPos");
     
-    __assert(pno->unitArray);
-    __assert(pno->unitArray->ctx);
+    __assert(pno->unitArray, "_PnoSwarm_ComputeAllPos");
+    __assert(pno->unitArray->ctx, "_PnoSwarm_ComputeAllPos");
     pnoi->SetFitness(pnoi, pno->unitArray->GetPower(pno->unitArray->ctx, i));
     if (pno->iteration == 1)
     {
@@ -295,4 +297,10 @@ const PnoSwarmInterface_t * PnoSwarmInterface (void)
   LinkedList_RemoveNode(&_unusedPnos, temp);
   LinkedList_AddToEnd(&_usedPnos, temp);
   return temp->ctx;
+}
+
+
+size_t PnoSwarm_GetNUsedSwarms (void)
+{
+  return _usedPnos.count;
 }

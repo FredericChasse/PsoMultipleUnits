@@ -25,8 +25,8 @@
 // Private definitions
 //==============================================================================
 
-#define N_PARTICLES_TOTAL      (N_UNITS_TOTAL*3)    // 3 is the minimum number of particles per swarm, 
-                                                    // so if every unit is using a swarm, we need 3 particles per unit.
+#define N_PARTICLES_TOTAL      (N_UNITS_TOTAL*5)    // 5 is the minimum number of particles per SPSO swarm, 
+                                                    // so if every unit is using a swarm, we need 5 particles per unit.
 
 typedef enum
 {
@@ -634,4 +634,9 @@ const PsoParticleInterface_t * PsoParticleInterface (void)
   LinkedList_RemoveNode(&_unusedParticles, temp);
   LinkedList_AddToEnd(&_usedParticles, temp);
   return temp->ctx;
+}
+
+size_t PsoParticle_GetNUsedParticles (void)
+{
+  return _usedParticles.count;
 }

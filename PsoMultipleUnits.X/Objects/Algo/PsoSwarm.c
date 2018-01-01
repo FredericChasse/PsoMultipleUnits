@@ -20,6 +20,7 @@
 #include "LinkedList.h"
 #include "MathFunctions.h"
 #include "Potentiometer.h"  // To compute positions
+#include "StateMachine.h"   // For __assert
 
 
 // Private definitions
@@ -196,9 +197,10 @@ void _Swarm_Release (PsoSwarm_t *s)
   
   for (i = 0; i < s->nParticles; i++)
   {
+    __assert(s->particles[i], "s->particles[i]->Release(s->particles[i]->ctx);");
     s->particles[i]->Release(s->particles[i]->ctx);
   }
-  
+  __assert(s->unitArray, "s->unitArray->Release(s->unitArray->ctx);");
   s->unitArray->Release(s->unitArray->ctx);
   
   LinkedList_RemoveNode(node->list, node);
@@ -753,4 +755,10 @@ const PsoSwarmInterface_t * PsoSwarmInterface (void)
   LinkedList_RemoveNode(&_unusedSwarms, temp);
   LinkedList_AddToEnd(&_usedSwarms, temp);
   return temp->ctx;
+}
+
+
+size_t PsoSwarm_GetNUsedSwarms (void)
+{
+  return _usedSwarms.count;
 }

@@ -92,6 +92,7 @@ inline void ComputeMeanAdcValues (void)
   UINT16 divider[N_UNITS_TOTAL];
   
   
+  
 //  for (j = 0; j < N_UNITS_TOTAL; j++)
 //  {
 //    meanCellRaw[j] = cellVoltRawMean[j] / N_SAMPLES_PER_ADC_READ;
@@ -140,7 +141,6 @@ inline void ComputeMeanAdcValues (void)
     meanCellRaw[j] = (meanCellRaw[j] / divider[j]);
   }
   
-
   sCellValues.cells[ 1].cellVolt_mV = (meanCellRaw[ 0] * VREF_MV) / 1023;
   sCellValues.cells[ 2].cellVolt_mV = (meanCellRaw[ 1] * VREF_MV) / 1023;
   sCellValues.cells[ 3].cellVolt_mV = (meanCellRaw[ 2] * VREF_MV) / 1023;
@@ -159,6 +159,7 @@ inline void ComputeMeanAdcValues (void)
   sCellValues.cells[13].cellVolt_mV = (meanCellRaw[12] * VREF_MV) / 1023;
   sCellValues.cells[14].cellVolt_mV = (meanCellRaw[13] * VREF_MV) / 1023;
   sCellValues.cells[15].cellVolt_mV = (meanCellRaw[14] * VREF_MV) / 1023;
+  
 }
 
 

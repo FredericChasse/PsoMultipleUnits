@@ -18,6 +18,7 @@
 #include "PsoSwarm.h"
 #include "Protocol.h" // For debugging
 #include "SteadyState.h"
+#include "StateMachine.h" // For __assert
 
 
 // Private definitions
@@ -204,6 +205,7 @@ void _Pso_Release (Pso_t *pso)
   UINT8 i;
   for (i = 0; i < pso->nSwarms; i++)
   {
+    __assert(pso->swarms[i], "pso->swarms[i]->Release(pso->swarms[i]->ctx);");
     pso->swarms[i]->Release(pso->swarms[i]->ctx);
     pso->swarms[i] = NULL;
   }
@@ -237,9 +239,9 @@ INT8 _ParallelPso_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
   pso->unitArray->GetPosLimits(pso->unitArray->ctx, &minPos, &maxPos);
   const PsoSwarmParam_t swarmParam = 
   {
-    .c1                     = 1
-   ,.c2                     = 2
-   ,.omega                  = 0.4
+    .c1                     = 0.5
+   ,.c2                     = 1.2
+   ,.omega                  = 0.3
    ,.posMin                 = minPos
    ,.posMax                 = maxPos
    ,.minParticles           = 3
@@ -277,12 +279,12 @@ INT8 _Pso1d_Init (Pso_t *pso, UnitArrayInterface_t *unitArray)
   pso->unitArray->GetPosLimits(pso->unitArray->ctx, &minPos, &maxPos);
   const PsoSwarmParam_t swarmParam = 
   {
-    .c1                     = 1
-   ,.c2                     = 2
-   ,.omega                  = 0.4
+    .c1                     = 0.5
+   ,.c2                     = 1.2
+   ,.omega                  = 0.3
    ,.posMin                 = minPos
    ,.posMax                 = maxPos
-   ,.minParticles           = 3
+   ,.minParticles           = 5
    ,.perturbAmp             = 15.7
    ,.sentinelMargin         = 0.05
    ,.type                   = PSO_SWARM_TYPE_PSO_1D

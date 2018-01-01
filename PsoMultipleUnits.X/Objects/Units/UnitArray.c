@@ -218,7 +218,7 @@ INT8 _UnitArray_RemoveUnitFromArray (UnitArray_t *array, UINT8 idx)
   {
     return -1;
   }
-  if (idx == array->nUnits)
+  if (idx == (array->nUnits - 1))
   {
     array->units[array->nUnits-1] = 0;
     array->nUnits--;
@@ -296,4 +296,10 @@ const UnitArrayInterface_t * UnitArrayInterface(void)
   LinkedList_RemoveNode(&_unusedArrays, temp);
   LinkedList_AddToEnd(&_usedArrays, temp);
   return temp->ctx;
+}
+
+
+size_t UnitArray_GetNUsedArrays (void)
+{
+  return _usedArrays.count;
 }
