@@ -20,6 +20,7 @@
 #include "Rng.h"
 #include "MathFunctions.h"
 #include "Potentiometer.h"  // To compute positions
+#include "StateMachine.h"   // For debugging
 
 
 // Private definitions
@@ -172,9 +173,16 @@ void _Particle_SetSteadyState(PsoParticle_t *p, size_t bufSize, float oscAmp)
 
 void _Particle_Release (PsoParticle_t *p)
 {
+  INT8 ret;
+  UINT8 dbgStr[50];
+  
   Node_t *node = &_particlesNodes[p->linkKey];
-  LinkedList_RemoveNode(node->list, node);
-  LinkedList_AddToEnd(&_unusedParticles, node);
+  
+  ret = LinkedList_RemoveNode(node->list, node);
+  __assert (ret == 0, "_Particle_Release remove node particle");
+  
+  ret = LinkedList_AddToEnd(&_unusedParticles, node);
+  __assert (ret == 0, "_Particle_Release add to end");
   
   SteadyState_Reset(&p->steadyState);
   _Particle_ResetOptPos(&p->optPos);
@@ -292,6 +300,11 @@ BOOL _Particle_FsmStep (PsoParticle_t *p, PsoSwarmInterface_t *swarm)
       break;
       
     case PARTICLE_STATE_VALIDATE_OPTIMUM:
+      
+      p->pos.curPos = p->pbestAbs.curPos;
+      p->oTestOptPos = 0;
+      oRemoveParticle = 1;
+      break;
       if (p->optPos.jinit == 0)
       {
         p->optPos.jinit   = p->pos.curFitness;

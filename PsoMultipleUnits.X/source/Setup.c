@@ -265,12 +265,15 @@ void InitUart (void)
 
   UartConfig_t       oConfigDbg     = UART_ENABLE_PINS_TX_RX_ONLY | UART_ENABLE_HIGH_SPEED;
   UartConfig_t       oConfigMatlab  = UART_ENABLE_PINS_TX_RX_ONLY | UART_ENABLE_HIGH_SPEED;
+//  UartConfig_t       oConfigDbg     = UART_ENABLE_PINS_TX_RX_ONLY;
+//  UartConfig_t       oConfigMatlab  = UART_ENABLE_PINS_TX_RX_ONLY;
   UartFifoMode_t     oFifoMode      = UART_INTERRUPT_ON_TX_BUFFER_EMPTY | UART_INTERRUPT_ON_RX_NOT_EMPTY;
   UartLineCtrlMode_t oLineControl   = UART_DATA_SIZE_8_BITS | UART_PARITY_NONE | UART_STOP_BITS_1;
 
+//  Uart.Open(U_DBG, BAUD57600  , oConfigDbg, oFifoMode, oLineControl);   // Open UART 3 as : 9600 BAUD, 1 stop bit, no parity and 8 bits data
+//  Uart.Open(U_MATLAB, BAUD57600, oConfigMatlab, oFifoMode, oLineControl);   // Open UART 6 as : 9600 BAUD, 1 stop bit, no parity and 8 bits data
   Uart.Open(U_DBG, BAUD115200  , oConfigDbg, oFifoMode, oLineControl);   // Open UART 3 as : 9600 BAUD, 1 stop bit, no parity and 8 bits data
   Uart.Open(U_MATLAB, BAUD115200, oConfigMatlab, oFifoMode, oLineControl);   // Open UART 6 as : 9600 BAUD, 1 stop bit, no parity and 8 bits data
-//  Uart.Open(UART6, BAUD9600, oConfigMatlab, oFifoMode, oLineControl);   // Open UART 6 as : 9600 BAUD, 1 stop bit, no parity and 8 bits data
 
   Uart.EnableRx(U_DBG);
   Uart.EnableRx(U_MATLAB);
@@ -278,8 +281,10 @@ void InitUart (void)
   Uart.EnableTx(U_DBG);
   Uart.EnableTx(U_MATLAB);
 
-  Uart.ConfigInterrupt(U_DBG, UART3_INTERRUPT_PRIORITY, UART3_INTERRUPT_SUBPRIORITY);
-  Uart.ConfigInterrupt(U_MATLAB, UART6_INTERRUPT_PRIORITY, UART6_INTERRUPT_SUBPRIORITY);
+//  Uart.ConfigInterrupt(U_DBG, UART3_INTERRUPT_PRIORITY, UART3_INTERRUPT_SUBPRIORITY);
+//  Uart.ConfigInterrupt(U_MATLAB, UART6_INTERRUPT_PRIORITY, UART6_INTERRUPT_SUBPRIORITY);
+  Uart.ConfigInterrupt(U_DBG, UART6_INTERRUPT_PRIORITY, UART6_INTERRUPT_SUBPRIORITY);
+  Uart.ConfigInterrupt(U_MATLAB, UART3_INTERRUPT_PRIORITY, UART3_INTERRUPT_SUBPRIORITY);
   
 }
 
@@ -290,7 +295,7 @@ void InitUart (void)
 void InitSkadi(void)
 {
 //  Skadi.Init(skadiCommandTable, sizeof(skadiCommandTable)/sizeof(sSkadiCommand_t), UART1, FALSE);   // This system does not use UART interrupts
-  Skadi.Init((sSkadiCommand_t *) skadiCommandTable, sizeof(skadiCommandTable)/sizeof(sSkadiCommand_t), UART3, TRUE);   // This system uses UART interrupts
+  Skadi.Init((sSkadiCommand_t *) skadiCommandTable, sizeof(skadiCommandTable)/sizeof(sSkadiCommand_t), U_DBG, TRUE);   // This system uses UART interrupts
 }
 
 

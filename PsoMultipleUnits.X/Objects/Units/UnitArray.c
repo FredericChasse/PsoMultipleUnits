@@ -17,6 +17,7 @@
 #include "UnitArray.h"
 #include "Unit.h"
 #include "LinkedList.h"
+#include "StateMachine.h"   // For debugging
 
 
 // Private definitions
@@ -101,13 +102,19 @@ void _UnitArray_GetPosLimits (UnitArray_t *array, float *minPos, float *maxPos)
 void _UnitArray_Release (UnitArray_t *array)
 {
   INT16 i;
+  INT8 ret;
   Node_t *node = &_arraysNodes[array->linkKey];
-  LinkedList_RemoveNode(node->list, node);
+  
+  ret = LinkedList_RemoveNode(node->list, node);
+  __assert(ret==0, "UnitArray Release remove node");
+  
   LinkedList_AddToEnd(&_unusedArrays, node);
+  __assert(ret==0, "UnitArray Release add to end");
   
   for (i = array->nUnits-1; i >= 0; i--)
   {
-    _UnitArray_RemoveUnitFromArray(array, i);
+    ret = _UnitArray_RemoveUnitFromArray(array, i);
+    __assert(ret == 0, "UnitArray_RemoveUnitFromArray(array, i)");
   }
 }
 

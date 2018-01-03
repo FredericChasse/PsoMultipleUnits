@@ -110,6 +110,7 @@ INT8 _Pno_Init (Pno_t *pno, UnitArrayInterface_t *unitArray)
     pno->param[i].delta_int = 2;
     pno->param[i].delta = pno->param[i].delta_int*POT_STEP_VALUE;
 //    pno->param[i].uinit_int = posMinIdx;
+//    pno->param[i].uinit_int = 0;   // 50
     pno->param[i].uinit_int = 38;   // 199.0196
     pno->param[i].uinit = potRealValues[pno->param[i].uinit_int];
     pno->param[i].umax_int = posMaxIdx;

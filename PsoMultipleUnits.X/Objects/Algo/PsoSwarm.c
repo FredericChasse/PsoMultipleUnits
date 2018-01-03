@@ -191,6 +191,7 @@ UINT32 _Swarm_IterationIncrement (PsoSwarm_t *s)
 void _Swarm_Release (PsoSwarm_t *s)
 {
   UINT8 i;
+  INT8 ret;
   Node_t *node = &_swarmsNodes[s->linkKey];
   
   s->param.iteration = 0;
@@ -203,8 +204,11 @@ void _Swarm_Release (PsoSwarm_t *s)
   __assert(s->unitArray, "s->unitArray->Release(s->unitArray->ctx);");
   s->unitArray->Release(s->unitArray->ctx);
   
-  LinkedList_RemoveNode(node->list, node);
+  ret = LinkedList_RemoveNode(node->list, node);
+  __assert(ret == 0, "_Swarm_Release removce node");
+  
   LinkedList_AddToEnd(&_unusedSwarms, node);
+  __assert(ret == 0, "_Swarm_Release add to end");
 }
 
 

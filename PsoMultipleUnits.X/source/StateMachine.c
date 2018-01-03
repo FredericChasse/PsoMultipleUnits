@@ -283,6 +283,9 @@ void StateAcq(void)
   sUartLineBuffer_t dbgBuf = {0};
   
   INT64 time_us, time_ns;
+  float powers[N_UNITS_TOTAL];
+  
+  UINT8 nUnits, i, id;
   
   //==================================================================
   // ADC READ
@@ -290,30 +293,30 @@ void StateAcq(void)
   //==================================================================
   if (oAdcReady)
   {
-//    DBG0_ON();
     oAdcReady = 0;
     
-    Adc.DisableInterrupts();
-    
-//    Timer.Tic();
+//    while(oAcqOngoing);
+//    Adc.DisableInterrupts();
+//    nSamples = 0;
     
     ComputeMeanAdcValues();
     
-//    if ((time_ns = Timer.Toc()) >= 0)
-//    {
-//      time_us = time_ns / 1000;
-//      LED2_ON();
-//    }
-    
     if (oSessionActive)
     {
-//      Timer.Tic();
       oNewSample = 1;   // Go to StateCompute
     }
     else
     {
-//      DBG0_OFF();
-      Adc.EnableInterrupts();
+      nUnits = mainArray->GetNUnits(mainArray->ctx);
+      
+      for (i = 0; i < nUnits; i++)
+      {
+        id = mainArray->GetUnitId(mainArray->ctx, i);
+        powers[i] = ComputeCellPower(unitAdcs[id], mainArray->GetUnitPosIdx(mainArray->ctx, i));
+        mainArray->SetPower(mainArray->ctx, i, powers[i]);
+      }
+      AD1CON1bits.ON = 1;
+//      Adc.EnableInterrupts();
     }
   }
   
@@ -327,20 +330,13 @@ void StateAcq(void)
   UINT64 seed1, seed2;
   UINT8 retBuf[MAX_DECODER_LENGTH];
   DecoderReturnMsg_t ret;
-  UINT8 nUnits;
   UINT8 units[N_UNITS_TOTAL];
   ProtocolSetPerturbPayload_t perturbPayload;
   ProtocolInitPerturbPayload_t initPerturbPayload;
   perturbPayload.units = units;
-  UINT8 i;
+  INT8 err;
   
-//  Timer.Tic();
   ret = codec->DecoderFsmStep(codec->ctx, retBuf);
-//  if ((time_ns = Timer.Toc()) >= 0)
-//  {
-//    time_us = time_ns / 1000;
-//    LED2_ON();
-//  }
   switch (ret)
   {
     case DECODER_RET_MSG_RNG_SEED:
@@ -389,11 +385,14 @@ void StateAcq(void)
             algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PSO_1D);
             algo->Init(algo->ctx, algoArray);
             while(oAcqOngoing);
-            Adc.DisableInterrupts();
-            Timer.DelayMs(10);
-            memset((void *) cellVoltRawMeanTemp, 0, N_UNITS_TOTAL*4);
+            AD1CON1bits.ON = 0;
+            oAdcReady = 0;
+//            Adc.DisableInterrupts();
             nSamples = 0;
-            Adc.EnableInterrupts();
+            Adc.Read();
+            INTClearFlag(INT_AD1);    // Clear the ADC conversion done interrupt Flag
+            AD1CON1bits.ON = 1;
+//            Adc.EnableInterrupts();
             break;
             
           case PARALLEL_PSO_MULTI_SWARM:
@@ -404,11 +403,14 @@ void StateAcq(void)
             algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PARALLEL_PSO_MULTI_SWARM);
             algo->Init(algo->ctx, algoArray);
             while(oAcqOngoing);
-            Adc.DisableInterrupts();
-            Timer.DelayMs(10);
-            memset((void *) cellVoltRawMeanTemp, 0, N_UNITS_TOTAL*4);
+            AD1CON1bits.ON = 0;
+            oAdcReady = 0;
+//            Adc.DisableInterrupts();
             nSamples = 0;
-            Adc.EnableInterrupts();
+            Adc.Read();
+            INTClearFlag(INT_AD1);    // Clear the ADC conversion done interrupt Flag
+            AD1CON1bits.ON = 1;
+//            Adc.EnableInterrupts();
             break;
             
           case CHARACTERIZATION:
@@ -419,11 +421,14 @@ void StateAcq(void)
             algo = (AlgoInterface_t *) CharacterizationInterface();
             algo->Init(algo->ctx, algoArray);
             while(oAcqOngoing);
-            Adc.DisableInterrupts();
-            Timer.DelayMs(10);
-            memset((void *) cellVoltRawMeanTemp, 0, N_UNITS_TOTAL*4);
+            AD1CON1bits.ON = 0;
+            oAdcReady = 0;
+//            Adc.DisableInterrupts();
             nSamples = 0;
-            Adc.EnableInterrupts();
+            Adc.Read();
+            INTClearFlag(INT_AD1);    // Clear the ADC conversion done interrupt Flag
+            AD1CON1bits.ON = 1;
+//            Adc.EnableInterrupts();
             break;
             
           case PARALLEL_PSO:
@@ -434,11 +439,14 @@ void StateAcq(void)
             algo = (AlgoInterface_t *) PsoInterface(PSO_TYPE_PARALLEL_PSO);
             algo->Init(algo->ctx, algoArray);
             while(oAcqOngoing);
-            Adc.DisableInterrupts();
-            Timer.DelayMs(10);
-            memset((void *) cellVoltRawMeanTemp, 0, N_UNITS_TOTAL*4);
+            AD1CON1bits.ON = 0;
+            oAdcReady = 0;
+//            Adc.DisableInterrupts();
             nSamples = 0;
-            Adc.EnableInterrupts();
+            Adc.Read();
+            INTClearFlag(INT_AD1);    // Clear the ADC conversion done interrupt Flag
+            AD1CON1bits.ON = 1;
+//            Adc.EnableInterrupts();
             break;
             
           case EXTREMUM_SEEKING:
@@ -449,11 +457,14 @@ void StateAcq(void)
             algo = (AlgoInterface_t *) ExtremumSeekingInterface();
             algo->Init(algo->ctx, algoArray);
             while(oAcqOngoing);
-            Adc.DisableInterrupts();
-            Timer.DelayMs(10);
-            memset((void *) cellVoltRawMeanTemp, 0, N_UNITS_TOTAL*4);
+            AD1CON1bits.ON = 0;
+            oAdcReady = 0;
+//            Adc.DisableInterrupts();
             nSamples = 0;
-            Adc.EnableInterrupts();
+            Adc.Read();
+            INTClearFlag(INT_AD1);    // Clear the ADC conversion done interrupt Flag
+            AD1CON1bits.ON = 1;
+//            Adc.EnableInterrupts();
             break;
             
           case PPSO_PNO:
@@ -464,11 +475,14 @@ void StateAcq(void)
             algo = (AlgoInterface_t *) PpsoPnoInterface();
             algo->Init(algo->ctx, algoArray);
             while(oAcqOngoing);
-            Adc.DisableInterrupts();
-            Timer.DelayMs(10);
-            memset((void *) cellVoltRawMeanTemp, 0, N_UNITS_TOTAL*4);
+//            Adc.DisableInterrupts();
+            AD1CON1bits.ON = 0;
+            oAdcReady = 0;
             nSamples = 0;
-            Adc.EnableInterrupts();
+            Adc.Read();
+            INTClearFlag(INT_AD1);    // Clear the ADC conversion done interrupt Flag
+            AD1CON1bits.ON = 1;
+//            Adc.EnableInterrupts();
             break;
             
           case PNO_CLASSIC:
@@ -479,11 +493,14 @@ void StateAcq(void)
             algo = (AlgoInterface_t *) PnoInterface();
             algo->Init(algo->ctx, algoArray);
             while(oAcqOngoing);
-            Adc.DisableInterrupts();
-            Timer.DelayMs(10);
-            memset((void *) cellVoltRawMeanTemp, 0, N_UNITS_TOTAL*4);
+            AD1CON1bits.ON = 0;
+            oAdcReady = 0;
+//            Adc.DisableInterrupts();
             nSamples = 0;
-            Adc.EnableInterrupts();
+            Adc.Read();
+            INTClearFlag(INT_AD1);    // Clear the ADC conversion done interrupt Flag
+            AD1CON1bits.ON = 1;
+//            Adc.EnableInterrupts();
             break;
             
           case DEBUG_ADC:
@@ -494,11 +511,14 @@ void StateAcq(void)
             algo = (AlgoInterface_t *) DebugAdcInterface();
             algo->Init(algo->ctx, algoArray);
             while(oAcqOngoing);
-            Adc.DisableInterrupts();
-            Timer.DelayMs(10);
-            memset((void *) cellVoltRawMeanTemp, 0, N_UNITS_TOTAL*4);
+            AD1CON1bits.ON = 0;
+            oAdcReady = 0;
+//            Adc.DisableInterrupts();
             nSamples = 0;
-            Adc.EnableInterrupts();
+            Adc.Read();
+            INTClearFlag(INT_AD1);    // Clear the ADC conversion done interrupt Flag
+            AD1CON1bits.ON = 1;
+//            Adc.EnableInterrupts();
             break;
             
           default:
@@ -517,34 +537,31 @@ void StateAcq(void)
     case DECODER_RET_MSG_STOP_ALGO:
       if (oSessionActive)   // To ensure that we are currently running
       {
-        DBG1_OFF();
         oSessionActive = 0;
         oAlgoIsPso     = 0;
         oAlgoIsPpsoPno  = 0;
         oDbgAdc        = 0;
-        __assert(algo, "algo->Release(algo->ctx);");
         algo->Release(algo->ctx);
-        __assert(algoArray, "nUnits = algoArray->GetNUnits(algoArray->ctx);");
         nUnits = algoArray->GetNUnits(algoArray->ctx);
         for (i = 0; i < nUnits; i++)
         {
-          algoArray->RemoveUnitFromArray(algoArray->ctx, 0);
+          err = algoArray->RemoveUnitFromArray(algoArray->ctx, 0);
         }
-        __assert(perturb, "perturb->Reset(perturb->ctx);");
         perturb->Reset(perturb->ctx);
         
-        Timer.DelayMs(10);
-        
-//        dbgBuf.length = sprintf(dbgBuf.buffer, "Used arrays = %i\n\r", UnitArray_GetNUsedArrays());
-//        while(Uart.PutTxFifoBuffer(U_DBG, &dbgBuf) < 0);
-//        dbgBuf.length = sprintf(dbgBuf.buffer, "Used PSO swarms = %i\n\r", PsoSwarm_GetNUsedSwarms());
-//        while(Uart.PutTxFifoBuffer(U_DBG, &dbgBuf) < 0);
-//        dbgBuf.length = sprintf(dbgBuf.buffer, "Used PSO particles = %i\n\r", PsoParticle_GetNUsedParticles());
-//        while(Uart.PutTxFifoBuffer(U_DBG, &dbgBuf) < 0);
-//        dbgBuf.length = sprintf(dbgBuf.buffer, "Used P&O swarms = %i\n\r", PnoSwarm_GetNUsedSwarms());
-//        while(Uart.PutTxFifoBuffer(U_DBG, &dbgBuf) < 0);
-//        dbgBuf.length = sprintf(dbgBuf.buffer, "Used P&O instances = %i\n\r", PnoInstance_GetNUsedInstances());
-//        while(Uart.PutTxFifoBuffer(U_DBG, &dbgBuf) < 0);
+        if (oNewSample)
+        {
+          oNewSample = 0;
+          nUnits = mainArray->GetNUnits(mainArray->ctx);
+
+          for (i = 0; i < nUnits; i++)
+          {
+            id = mainArray->GetUnitId(mainArray->ctx, i);
+            powers[i] = ComputeCellPower(unitAdcs[id], mainArray->GetUnitPosIdx(mainArray->ctx, i));
+            mainArray->SetPower(mainArray->ctx, i, powers[i]);
+          }
+          AD1CON1bits.ON = 1;
+        }
       }
       
       break;
@@ -630,7 +647,9 @@ void StateCompute(void)
   perturb->Run(perturb->ctx);
   
 //  DBG0_OFF();
-  Adc.EnableInterrupts();
+  INTClearFlag(INT_AD1);
+  AD1CON1bits.ON = 1;
+//  Adc.EnableInterrupts();
   
 }
 

@@ -82,12 +82,16 @@ void StartInterrupts  (void);
 #define DBG1_TOGGLE()   Port.C.ToggleBits(BIT_14)
 #define DBG2_TOGGLE()   Port.E.ToggleBits(BIT_4)
 
-#define U_MATLAB      UART6
-#define U_DBG         UART3
+//#define U_MATLAB      UART6
+//#define U_DBG         UART3
+#define U_MATLAB      UART3
+#define U_DBG         UART6
 
 #ifdef ONLY_2_UART_BUFFERS
-#define U_MATLAB_IDX  (1)
-#define U_DBG_IDX     (0)
+#define U_MATLAB_IDX  (0)
+#define U_DBG_IDX     (1)
+//#define U_MATLAB_IDX  (1)
+//#define U_DBG_IDX     (0)
 #else
 #define U_MATLAB_IDX  (U_MATLAB)
 #define U_DBG_IDX     (U_DBG)
@@ -106,7 +110,7 @@ void StartInterrupts  (void);
 #define ADC_TIMER_SCALE_FLOAT   (TIMER_SCALE_US)
 #define N_SAMPLES_PER_ADC_READ  (600)     // Number of samples / ADC value
 #define N_SAMPLES_TO_START      (N_SAMPLES_PER_ADC_READ)
-#define N_SAMPLES_TO_DROP       (30)
+#define N_SAMPLES_TO_DROP       (0)
 #define N_TOTAL_SAMPLES         (N_SAMPLES_PER_ADC_READ - N_SAMPLES_TO_DROP)
 
 #define SAMPLING_TIME_FLOAT     (ADC_TIMER_SCALE_FLOAT * ADC_TIMER_PERIOD * N_SAMPLES_PER_ADC_READ * N_UNITS_TOTAL)

@@ -214,8 +214,8 @@ INT8 _PpsoPno_Init (PpsoPno_t *pso, UnitArrayInterface_t *unitArray)
 //   ,.oscAmp         = 2
 //   ,.perturbOsc     = 0.05
 
-    .delta_int      = 1
-   ,.delta          = 1 * POT_STEP_VALUE
+    .delta_int      = 2
+   ,.delta          = 2 * POT_STEP_VALUE
    ,.uinit_int      = maxPosIdx
    ,.uinit          = potRealValues[maxPosIdx]
    ,.umax_int       = maxPosIdx
@@ -398,7 +398,8 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
     {
       if (pno->GetSteadyState(pno->ctx, iUnit))
       {
-        nextPositions[iUnit] = pso->classifier->GetBestPos(pso->classifier->ctx, array->GetUnitId(array->ctx, iUnit));
+        nextPositions[iUnit] = pno->GetBestPos(pno->ctx, iUnit);
+//        nextPositions[iUnit] = pso->classifier->GetBestPos(pso->classifier->ctx, array->GetUnitId(array->ctx, iUnit));
         pno->SetPos(pno->ctx, iUnit, nextPositions[iUnit]);
       }
       
@@ -715,7 +716,8 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
         pno->Init(pno->ctx, newArray, &pso->pnoParam, pso->nPnos++);
         for (iUnit = 0; iUnit < nUnits; iUnit++)
         {
-          pno->SetPos(pno->ctx, iUnit, nextPositions[iUnit]);
+          pno->SetPos(pno->ctx, iUnit, pso->classifier->GetBestPos(pso->classifier->ctx, newArray->GetUnitId(newArray->ctx, iUnit)));
+//          pno->SetPos(pno->ctx, iUnit, nextPositions[iUnit]);
         }
       }
       else
@@ -769,7 +771,8 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
         pno->Init(pno->ctx, newArray, &pso->pnoParam, pso->nPnos++);
         for (iUnit = 0; iUnit < nUnits; iUnit++)
         {
-          pno->SetPos(pno->ctx, iUnit, nextPositions[iUnit]);
+          pno->SetPos(pno->ctx, iUnit, pso->classifier->GetBestPos(pso->classifier->ctx, newArray->GetUnitId(newArray->ctx, iUnit)));
+//          pno->SetPos(pno->ctx, iUnit, nextPositions[iUnit]);
         }
       }
       else

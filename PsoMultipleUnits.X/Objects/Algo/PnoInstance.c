@@ -68,6 +68,9 @@ UINT8 _PnoInstance_GetPosIdx          (PnoInstance_t *pnoi);
 void  _PnoInstance_SetFitness         (PnoInstance_t *pnoi, float fitness);
 void  _PnoInstance_Release            (PnoInstance_t *pnoi);
 void  _PnoInstance_SetId              (PnoInstance_t *pnoi, UINT8 id);
+float _PnoInstance_GetBestPos         (PnoInstance_t *pnoi);
+void  _PnoInstance_SetDelta           (PnoInstance_t *pnoi, UINT8 delta);
+void  _PnoInstance_ResetSteadyState   (PnoInstance_t *pnoi);
 
 
 // Private variables
@@ -102,9 +105,31 @@ void _PnoInstance_Init (PnoInstance_t *pnoi, UINT8 delta, UINT8 pos, UINT8 umin,
 }
 
 
+void _PnoInstance_SetDelta (PnoInstance_t *pnoi, UINT8 delta)
+{
+  pnoi->delta_int = delta;
+  pnoi->delta = delta*POT_STEP_VALUE;
+  pnoi->ss.delta = pnoi->delta;
+}
+
+
+void _PnoInstance_ResetSteadyState   (PnoInstance_t *pnoi)
+{
+  SteadyStatePno_Reset(&pnoi->ss);
+}
+
+
 void _PnoInstance_SetId (PnoInstance_t *pnoi, UINT8 id)
 {
   pnoi->id = id;
+}
+
+
+float _PnoInstance_GetBestPos (PnoInstance_t *pnoi)
+{
+  float value = SteadyStatePno_GetMeanPos(&pnoi->ss);
+  ComputePotValueDec2Float(ComputePotValueFloat2Dec(value), &value);
+  return value;
 }
 
 
@@ -221,10 +246,15 @@ void _PnoInstance_SetFitness (PnoInstance_t *pnoi, float fitness)
 
 void _PnoInstance_Release (PnoInstance_t *pnoi)
 {
+  INT8 ret;
   Node_t *node = LinkedList_FindNode(&_usedInstances, pnoi);
   __assert(node, "_PnoInstance_Release");
-  LinkedList_RemoveNode(node->list, node);
-  LinkedList_AddToEnd(&_unusedInstances, node);
+  
+  ret = LinkedList_RemoveNode(node->list, node);
+  __assert(ret == 0, "_PnoInstance_Release remove node");
+  
+  ret = LinkedList_AddToEnd(&_unusedInstances, node);
+  __assert(ret==0, "_PnoInstance_Release add to end");
   
   Position_Reset(&pnoi->pos);
     pnoi->delta
@@ -286,6 +316,9 @@ const PnoInstanceInterface_t * PnoInstanceInterface (PnoType_t type)
       _instances[i].base.SetSteadyState = (PnoiSetSteadyState_fct)  &_PnoInstance_SetSteadyState;
       _instances[i].base.GetSteadyState = (PnoiGetSteadyState_fct)  &_PnoInstance_GetSteadyState;
       _instances[i].base.SetId          = (PnoiSetId_fct)           &_PnoInstance_SetId;
+      _instances[i].base.GetBestPos     = (PnoiGetBestPos_fct)      &_PnoInstance_GetBestPos;
+      _instances[i].base.SetDelta       = (PnoiSetDelta_fct)        &_PnoInstance_SetDelta;
+      _instances[i].base.ResetSs        = (PnoiResetSs_fct)         &_PnoInstance_ResetSteadyState;
       
       // Init the linked list
       _instancesNodes[i].ctx = (void *) &_instances[i];

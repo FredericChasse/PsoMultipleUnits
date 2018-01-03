@@ -44,6 +44,9 @@ typedef void  (*PnoiRelease_fct)          (void *ctx);
 typedef void  (*PnoiSetSteadyState_fct)   (void *ctx, UINT8 nSamplesForSs, UINT8 oscAmp);
 typedef BOOL  (*PnoiGetSteadyState_fct)   (void *ctx);
 typedef void  (*PnoiSetId_fct)            (void *ctx, UINT8 id);
+typedef float (*PnoiGetBestPos_fct)       (void *ctx);
+typedef void  (*PnoiSetDelta_fct)         (void *ctx, UINT8 delta);
+typedef void  (*PnoiResetSs_fct)          (void *ctx);
 
 typedef struct
 {
@@ -58,6 +61,9 @@ typedef struct
   PnoiSetSteadyState_fct  SetSteadyState;
   PnoiGetSteadyState_fct  GetSteadyState;
   PnoiSetId_fct           SetId;
+  PnoiGetBestPos_fct      GetBestPos;
+  PnoiSetDelta_fct        SetDelta;
+  PnoiResetSs_fct         ResetSs;
 } PnoInstanceInterface_t;
 
 

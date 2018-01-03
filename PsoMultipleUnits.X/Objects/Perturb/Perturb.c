@@ -18,6 +18,7 @@
 #include "LedDriver.h"
 #include "UnitMapping.h"
 #include "MathFunctions.h"
+#include "StateMachine.h"   // For debugging
 
 
 // Private definitions
@@ -149,13 +150,15 @@ INT8 _Perturb_SetNewPerturb (Perturb_t *p, UINT8 *units, UINT8 nUnits, INT16 amp
 void _Perturb_Reset (Perturb_t *p)
 {
   UINT8 i;
+  INT8 ret;
   p->nPerturbs = 0;
   p->iteration = 0;
   
   for (i = 0; i < p->nLeds; i++)
   {
     p->intensities[i] = p->initVal[i];
-    SetLedDutyCycle(p->leds[i], p->intensities[i]);
+    ret = SetLedDutyCycle(p->leds[i], p->intensities[i]);
+    __assert(ret == 0, "_Perturb_Reset");
   }
 }
 

@@ -45,10 +45,11 @@ typedef struct
 // Public functions
 //==============================================================================
 
-BOOL SteadyStatePno_CheckForSteadyState (SteadyStatePno_t *ss);
-void SteadyStatePno_Init (SteadyStatePno_t *ss, float *sampleBuf, size_t bufSize, UINT8 oscAmp, float delta);
-void SteadyStatePno_AddSample (SteadyStatePno_t *ss, float *newSample);
-void SteadyStatePno_Reset (SteadyStatePno_t *ss);
+BOOL  SteadyStatePno_CheckForSteadyState (SteadyStatePno_t *ss);
+void  SteadyStatePno_Init (SteadyStatePno_t *ss, float *sampleBuf, size_t bufSize, UINT8 oscAmp, float delta);
+void  SteadyStatePno_AddSample (SteadyStatePno_t *ss, float *newSample);
+void  SteadyStatePno_Reset (SteadyStatePno_t *ss);
+float SteadyStatePno_GetMeanPos (SteadyStatePno_t *ss);
 
 
 

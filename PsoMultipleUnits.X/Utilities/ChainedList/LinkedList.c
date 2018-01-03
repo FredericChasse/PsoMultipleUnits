@@ -114,6 +114,7 @@ INT8 LinkedList_RemoveNode (LinkedList_t *list, Node_t *node)
     list->head = node->next;
     list->count--;
     node->list = node->next = NULL;
+    return 0;
   }
   else  // List has multiple elements
   {

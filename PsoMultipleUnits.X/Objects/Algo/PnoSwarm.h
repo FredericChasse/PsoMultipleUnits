@@ -54,6 +54,7 @@ typedef UINT8 (*PnoSwarmGetNInstances_fct)    (void *ctx);
 typedef void  (*PnoSwarmIncIteration_fct)     (void *ctx);
 typedef void* (*PnoSwarmGetArray_fct)         (void *ctx);
 typedef void  (*PnoSwarmSetId_fct)            (void *ctx, UINT8 id);
+typedef float (*PnoSwarmGetBestPos_fct)       (void *ctx, UINT8 id);
 
 typedef struct
 {
@@ -69,6 +70,7 @@ typedef struct
   PnoSwarmIncIteration_fct    IncIteration;
   PnoSwarmGetArray_fct        GetArray;
   PnoSwarmSetId_fct           SetId;
+  PnoSwarmGetBestPos_fct      GetBestPos;
 } PnoSwarmInterface_t;
 
 // Public functions

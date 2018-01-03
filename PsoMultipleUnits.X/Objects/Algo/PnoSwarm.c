@@ -57,6 +57,7 @@ void  _PnoSwarm_SetFitness        (PnoSwarm_t *pno, UINT8 idx, float fitness);
 void  _PnoSwarm_IncIteration      (PnoSwarm_t *pno);
 void* _PnoSwarm_GetArray          (PnoSwarm_t *pno);
 void  _PnoSwarm_SetId             (PnoSwarm_t *pno, UINT8 id);
+float _PnoSwarm_GetBestPos        (PnoSwarm_t *pno, UINT8 id);
 
 static int _CompareFunc (const void *p1, const void *p2);
 void _PnoSwarm_ShiftInstancesLeft (PnoSwarm_t *pno, UINT8 idxToShift);
@@ -123,6 +124,12 @@ void _PnoSwarm_Release (PnoSwarm_t *pno)
 void _PnoSwarm_IncIteration (PnoSwarm_t *pno)
 {
   pno->iteration++;
+}
+
+
+float _PnoSwarm_GetBestPos (PnoSwarm_t *pno, UINT8 id)
+{
+  return pno->instances[id]->GetBestPos(pno->instances[id]);
 }
 
 
@@ -270,6 +277,7 @@ const PnoSwarmInterface_t * PnoSwarmInterface (void)
       _pnos_if[i].IncIteration    = (PnoSwarmIncIteration_fct)    &_PnoSwarm_IncIteration;
       _pnos_if[i].GetArray        = (PnoSwarmGetArray_fct)        &_PnoSwarm_GetArray;
       _pnos_if[i].SetId           = (PnoSwarmSetId_fct)           &_PnoSwarm_SetId;
+      _pnos_if[i].GetBestPos      = (PnoSwarmGetBestPos_fct)      &_PnoSwarm_GetBestPos;
       
       // Init the linked list
       _pnosNodes[i].ctx = (void *) &_pnos_if[i];

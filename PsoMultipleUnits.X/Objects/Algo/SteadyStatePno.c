@@ -93,8 +93,8 @@ BOOL SteadyStatePno_CheckForSteadyState (SteadyStatePno_t *ss)
   max  = _SteadyStatePno_GetMaxSamples (ss);
   upper = max - mean;
   lower = mean - min;
-  if (  ( ABS(upper) / mean >= (ss->oscAmp*ss->delta) )
-     || ( ABS(lower) / mean >= (ss->oscAmp*ss->delta) ) )
+  if (  ( ABS(upper) >= (ss->oscAmp*ss->delta) )
+     || ( ABS(lower) >= (ss->oscAmp*ss->delta) ) )
   {
     ss->oInSteadyState = 0;
   }
@@ -129,4 +129,10 @@ void SteadyStatePno_Reset (SteadyStatePno_t *ss)
 {
   BUFFER_RESET(ss);
   ss->oInSteadyState = 0;
+}
+
+
+float SteadyStatePno_GetMeanPos (SteadyStatePno_t *ss)
+{
+  return _SteadyStatePno_GetMeanSamples(ss);
 }

@@ -347,6 +347,7 @@ void __ISR(_ADC_VECTOR, ADC_INTERRUPT_PRIO) AdcInterruptHandler(void)
   {
 //    DBG1_TOGGLE();
     nSamples = 0;
+    AD1CON1bits.ON = 0;
     oAdcReady = 1;
 //    memcpy((void *) cellVoltRawMean, (void *) cellVoltRawMeanTemp, memcpySize);
 //    memset((void *) cellVoltRawMeanTemp, 0, memcpySize);

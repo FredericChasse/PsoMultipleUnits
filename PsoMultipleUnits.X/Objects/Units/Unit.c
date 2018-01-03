@@ -336,6 +336,7 @@ INT8 _Unit_SetPos (Unit_t *unit, float pos)
     }
     else
     {
+      __assert(0, "_Unit_SetPos");
       return -1;
     }
   }

@@ -72,7 +72,7 @@ void LedToggle(sSkadi_t *skadi, sSkadiArgs_t args)
   else
   {
     buffer.length = sprintf(buffer.buffer, "Cette led n'existe pas!\r\n\n");
-    Uart.PutTxFifoBuffer(UART3, &buffer);
+    Uart.PutTxFifoBuffer(U_DBG, &buffer);
   }
 }
 
@@ -96,7 +96,7 @@ void ClearScreen(sSkadi_t *skadi, sSkadiArgs_t args)
   }
   buffer.length = i;
   
-  Uart.PutTxFifoBuffer(UART3, &buffer);
+  Uart.PutTxFifoBuffer(U_DBG, &buffer);
 }
 
 
@@ -123,7 +123,7 @@ void SetAllPwmSkadi(sSkadi_t *skadi, sSkadiArgs_t args)
   else
   {
     buffer.length = sprintf(buffer.buffer, "Mauvais argument!\r\n\n");
-    Uart.PutTxFifoBuffer(UART3, &buffer);
+    Uart.PutTxFifoBuffer(U_DBG, &buffer);
   }
 }
 
@@ -148,7 +148,7 @@ void SetPwmSkadi(sSkadi_t *skadi, sSkadiArgs_t args)
   else
   {
     buffer.length = sprintf(buffer.buffer, "Mauvais argument!\r\n\n");
-    Uart.PutTxFifoBuffer(UART3, &buffer);
+    Uart.PutTxFifoBuffer(U_DBG, &buffer);
   }
 }
 
@@ -175,7 +175,7 @@ void SetPotSkadi(sSkadi_t *skadi, sSkadiArgs_t args)
   else
   {
     buffer.length = sprintf(buffer.buffer, "Mauvais argument!\r\n\n");
-    Uart.PutTxFifoBuffer(UART3, &buffer);
+    Uart.PutTxFifoBuffer(U_DBG, &buffer);
   }
 }
 
@@ -201,6 +201,6 @@ void SetAllPotSkadi(sSkadi_t *skadi, sSkadiArgs_t args)
   else
   {
     buffer.length = sprintf(buffer.buffer, "Mauvais argument!\r\n\n");
-    Uart.PutTxFifoBuffer(UART3, &buffer);
+    Uart.PutTxFifoBuffer(U_DBG, &buffer);
   }
 }
