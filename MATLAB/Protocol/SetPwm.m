@@ -34,12 +34,14 @@ N_UNITS_TOTAL             = 15;
 
 %% Port setup
 
+comPort = 'COM4';
+
 % Create a serial port object.
-port = instrfind('Type', 'serial', 'Port', 'COM3', 'Tag', '');
+port = instrfind('Type', 'serial', 'Port', comPort, 'Tag', '');
 
 if isempty(port)
 %     port = serial('COM5');
-    port = serial('COM3');
+    port = serial(comPort);
 else
     % Remove contents of input buffer
     flushinput(port);

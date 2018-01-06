@@ -214,8 +214,8 @@ INT8 _PpsoPno_Init (PpsoPno_t *pso, UnitArrayInterface_t *unitArray)
 //   ,.oscAmp         = 2
 //   ,.perturbOsc     = 0.05
 
-    .delta_int      = 2
-   ,.delta          = 2 * POT_STEP_VALUE
+    .delta_int      = 3
+   ,.delta          = _pnoParam.delta_int * POT_STEP_VALUE
    ,.uinit_int      = maxPosIdx
    ,.uinit          = potRealValues[maxPosIdx]
    ,.umax_int       = maxPosIdx
@@ -396,12 +396,12 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
     
     for (iUnit = 0; iUnit < nUnits; iUnit++)
     {
-      if (pno->GetSteadyState(pno->ctx, iUnit))
-      {
-        nextPositions[iUnit] = pno->GetBestPos(pno->ctx, iUnit);
-//        nextPositions[iUnit] = pso->classifier->GetBestPos(pso->classifier->ctx, array->GetUnitId(array->ctx, iUnit));
-        pno->SetPos(pno->ctx, iUnit, nextPositions[iUnit]);
-      }
+//      if (pno->GetSteadyState(pno->ctx, iUnit))
+//      {
+//        nextPositions[iUnit] = pno->GetBestPos(pno->ctx, iUnit);
+////        nextPositions[iUnit] = pso->classifier->GetBestPos(pso->classifier->ctx, array->GetUnitId(array->ctx, iUnit));
+//        pno->SetPos(pno->ctx, iUnit, nextPositions[iUnit]);
+//      }
       
       array->SetPos(array->ctx, iUnit, nextPositions[iUnit]);
     }
@@ -504,6 +504,7 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
   UINT8 algoIdxPerturbed[N_UNITS_TOTAL] = {0};
   UINT8 algoIdxPerturbedSize = 0;
   UINT8 tmp, idx;
+  UINT8 unitId;
   iAlgo = 0;
   nPerturbed = 0;
   
@@ -622,7 +623,6 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
   // Assess perturbed Parallel PSO
   //-----------------------------------
   void *units[N_UNITS_TOTAL];
-  UINT8 unitId;
   UnitArrayInterface_t *newArray;
   UINT8 tmpUnitsToRemove[N_UNITS_TOTAL], nUnitsToRemove = 0;
   for (i = 0; i < pso->nParaSwarms; i++)
@@ -662,6 +662,8 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
       {
         pno->SetPos(pno->ctx, iUnit, nextPositions[iUnit]);
         newArray->SetPos(newArray->ctx, iUnit, nextPositions[iUnit]);
+        unitId = newArray->GetUnitId(newArray->ctx, iUnit);
+        pso->classifier->ResetValues(pso->classifier->ctx, &unitId, 1);
       }
     }
     
@@ -716,7 +718,9 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
         pno->Init(pno->ctx, newArray, &pso->pnoParam, pso->nPnos++);
         for (iUnit = 0; iUnit < nUnits; iUnit++)
         {
-          pno->SetPos(pno->ctx, iUnit, pso->classifier->GetBestPos(pso->classifier->ctx, newArray->GetUnitId(newArray->ctx, iUnit)));
+          unitId = newArray->GetUnitId(newArray->ctx, iUnit);
+          pno->SetPos(pno->ctx, iUnit, pso->classifier->GetBestPos(pso->classifier->ctx, unitId));
+          pso->classifier->ResetValues(pso->classifier->ctx, &unitId, 1);
 //          pno->SetPos(pno->ctx, iUnit, nextPositions[iUnit]);
         }
       }
@@ -771,7 +775,9 @@ INT8 _PpsoPno_Run (PpsoPno_t *pso)
         pno->Init(pno->ctx, newArray, &pso->pnoParam, pso->nPnos++);
         for (iUnit = 0; iUnit < nUnits; iUnit++)
         {
-          pno->SetPos(pno->ctx, iUnit, pso->classifier->GetBestPos(pso->classifier->ctx, newArray->GetUnitId(newArray->ctx, iUnit)));
+          unitId = newArray->GetUnitId(newArray->ctx, iUnit);
+          pno->SetPos(pno->ctx, iUnit, pso->classifier->GetBestPos(pso->classifier->ctx, unitId));
+          pso->classifier->ResetValues(pso->classifier->ctx, &unitId, 1);
 //          pno->SetPos(pno->ctx, iUnit, nextPositions[iUnit]);
         }
       }

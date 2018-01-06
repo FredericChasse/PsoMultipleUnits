@@ -106,7 +106,7 @@ INT8 _Charac_Run (Charac_t *c)
   
   c->timeElapsed += c->sampleTime;
   
-  if (c->currentPosIdx <= 255)
+  if (c->currentPosIdx < POT_MAX_INDEX)
   {
     c->currentPosIdx++;
     for (i = 0; i < c->nUnits; i++)

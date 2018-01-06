@@ -83,17 +83,17 @@ fopen(port);
 
 %% Data setup
 
-% RNG Seed
-delimiter = PROTOCOL_DELIMITER;
-typeOfMsg = NEW_RNG_SEED;
-lengthOfPayload = typecast(uint16(16), 'uint8');
-[seed1, seed2] = GenerateNewSeeds;
-% seed1 = uint64(3687972931876243762);
-% seed2 = uint64(3111786400007884411);
-seeds = typecast([seed1, seed2], 'uint8');
-
-buf = [delimiter, typeOfMsg, lengthOfPayload, seeds];
-fwrite(port, buf);
+% % RNG Seed
+% delimiter = PROTOCOL_DELIMITER;
+% typeOfMsg = NEW_RNG_SEED;
+% lengthOfPayload = typecast(uint16(16), 'uint8');
+% [seed1, seed2] = GenerateNewSeeds;
+% % seed1 = uint64(3687972931876243762);
+% % seed2 = uint64(3111786400007884411);
+% seeds = typecast([seed1, seed2], 'uint8');
+% 
+% buf = [delimiter, typeOfMsg, lengthOfPayload, seeds];
+% fwrite(port, buf);
 
 % Initial intensity
 initLedIntensity = 500;
@@ -116,14 +116,14 @@ if nPerturbs > 0
   perturbUnits = cell(1, nPerturbs);
   perturbIterations = zeros(1, nPerturbs);
   perturbAmps(1) = -200;
-  perturbUnits{1} = [0:1:14];
-%   perturbUnits{1} = [0:1:7];
+%   perturbUnits{1} = [0:1:14];
+  perturbUnits{1} = [0:1:7];
   perturbIterations(1) = 300;
 end
 
 if nPerturbs >= 2
-%   perturbUnits{2} = [0:1:7];
-  perturbUnits{2} = [0:1:14];
+  perturbUnits{2} = [0:1:7];
+%   perturbUnits{2} = [0:1:14];
   perturbAmps(2) = 200;
   perturbIterations(2) = 600;
 end
@@ -147,11 +147,12 @@ typeOfMsg = START_ACQ;
 startAlgoChar = PROTOCOL_START_ALGO;
 
 if ~exist('algo', 'var')
-  % algo = CHARACTERIZATION;
-  % algo = PNO;
-  algo = CLASSIC_PSO;
+  algo = CHARACTERIZATION;
+%   algo = PNO;
+%   algo = CLASSIC_PSO;
   % algo = PARALLEL_PSO;
 %   algo = PPSO_PNO;
+  
   % algo = DEBUG_ADC;
   % algo = PARALLEL_PSO_MULTI_SWARM;
   % algo = MULTI_UNIT;
@@ -484,7 +485,7 @@ efficiencyBefore = zeros(1, nUnits);
 joulesBefore = zeros(1, nUnits);
 tBefore = (1:len) * tsMem(2);
 
-oscAmp = 0.05;
+oscAmp = 0.01;
 for iUnit = 1 : nUnits
   for iIteration = 1 : len
     clear meanJ
@@ -546,6 +547,8 @@ end
 if exist('oDoingLoops', 'var')
   joulesMem(iLoop, 1) = sum(joulesBefore(:));
   powersMem(iLoop, 1) = sum(meanPowerBefore(:));
+  efficiencyMem(iLoop, 1) = totalEfficiencyBefore;
+  precisionMem(iLoop, 1) = mean(precisionBefore(:));
 end
   
 unitsS0 = zeros(1,nUnits);    % Change this
@@ -672,6 +675,8 @@ for iPerturb = 1 : nPerturbs
   if exist('oDoingLoops', 'var')
     joulesMem(iLoop, iPerturb + 1) = sum(joulesAfter(:));
     powersMem(iLoop, iPerturb + 1) = sum(meanPowerAfter(:));
+    efficiencyMem(iLoop, iPerturb + 1) = totalEfficiencyAfter;
+  precisionMem(iLoop, iPerturb + 1) = mean(precisionAfter(:));
   end
 
   fprintf('\n==========================================================================================================\n')

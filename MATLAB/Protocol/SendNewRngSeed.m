@@ -63,15 +63,17 @@ port.Terminator = '';
 fopen(port);
 
 
-%% Kill PWM
+%% RNG seed
 
-initLedIntensity = 0;
 delimiter = PROTOCOL_DELIMITER;
-typeOfMsg = INIT_PERTURB;
-lengthOfPayload = typecast(uint16(2), 'uint8');
-payload = typecast(uint16(initLedIntensity), 'uint8');
+typeOfMsg = NEW_RNG_SEED;
+lengthOfPayload = typecast(uint16(16), 'uint8');
+[seed1, seed2] = GenerateNewSeeds;
+% seed1 = uint64(3687972931876243762);
+% seed2 = uint64(3111786400007884411);
+seeds = typecast([seed1, seed2], 'uint8');
 
-buf = [delimiter, typeOfMsg, lengthOfPayload, payload];
+buf = [delimiter, typeOfMsg, lengthOfPayload, seeds];
 fwrite(port, buf);
 
 
