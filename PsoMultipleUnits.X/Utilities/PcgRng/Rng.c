@@ -21,18 +21,6 @@
 // Private definitions
 //==============================================================================
 
-// https://www.doornik.com/research/randomdouble.pdf
-//----------------------------------------------------------
-#define M_RAN_INVM32  (2.32830643653869628906e-010)
-#define M_RAN_INVM52  (2.22044604925031308085e-016)
-#define RANDBL_32new(iRan1) \
-((int)(iRan1) * M_RAN_INVM32 + (0.5 + M_RAN_INVM32 / 2))
-#define RANDBL_52new(iRan1, iRan2) \
-((int)(iRan1) * M_RAN_INVM32 + (0.5 + M_RAN_INVM52 / 2) + \
-(int)((iRan2) & 0x000FFFFF) * M_RAN_INVM52)
-//----------------------------------------------------------
-
-
 typedef pcg32_random_t Rng_t;
 
 
@@ -61,7 +49,9 @@ double _RandUint32ToDouble (UINT32 rand);
 
 double _RandUint32ToDouble (UINT32 rand)
 {
-  return RANDBL_32new(rand);
+#define MAX_UINT32_INVERTED     (2.32830643653869628906e-010)
+  const double inv32 = MAX_UINT32_INVERTED;
+  return ((double) rand) * inv32;
 }
 
 
