@@ -29,6 +29,13 @@
 
 #define N_INSTANCES_TOTAL      (N_UNITS_TOTAL)
 
+typedef enum
+{
+  PNOI_VAL_POS1
+ ,PNOI_VAL_POS2
+ ,PNOI_VAL_POS3
+} PnoiValidationState_t;
+
 typedef struct
 {
   PnoInstanceInterface_t base;
@@ -41,6 +48,8 @@ typedef struct
   float umax;
   INT8  k;
   float delta;
+  float deltaMem;
+  INT16 deltaMemInt;
   float perturbOsc;
   
   BOOL  oFirstSteadyState;
@@ -53,6 +62,16 @@ typedef struct
   INT16 delta_int;
   UINT8 umin_int;
   UINT8 umax_int;
+  
+  BOOL  oInValMode;
+  Position_t valPos1;
+  Position_t valPos2;
+  Position_t valPos3;
+  Position_t valPosMem;
+  PnoiValidationState_t valState;
+  float deltaVal;
+  INT16 deltaVal_int;
+  BOOL oCheckingPerturb;
   
   SteadyStatePno_t ss;
   float ssBuf[STEADY_STATE_PNO_MAX_SAMPLES];
@@ -67,6 +86,7 @@ void  _PnoInstance_SetSteadyState     (PnoInstance_t *pnoi, UINT8 samplesForSs, 
 BOOL  _PnoInstance_GetSteadyState     (PnoInstance_t *pnoi);
 float _PnoInstance_ComputePosClassic  (PnoInstance_t *pnoi, UINT8 *oPerturbed);
 float _PnoInstance_ComputePosSwarm    (PnoInstance_t *pnoi, UINT8 *oPerturbed);
+float _PnoInstance_ComputePosOeppcd   (PnoInstance_t *pnoi, UINT8 *oPerturbed);
 void  _PnoInstance_SetPos             (PnoInstance_t *pnoi, float pos);
 float _PnoInstance_GetPos             (PnoInstance_t *pnoi);
 void  _PnoInstance_SetPosIdx          (PnoInstance_t *pnoi, UINT8 pos);
@@ -98,6 +118,8 @@ void _PnoInstance_Init (PnoInstance_t *pnoi, UINT8 delta, UINT8 pos, UINT8 umin,
 {
   pnoi->delta_int = delta;
   pnoi->delta = delta*POT_STEP_VALUE;
+  pnoi->deltaMem = pnoi->delta;
+  pnoi->deltaMemInt = pnoi->delta_int;
   Position_Reset(&pnoi->pos);
   SteadyStatePno_Reset(&pnoi->ss);
   pnoi->prevPotIdx = pnoi->curPotIdx = pos;
@@ -111,7 +133,17 @@ void _PnoInstance_Init (PnoInstance_t *pnoi, UINT8 delta, UINT8 pos, UINT8 umin,
   pnoi->oFirstSteadyState = 1;
   pnoi->oLastPos = 0;
   pnoi->divCount = 0;
-  pnoi->divCountMax = 50;
+  pnoi->divCountMax = 40;
+  
+  pnoi->oInValMode = 0;
+  Position_Reset(&pnoi->valPos1);
+  Position_Reset(&pnoi->valPos2);
+  Position_Reset(&pnoi->valPos3);
+  Position_Reset(&pnoi->valPosMem);
+  pnoi->valState = PNOI_VAL_POS1;
+  pnoi->deltaVal_int = 4;
+  pnoi->deltaVal = pnoi->deltaVal_int*POT_STEP_VALUE;
+  pnoi->oCheckingPerturb = 0;
   
   pnoi->pbestAbs.curPos = pnoi->pbestAbs.prevPos = pnoi->pos.curPos;
   pnoi->pbestAbs.curFitness = pnoi->pbestAbs.prevFitness = 0;
@@ -172,6 +204,174 @@ float _PnoInstance_ComputePosClassic (PnoInstance_t *pnoi, UINT8 *oPerturbed)
   pnoi->pos.curPos += potRealValues[pnoi->curPotIdx];
   
   return (float) pnoi->curPotIdx;
+}
+
+
+float _PnoInstance_ComputePosOeppcd (PnoInstance_t *pnoi, UINT8 *oPerturbed)
+{
+  float error;
+  size_t i;
+  *oPerturbed = 0;
+  
+  SteadyStatePno_AddSample(&pnoi->ss, &pnoi->pos.curPos);
+  
+  if (pnoi->pos.curFitness > pnoi->pbestAbs.curFitness)
+  {
+    pnoi->pbestAbs.prevFitness = pnoi->pbestAbs.curFitness;
+    pnoi->pbestAbs.prevPos = pnoi->pbestAbs.curPos;
+    pnoi->pbestAbs.curFitness = pnoi->pos.curFitness;
+    pnoi->pbestAbs.curPos = pnoi->pos.curPos;
+  }
+  
+  if (pnoi->pos.curFitness < pnoi->pos.prevFitness)
+  {
+    pnoi->k = -pnoi->k;
+  }
+  
+  SteadyStatePno_CheckForSteadyState(&pnoi->ss);
+  
+  if (pnoi->oInValMode)
+  {
+    switch(pnoi->valState)
+    {
+      case PNOI_VAL_POS1:
+        pnoi->valPos1.curFitness = pnoi->pos.curFitness;
+        pnoi->pos.prevPos = pnoi->pos.curPos;
+        pnoi->pos.curPos = pnoi->valPos2.curPos;
+        pnoi->valState = PNOI_VAL_POS2;
+        break;
+      case PNOI_VAL_POS2:
+        pnoi->valPos2.curFitness = pnoi->pos.curFitness;
+        pnoi->pos.prevPos = pnoi->pos.curPos;
+        pnoi->pos.curPos = pnoi->valPos3.curPos;
+        pnoi->valState = PNOI_VAL_POS3;
+        break;
+      case PNOI_VAL_POS3:
+        pnoi->valState = PNOI_VAL_POS1;
+        pnoi->valPos3.curFitness = pnoi->pos.curFitness;
+        
+        // Position in an optimum
+        if ( (pnoi->valPos1.curFitness <= pnoi->valPos3.curFitness) && (pnoi->valPos2.curFitness <= pnoi->valPos3.curFitness) )
+        {
+          pnoi->oCheckingPerturb = 0;
+          pnoi->pos.prevPos = pnoi->pos.curPos;
+          pnoi->oLastPos = 1;
+          pnoi->oFirstSteadyState = 0;
+          for (i = 0; i < pnoi->ss.bufSize; i++)
+          {
+            SteadyStatePno_AddSample(&pnoi->ss, &pnoi->pos.curPos);
+          }
+          SteadyStatePno_CheckForSteadyState(&pnoi->ss);
+        }
+        else
+        {
+          pnoi->delta = pnoi->deltaMem;
+          pnoi->delta_int = pnoi->deltaMemInt;
+          SteadyStatePno_Init (&pnoi->ss, pnoi->ssBuf, pnoi->ss.bufSize, pnoi->ss.oscAmp, pnoi->delta);
+          pnoi->oLastPos = 0;
+          pnoi->oFirstSteadyState = 1;
+          if (pnoi->oCheckingPerturb)
+          {
+            pnoi->oCheckingPerturb = 0;
+            *oPerturbed = 1;
+          }
+        }
+        pnoi->pbestAbs.curFitness = pnoi->pos.curFitness;
+        pnoi->pbestAbs.curPos = pnoi->pos.curPos;
+        
+        // Check perturb
+        error = (pnoi->pos.curFitness - pnoi->valPosMem.curFitness)/pnoi->valPosMem.curFitness;
+        if ( ABS(error) > pnoi->perturbOsc )
+        {
+          *oPerturbed = 1;
+        }
+        Position_Reset(&pnoi->valPos1);
+        Position_Reset(&pnoi->valPos2);
+        Position_Reset(&pnoi->valPos3);
+        Position_Reset(&pnoi->valPosMem);
+        pnoi->oInValMode = 0;
+        break;
+      default:
+        break;
+    }
+  }
+  else if (pnoi->ss.oInSteadyState)
+  {
+    if (pnoi->oFirstSteadyState)
+    {
+      pnoi->oFirstSteadyState = 0;
+      pnoi->deltaMemInt = pnoi->delta_int;
+      pnoi->deltaMem = pnoi->delta;
+      pnoi->delta_int = 1;
+      pnoi->delta = pnoi->delta_int * POT_STEP_VALUE;
+      SteadyStatePno_Init (&pnoi->ss, pnoi->ssBuf, pnoi->ss.bufSize, pnoi->ss.oscAmp, pnoi->delta);
+      pnoi->pos.prevPos = pnoi->pos.curPos;
+      pnoi->pos.curPos += pnoi->delta*pnoi->k;
+      if (pnoi->pos.curPos > pnoi->umax)
+      {
+        pnoi->pos.curPos = pnoi->umax;
+        pnoi->k = -ABS(pnoi->k);
+      }
+      if (pnoi->pos.curPos < pnoi->umin)
+      {
+        pnoi->pos.curPos = pnoi->umin;
+        pnoi->k = ABS(pnoi->k);
+      }
+    }
+    else
+    {
+      if (!pnoi->oLastPos)
+      {
+        pnoi->oLastPos = 1;
+        pnoi->pos.prevPos = pnoi->pos.curPos;
+        pnoi->pos.curPos = pnoi->pbestAbs.curPos;
+      }
+      else
+      {
+        if (pnoi->pos.prevPos == pnoi->pos.curPos)
+        {
+          error = (pnoi->pos.curFitness - pnoi->pos.prevFitness)/pnoi->pos.prevFitness;
+          if ( ABS(error) > pnoi->perturbOsc )
+          {
+//            *oPerturbed = 1;
+            pnoi->oCheckingPerturb = 1;
+          }
+//          if (++pnoi->divCount == pnoi->divCountMax)
+          if ((++pnoi->divCount == pnoi->divCountMax) || pnoi->oCheckingPerturb)
+          {
+            pnoi->divCount = 0;
+            pnoi->oInValMode = 1;
+            pnoi->pos.prevPos = pnoi->pos.curPos;
+            pnoi->valPosMem.curPos = pnoi->pos.curPos;
+            pnoi->valPosMem.curFitness = pnoi->pos.curFitness;
+            pnoi->valPos1.curPos = pnoi->pos.curPos - pnoi->deltaVal;
+            pnoi->valPos2.curPos = pnoi->pos.curPos + pnoi->deltaVal;
+            pnoi->valPos3.curPos = pnoi->pos.curPos;
+            pnoi->valState = PNOI_VAL_POS1;
+            pnoi->pos.curPos = pnoi->valPos1.curPos;
+          }
+        }
+        pnoi->pos.prevPos = pnoi->pos.curPos;
+      }
+    }
+  }
+  else
+  {
+    pnoi->pos.prevPos = pnoi->pos.curPos;
+    pnoi->pos.curPos += pnoi->delta*pnoi->k;
+    if (pnoi->pos.curPos > pnoi->umax)
+    {
+      pnoi->pos.curPos = pnoi->umax;
+      pnoi->k = -ABS(pnoi->k);
+    }
+    if (pnoi->pos.curPos < pnoi->umin)
+    {
+      pnoi->pos.curPos = pnoi->umin;
+      pnoi->k = ABS(pnoi->k);
+    }
+  }
+  
+  return pnoi->pos.curPos;
 }
 
 
@@ -401,12 +601,12 @@ BOOL _PnoInstance_GetSteadyState (PnoInstance_t *pnoi)
 // Public functions
 //==============================================================================
 
-const PnoInstanceInterface_t * PnoInstanceInterface (PnoType_t type)
+const PnoInstanceInterface_t * PnoInstanceInterface (PnoInstanceType_t type)
 {
   UINT8 i;
   Node_t *temp;
   
-  if (type > PNO_TYPE_SWARM)
+  if (type > PNO_TYPE_OEPPCD)
   {
     return NULL;
   }
@@ -469,9 +669,13 @@ const PnoInstanceInterface_t * PnoInstanceInterface (PnoType_t type)
   {
     ((PnoInstance_t *) temp->ctx)->base.ComputePos = (PnoiComputePos_fct) &_PnoInstance_ComputePosClassic;
   }
-  else
+  else if (type == PNO_TYPE_SWARM)
   {
     ((PnoInstance_t *) temp->ctx)->base.ComputePos = (PnoiComputePos_fct) &_PnoInstance_ComputePosSwarm;
+  }
+  else
+  {
+    ((PnoInstance_t *) temp->ctx)->base.ComputePos = (PnoiComputePos_fct) &_PnoInstance_ComputePosOeppcd;
   }
   return temp->ctx;
 }

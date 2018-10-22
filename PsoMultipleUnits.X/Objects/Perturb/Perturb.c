@@ -31,7 +31,8 @@
 
 typedef struct
 {
-  UINT32  iteration;
+  UINT32  start;
+  UINT32  end;
   UINT8   units[N_UNITS_TOTAL];
   UINT8   nUnits;
   INT16   amplitude;
@@ -55,7 +56,7 @@ typedef struct
 void    _Perturb_Init               (Perturb_t *p, UINT16 intensityInit);
 UINT16  _Perturb_GetUnitIntensity   (Perturb_t *p, UINT8 unit);
 void    _Perturb_SetUnitIntensity   (Perturb_t *p, UINT8 unit, UINT16 intensity);
-INT8    _Perturb_SetNewPerturb      (Perturb_t *p, UINT8 *units, UINT8 nUnits, INT16 amplitude, UINT32 iteration);
+INT8    _Perturb_SetNewPerturb      (Perturb_t *p, UINT8 *units, UINT8 nUnits, INT16 amplitude, UINT32 start, UINT32 end);
 void    _Perturb_Reset              (Perturb_t *p);
 void    _Perturb_Run                (Perturb_t *p);
 
@@ -65,7 +66,8 @@ void    _Perturb_Run                (Perturb_t *p);
 
 PerturbInstance_t _perturbs[N_PERTURB_TOTAL] = 
 {
-  {.iteration =  0 }
+  {.start     =  0 }
+ ,{.end       =  0 }
  ,{.amplitude =  0 }
  ,{.nUnits    =  0 }
  ,{.units     = {0}}
@@ -130,7 +132,7 @@ UINT16 _Perturb_GetUnitIntensity (Perturb_t *p, UINT8 unit)
 }
 
 
-INT8 _Perturb_SetNewPerturb (Perturb_t *p, UINT8 *units, UINT8 nUnits, INT16 amplitude, UINT32 iteration)
+INT8 _Perturb_SetNewPerturb (Perturb_t *p, UINT8 *units, UINT8 nUnits, INT16 amplitude, UINT32 start, UINT32 end)
 {
   if (p->nPerturbs == N_PERTURB_TOTAL)
   {
@@ -140,7 +142,8 @@ INT8 _Perturb_SetNewPerturb (Perturb_t *p, UINT8 *units, UINT8 nUnits, INT16 amp
   memcpy(p->perturbs[p->nPerturbs].units, units, nUnits);
   p->perturbs[p->nPerturbs].nUnits = nUnits;
   p->perturbs[p->nPerturbs].amplitude = amplitude;
-  p->perturbs[p->nPerturbs].iteration = iteration;
+  p->perturbs[p->nPerturbs].start = start;
+  p->perturbs[p->nPerturbs].end = end;
   p->nPerturbs++;
   
   return 0;
@@ -173,7 +176,7 @@ void _Perturb_Run (Perturb_t *p)
   for (i = 0; i < p->nPerturbs; i++)
   {
     pb = &p->perturbs[i];
-    if (p->iteration == pb->iteration)
+    if ((p->iteration >= pb->start) && (p->iteration < pb->end))
     {
       for (j = 0; j < pb->nUnits; j++)
       {

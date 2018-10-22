@@ -23,7 +23,7 @@
 typedef void    (*PerturbInit_fct)              (void *ctx, UINT16 intensityInit);
 typedef void    (*PerturbSetUnitIntensity_fct)  (void *ctx, UINT8 unit, UINT16 intensity);
 typedef UINT16  (*PerturbGetUnitIntensity_fct)  (void *ctx, UINT8 unit);
-typedef INT8    (*PerturbSetNewPerturb_fct)     (void *ctx, UINT8 *units, UINT8 nUnits, INT16 amplitude, UINT32 iteration);
+typedef INT8    (*PerturbSetNewPerturb_fct)     (void *ctx, UINT8 *units, UINT8 nUnits, INT16 amplitude, UINT32 start, UINT32 end);
 typedef void    (*PerturbReset_fct)             (void *ctx);
 typedef void    (*PerturbRun_ftc)               (void *ctx);
 

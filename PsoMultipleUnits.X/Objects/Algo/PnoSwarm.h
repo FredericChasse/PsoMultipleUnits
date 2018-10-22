@@ -28,19 +28,26 @@
 // Public definitions
 //==============================================================================
 
+typedef enum
+{
+  PNO_SWARM_OEPPC
+ ,PNO_SWARM_OEPPCD
+} PnoSwarmType_t;
+
 typedef struct
 {
-  float         delta;
-  INT16         delta_int;
-  float         umin;
-  INT16         umin_int;
-  float         umax;
-  INT16         umax_int;
-  float         uinit;
-  INT16         uinit_int;
-  UINT8         nSamplesForSs;
-  UINT8         oscAmp;
-  float         perturbOsc;
+  float           delta;
+  INT16           delta_int;
+  float           umin;
+  INT16           umin_int;
+  float           umax;
+  INT16           umax_int;
+  float           uinit;
+  INT16           uinit_int;
+  UINT8           nSamplesForSs;
+  UINT8           oscAmp;
+  float           perturbOsc;
+  PnoSwarmType_t  type;
 } PnoSwarmParam_t;
 
 typedef INT8  (*PnoSwarmInit_fct)             (void *ctx, UnitArrayInterface_t *unitArray, PnoSwarmParam_t *param, UINT8 id);

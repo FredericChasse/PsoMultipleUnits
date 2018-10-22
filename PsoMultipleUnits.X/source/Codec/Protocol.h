@@ -72,7 +72,8 @@ extern const size_t sizeOfInitPerturbPayloadBase;
 
 typedef struct
 {
-  UINT32 iteration;
+  UINT32 start;
+  UINT32 end;
   INT16  amplitude;
   UINT8  nUnits;
   UINT8 *units;
@@ -96,6 +97,7 @@ typedef enum
  ,PPSO_PNO                  = 0x06
  ,PNO_CLASSIC               = 0x07
  ,DEBUG_ADC                 = 0x08
+ ,ALGO_PPSOCD               = 0x09
 } ProtocolTypeOfAlgo_t;
 
 #define PROTOCOL_START_ALGO   ('!')

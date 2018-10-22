@@ -31,6 +31,7 @@ CHARACTERIZATION          = uint8(5);
 PPSO_PNO                  = uint8(6);
 PNO                       = uint8(7);
 DEBUG_ADC                 = uint8(8);
+PPSOCD                    = uint8(9);
 
 PROTOCOL_START_ALGO       = uint8('!' - 0);
 PROTOCOL_STOP_ALGO        = uint8('x' - 0);
@@ -106,39 +107,61 @@ buf = [delimiter, typeOfMsg, lengthOfPayload, payload];
 fwrite(port, buf);
 
 % Perturb
-% nPerturbs = 2;
-nPerturbs = 0;
+nPerturbs = 2;
+% nPerturbs = 1;
+% nPerturbs = 0;
 oDoPerturb = 0;
+% oSlowPerturb = 1;
+oSlowPerturb = 0;
 
 if nPerturbs > 0
-  oDoPerturb = 1;
-  perturbAmps = zeros(1, nPerturbs);
-  perturbUnits = cell(1, nPerturbs);
-  perturbIterations = zeros(1, nPerturbs);
-  perturbAmps(1) = -200;
-%   perturbUnits{1} = [0:1:14];
-  perturbUnits{1} = [0:1:7];
-  perturbIterations(1) = 300;
+  if oSlowPerturb
+    oDoPerturb = 1;
+    perturbAmps = zeros(1, nPerturbs);
+    perturbUnits = cell(1, nPerturbs);
+    perturbIterations = zeros(nPerturbs, 2);
+    perturbAmps(1) = -1;
+    perturbUnits{1} = [0:1:14];
+%     perturbUnits{1} = [0:1:7];
+    perturbIterations(1, :) = [100 300];
+
+    if nPerturbs >= 2
+%       perturbUnits{2} = [0:1:7];
+      perturbUnits{2} = [0:1:14];
+      perturbAmps(2) = 1;
+      perturbIterations(2, :) = [500 700];
+    end
+  else
+    oDoPerturb = 1;
+    perturbAmps = zeros(1, nPerturbs);
+    perturbUnits = cell(1, nPerturbs);
+    perturbIterations = zeros(nPerturbs, 2);
+    perturbAmps(1) = -200;
+    perturbUnits{1} = [0:1:14];
+%     perturbUnits{1} = [0:1:7];
+    perturbIterations(1, :) = [300 301];
+
+    if nPerturbs >= 2
+%       perturbUnits{2} = [0:1:7];
+      perturbUnits{2} = [0:1:14];
+      perturbAmps(2) = 200;
+      perturbIterations(2, :) = [600 601];
+    end
+  end
 end
 
-if nPerturbs >= 2
-  perturbUnits{2} = [0:1:7];
-%   perturbUnits{2} = [0:1:14];
-  perturbAmps(2) = 200;
-  perturbIterations(2) = 600;
-end
-
-perturbPayloadBaseLength = 4 + 2 + 1;
+perturbPayloadBaseLength = 4 + 4 + 2 + 1;
 delimiter = PROTOCOL_DELIMITER;
 typeOfMsg = SET_PERTURB;
 for i = 1 : nPerturbs
-  iteration = typecast(uint32(perturbIterations(i)), 'uint8');
+  startIteration = typecast(uint32(perturbIterations(i, 1)), 'uint8');
+  endIteration = typecast(uint32(perturbIterations(i, 2)), 'uint8');
   amplitude = typecast(int16(perturbAmps(i)), 'uint8');
   nUnits = uint8(length(perturbUnits{i}));
   units = uint8(perturbUnits{i});
   
   lengthOfPayload = typecast(uint16(perturbPayloadBaseLength + length(perturbUnits{i})), 'uint8');
-  buf = [delimiter, typeOfMsg, lengthOfPayload, iteration, amplitude, nUnits, units];
+  buf = [delimiter, typeOfMsg, lengthOfPayload, startIteration, endIteration, amplitude, nUnits, units];
   fwrite(port, buf)
 end
 
@@ -148,7 +171,8 @@ startAlgoChar = PROTOCOL_START_ALGO;
 
 if ~exist('algo', 'var')
 %   algo = CHARACTERIZATION;
-  algo = PNO;
+%   algo = PNO;
+  algo = PPSOCD;
 %   algo = CLASSIC_PSO;
   % algo = PARALLEL_PSO;
 %   algo = PPSO_PNO;
@@ -190,6 +214,9 @@ elseif algo == PARALLEL_PSO_MULTI_SWARM
 elseif algo == PPSO_PNO
   oSendDebugData = uint8(1);
   algoStr = 'de l''OEPPC';
+elseif algo == PPSOCD
+  oSendDebugData = uint8(1);
+  algoStr = 'de l''OEPPCD';
 elseif algo == PNO
   oSendDebugData = uint8(0);
   algoStr = 'du P&O';
@@ -452,6 +479,8 @@ elseif algo == PARALLEL_PSO
   fprintf('\t\t\t\t\t\t\t*********** PARALLEL PSO ANALYSIS *************\n')
 elseif algo == PPSO_PNO
   fprintf('\t\t\t\t\t\t\t************** PSO-P&O ANALYSIS ***************\n')
+elseif algo == PPSOCD
+  fprintf('\t\t\t\t\t\t\t************** OEPPCD ANALYSIS  ***************\n')
 elseif algo == PNO
   fprintf('\t\t\t\t\t\t\t**************** P&O ANALYSIS *****************\n')
 else

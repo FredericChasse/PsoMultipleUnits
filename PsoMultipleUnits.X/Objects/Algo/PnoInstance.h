@@ -31,7 +31,8 @@ typedef enum
 {
   PNO_TYPE_CLASSIC
  ,PNO_TYPE_SWARM
-} PnoType_t;
+ ,PNO_TYPE_OEPPCD
+} PnoInstanceType_t;
 
 typedef void  (*PnoiInit_fct)             (void *ctx, UINT8 delta, UINT8 pos, UINT8 umin, UINT8 umax, float perturbOsc);
 typedef float (*PnoiComputePos_fct)       (void *ctx, UINT8 *oPerturbed);
@@ -70,7 +71,7 @@ typedef struct
 // Public functions
 //==============================================================================
 
-const PnoInstanceInterface_t * PnoInstanceInterface (PnoType_t type);
+const PnoInstanceInterface_t * PnoInstanceInterface (PnoInstanceType_t type);
 
 size_t PnoInstance_GetNUsedInstances (void);
 

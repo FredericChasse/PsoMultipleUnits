@@ -87,10 +87,20 @@ INT8 _PnoSwarm_Init (PnoSwarm_t *pno, UnitArrayInterface_t *unitArray, PnoSwarmP
   pno->iteration      = 0;
   pno->unitArray      = unitArray;
   pno->nInstances     = unitArray->GetNUnits(unitArray->ctx);
+  PnoInstanceType_t   type;
+  
+  if (param->type == PNO_SWARM_OEPPC) 
+  {
+    type = PNO_TYPE_SWARM;
+  }
+  else
+  {
+    type = PNO_TYPE_OEPPCD;
+  }
   
   for (i = 0; i < pno->nInstances; i++)
   {
-    pno->instances[i] = (PnoInstanceInterface_t *) PnoInstanceInterface(PNO_TYPE_SWARM);
+    pno->instances[i] = (PnoInstanceInterface_t *) PnoInstanceInterface(type);
     __assert(pno->instances[i], "_PnoSwarm_Init");
     memcpy(&pno->param[i], param, sizeof(PnoSwarmParam_t));
     

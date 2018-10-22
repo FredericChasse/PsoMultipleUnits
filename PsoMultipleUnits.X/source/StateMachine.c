@@ -353,7 +353,7 @@ void StateAcq(void)
     case DECODER_RET_MSG_NEW_PERTURB:
       memcpy(&perturbPayload, &retBuf[0], sizeOfSetPerturbPayloadBase);
       memcpy(&perturbPayload.units[0], &retBuf[sizeOfSetPerturbPayloadBase], perturbPayload.nUnits);  // UINT8 buffer
-      perturb->SetNewPerturb(perturb->ctx, perturbPayload.units, perturbPayload.nUnits, perturbPayload.amplitude, perturbPayload.iteration);
+      perturb->SetNewPerturb(perturb->ctx, perturbPayload.units, perturbPayload.nUnits, perturbPayload.amplitude, perturbPayload.start, perturbPayload.end);
       break;
       
     case DECODER_RET_MSG_INIT_PERTURB:
@@ -472,7 +472,25 @@ void StateAcq(void)
             oAlgoIsPpsoPno  = 1;
             oDbgAdc         = 0;
             oSessionActive  = 1;
-            algo = (AlgoInterface_t *) PpsoPnoInterface();
+            algo = (AlgoInterface_t *) PpsoPnoInterface(PPSOC);
+            algo->Init(algo->ctx, algoArray);
+            while(oAcqOngoing);
+//            Adc.DisableInterrupts();
+            AD1CON1bits.ON = 0;
+            oAdcReady = 0;
+            nSamples = 0;
+            Adc.Read();
+            INTClearFlag(INT_AD1);    // Clear the ADC conversion done interrupt Flag
+            AD1CON1bits.ON = 1;
+//            Adc.EnableInterrupts();
+            break;
+            
+          case ALGO_PPSOCD:
+            oAlgoIsPso      = 0;
+            oAlgoIsPpsoPno  = 1;
+            oDbgAdc         = 0;
+            oSessionActive  = 1;
+            algo = (AlgoInterface_t *) PpsoPnoInterface(PPSOCD);
             algo->Init(algo->ctx, algoArray);
             while(oAcqOngoing);
 //            Adc.DisableInterrupts();

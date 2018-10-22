@@ -43,6 +43,7 @@ typedef struct
   PsoSwarmInterface_t *paraSwarms[N_UNITS_TOTAL];
   ClassifierInterface_t *classifier;
   ProtocolPpsoPnoDataPayload_t classifierGroups;
+  PpsocType_t type;
 } PpsoPno_t;
 
 //#define SEND_DEBUG_DATA_TO_UART
@@ -61,6 +62,7 @@ typedef enum
 
 INT8  _PpsoPno_Init               (PpsoPno_t *pso, UnitArrayInterface_t *unitArray);
 INT8  _PpsoPno_Run                (PpsoPno_t *pso);
+INT8  _PpsodPno_Run               (PpsoPno_t *pso);
 float _PpsoPno_GetTimeElapsed     (PpsoPno_t *pso);
 void  _PpsoPno_Release            (PpsoPno_t *pso);
 void  _PpsoPno_GetDebugData       (PpsoPno_t *pso, ProtocolPpsoPnoDataPayload_t *ret);
@@ -100,6 +102,26 @@ PpsoPno_t _ppsoPno =
  ,.swarmParam       = {NULL}
  ,.pnoParam         = {NULL}
  ,.classifierGroups = {0, 0, {0}, {0}}
+ ,.type             = PPSOC
+};
+
+PpsoPno_t _ppsodPno = 
+{
+  .unitArray        = NULL
+ ,.sampleTime       = SAMPLING_TIME_FLOAT
+ ,.timeElapsed      = 0
+ ,.iteration        = 0
+ ,.nParaSwarms      = 0
+ ,.nSeqSwarms       = 0
+ ,.nPnos            = 0
+ ,.paraSwarms       = {NULL}
+ ,.seqSwarms        = {NULL}
+ ,.pnos             = {NULL}
+ ,.classifier       = NULL
+ ,.swarmParam       = {NULL}
+ ,.pnoParam         = {NULL}
+ ,.classifierGroups = {0, 0, {0}, {0}}
+ ,.type             = PPSOCD
 };
 
 const AlgoInterface_t _ppsoPno_if =
@@ -107,6 +129,16 @@ const AlgoInterface_t _ppsoPno_if =
   .ctx            = (void *)                  &_ppsoPno
  ,.Init           = (AlgoInit_fct)            &_PpsoPno_Init
  ,.Run            = (AlgoRun_fct)             &_PpsoPno_Run
+ ,.GetTimeElapsed = (AlgoGetTimeElapsed_fct)  &_PpsoPno_GetTimeElapsed
+ ,.Release        = (AlgoRelease_fct)         &_PpsoPno_Release
+ ,.GetDebugData   = (AlgoGetDebugData_fct)    &_PpsoPno_GetDebugData
+};
+
+const AlgoInterface_t _ppsocPno_if =
+{
+  .ctx            = (void *)                  &_ppsodPno
+ ,.Init           = (AlgoInit_fct)            &_PpsoPno_Init
+ ,.Run            = (AlgoRun_fct)             &_PpsodPno_Run
  ,.GetTimeElapsed = (AlgoGetTimeElapsed_fct)  &_PpsoPno_GetTimeElapsed
  ,.Release        = (AlgoRelease_fct)         &_PpsoPno_Release
  ,.GetDebugData   = (AlgoGetDebugData_fct)    &_PpsoPno_GetDebugData
@@ -200,7 +232,7 @@ INT8 _PpsoPno_Init (PpsoPno_t *pso, UnitArrayInterface_t *unitArray)
    ,.currentParticle        = 0
   };
   
-  const PnoSwarmParam_t _pnoParam = 
+  PnoSwarmParam_t _pnoParam = 
   {    
 //    .delta_int      = 5
 //   ,.delta          = 5 * POT_STEP_VALUE
@@ -225,7 +257,13 @@ INT8 _PpsoPno_Init (PpsoPno_t *pso, UnitArrayInterface_t *unitArray)
    ,.nSamplesForSs  = 12
    ,.oscAmp         = 2
    ,.perturbOsc     = 0.05
+   ,.type           = PNO_SWARM_OEPPC
   };
+  
+  if (pso->type == PPSOCD)
+  {
+    _pnoParam.type = PNO_SWARM_OEPPCD;
+  }
   
   memcpy(&pso->swarmParam, &_swarmParam, sizeof(PsoSwarmParam_t));
   memcpy(&pso->pnoParam  , &_pnoParam  , sizeof(PnoSwarmParam_t));
@@ -253,6 +291,641 @@ INT8 _PpsoPno_Init (PpsoPno_t *pso, UnitArrayInterface_t *unitArray)
 
 
 INT8 _PpsoPno_Run (PpsoPno_t *pso)
+{
+  // <editor-fold defaultstate="collapsed" desc="Init">
+  UnitArrayInterface_t *array = pso->unitArray;
+  PsoSwarmInterface_t *swarm;
+  PnoSwarmInterface_t *pno;
+  UINT8  i = 0
+        ,j
+        ,nUnits = array->GetNUnits(array->ctx)
+        ,nParticles
+        ,iUnit
+        ,curParticle
+        ;
+  BOOL oInSteadyState;
+  UINT8 idxPerturbed[N_UNITS_TOTAL];
+  float nextPositions[N_UNITS_TOTAL];
+  UINT32 nPerturbed;
+  UINT32 iAlgo = 0;
+  UINT8 nIdxToRemove;
+  UINT8 idxToRemove[N_UNITS_TOTAL];
+  UINT8 allIdxPerturbed[N_UNITS_TOTAL][N_UNITS_TOTAL] = {0};
+  UINT8 allIdxPerturbedSize[N_UNITS_TOTAL] = {0};
+  UINT8 allIdxToRemove[N_UNITS_TOTAL][N_UNITS_TOTAL] = {0};
+  UINT8 allIdxToRemoveSize[N_UNITS_TOTAL] = {0};
+  
+  pso->classifierGroups.nGroups = 0;
+  
+#ifdef SEND_DEBUG_DATA_TO_UART
+  _SendAlgoStatus(pso);
+  _SendUnitsPos(pso);
+#endif
+  
+  // </editor-fold>
+  
+  // <editor-fold defaultstate="collapsed" desc="Update algo values and classifier">
+  pso->iteration++;
+  pso->timeElapsed += pso->sampleTime;
+  
+  pso->classifier->UpdateValues(pso->classifier->ctx);
+  // </editor-fold>
+  
+  // <editor-fold defaultstate="collapsed" desc="Parallel PSO">
+  // Parallel PSO
+  //----------------------------------------------------------------------------
+  for (i = 0; i < pso->nParaSwarms; i++)
+  {
+    swarm = pso->paraSwarms[i];
+    __assert(swarm, "_PpsoPno_Run swarm = pso->paraSwarms[i];");
+    
+    swarm->IterationInc(swarm->ctx);
+    
+    nParticles = swarm->GetNParticles(swarm->ctx);
+    
+    // Update the fitness of the particles
+    //--------------------------------------
+    swarm->UpdateParticlesFitness(swarm->ctx);
+    //--------------------------------------
+    
+    // Compute pbest and gbest
+    //--------------------------------------
+    swarm->ComputeAllPbest(swarm->ctx);
+    swarm->ComputeGbest   (swarm->ctx);
+    //--------------------------------------
+        
+    // Check for perturbations
+    //-----------------------------------
+    nPerturbed = swarm->CheckForPerturb(swarm->ctx, idxPerturbed);
+    //-----------------------------------
+
+    // Check for steady state of the particles
+    //-----------------------------------
+    swarm->EvalSteadyState(swarm->ctx);
+    //-----------------------------------
+        
+    // Compute next positions
+    //-----------------------------------
+    nIdxToRemove = swarm->ComputeNextPos(swarm->ctx, nextPositions, idxToRemove);
+    //-----------------------------------
+    
+    // Particles that haven't found their optimum
+    //-----------------------------------
+    if (nIdxToRemove)
+    {
+#ifdef SEND_DEBUG_DATA_TO_UART
+  _SendUnitsToRemove(pso, i, idxToRemove, nIdxToRemove);
+#endif
+      memcpy(&allIdxToRemove[iAlgo][0], idxToRemove, nIdxToRemove);
+      allIdxToRemoveSize[iAlgo] = nIdxToRemove;
+    }
+    else
+    {
+      allIdxToRemoveSize[iAlgo] = 0;
+    }
+    //-----------------------------------
+    
+    // Particles perturbed
+    //-----------------------------------
+    if (nPerturbed)
+    {
+#ifdef SEND_DEBUG_DATA_TO_UART
+  _SendSwarmPerturbedUnits(pso, DBG_PARA_SWARM, i, idxPerturbed, nPerturbed);
+#endif
+      memcpy(&allIdxPerturbed[iAlgo][0], idxPerturbed, nPerturbed);
+      allIdxPerturbedSize[iAlgo] = nPerturbed;
+    }
+    else
+    {
+      allIdxPerturbedSize[iAlgo] = 0;
+    }
+    //-----------------------------------
+    
+    array = swarm->GetUnitArray(swarm->ctx);
+    __assert(array, "_PpsoPno_Run array = swarm->GetUnitArray(swarm->ctx);");
+    nUnits = array->GetNUnits(array->ctx);
+    
+    for (iUnit = 0; iUnit < nUnits; iUnit++)
+    {
+      array->SetPos(array->ctx, iUnit, nextPositions[iUnit]);
+    }
+    
+    iAlgo++;
+  }
+  //----------------------------------------------------------------------------
+  // </editor-fold>
+  
+  // <editor-fold defaultstate="collapsed" desc="P&O">
+  // P&O
+  //----------------------------------------------------------------------------
+  for (i = 0; i < pso->nPnos; i++)
+  {
+    pno = pso->pnos[i];
+    __assert(pno, "_PpsoPno_Run pno = pso->pnos[i];");
+    
+    pno->IncIteration(pno->ctx);
+    
+    nPerturbed = pno->ComputeAllPos(pno->ctx, nextPositions, idxPerturbed);
+    
+    nUnits = pno->GetNInstances(pno->ctx);
+    
+    array = pno->GetArray(pno->ctx);
+    __assert(array, "_PpsoPno_Run array = pno->GetArray(pno->ctx);");
+    
+    for (iUnit = 0; iUnit < nUnits; iUnit++)
+    {
+//      if (pno->GetSteadyState(pno->ctx, iUnit))
+//      {
+//        nextPositions[iUnit] = pno->GetBestPos(pno->ctx, iUnit);
+////        nextPositions[iUnit] = pso->classifier->GetBestPos(pso->classifier->ctx, array->GetUnitId(array->ctx, iUnit));
+//        pno->SetPos(pno->ctx, iUnit, nextPositions[iUnit]);
+//      }
+      
+      array->SetPos(array->ctx, iUnit, nextPositions[iUnit]);
+    }
+    
+    if (nPerturbed)
+    {
+#ifdef SEND_DEBUG_DATA_TO_UART
+  _SendSwarmPerturbedUnits(pso, DBG_PNO, i, idxPerturbed, nPerturbed);
+#endif
+      memcpy(&allIdxPerturbed[iAlgo][0], idxPerturbed, nPerturbed);
+      allIdxPerturbedSize[iAlgo] = nPerturbed;
+    }
+    iAlgo++;
+  }
+  //----------------------------------------------------------------------------
+  // </editor-fold>
+  
+  // <editor-fold defaultstate="collapsed" desc="Sequential PSO">
+  // Sequential PSO
+  //----------------------------------------------------------------------------
+  for (i = 0; i < pso->nSeqSwarms; i++)
+  {
+    swarm = pso->seqSwarms[i];
+    __assert(swarm, "_PpsoPno_Run swarm = pso->seqSwarms[i];");
+    nParticles = swarm->GetNParticles(swarm->ctx);
+    array = swarm->GetUnitArray(swarm->ctx);
+    __assert(array, "_PpsoPno_Run array = swarm->GetUnitArray(swarm->ctx);");
+    
+    curParticle = swarm->GetCurParticle(swarm->ctx);
+    swarm->SetParticleFitness(swarm->ctx, curParticle, array->GetPower(array->ctx, 0));
+
+    if (curParticle == (nParticles - 1))  // Ready for a real iteration
+    {
+      swarm->IterationInc(swarm->ctx);
+
+      // Compute Pbest and Gbest
+      //-----------------------------------
+      swarm->ComputeAllPbest(swarm->ctx);
+      swarm->ComputeGbest   (swarm->ctx);
+      //-----------------------------------
+
+      // Check for perturbations
+      //-----------------------------------
+      nPerturbed = swarm->CheckForPerturb(swarm->ctx, idxPerturbed);
+      //-----------------------------------
+
+      // Check for steady state of the particles and the swarm
+      //-----------------------------------
+      oInSteadyState = swarm->EvalSteadyState(swarm->ctx);
+      //-----------------------------------
+
+      // Compute next positions
+      //-----------------------------------
+      swarm->ComputeNextPos(swarm->ctx, nextPositions, 0);
+      //-----------------------------------
+      
+      // Assess perturbations
+      //-----------------------------------
+      if (nPerturbed)
+      {
+#ifdef SEND_DEBUG_DATA_TO_UART
+  _SendSwarmPerturbedUnits(pso, DBG_SEQ_SWARM, i, idxPerturbed, nPerturbed);
+#endif
+        memcpy(&allIdxPerturbed[iAlgo][0], idxPerturbed, nPerturbed);
+        allIdxPerturbedSize[iAlgo] = nPerturbed;
+      }
+      //-----------------------------------
+      
+      // Assess steady state
+      //-----------------------------------
+      if (oInSteadyState)
+      {
+        nParticles = swarm->GetNParticles(swarm->ctx);
+        for (iUnit = 0; iUnit < nParticles; iUnit++)
+        {
+          swarm->SetParticlePos(swarm->ctx, iUnit, pso->classifier->GetBestPos(pso->classifier->ctx, array->GetUnitId(array->ctx, 0)));
+        }
+        for (j = 0; j < pso->swarmParam.nSamplesForSteadyState; j++)
+        {
+          swarm->EvalSteadyState(swarm->ctx);
+        }
+      }
+      //-----------------------------------
+    }
+
+    swarm->IncCurrentParticle(swarm->ctx);
+    curParticle = swarm->GetCurParticle(swarm->ctx);
+
+    nextPositions[0] = swarm->GetParticlePos(swarm->ctx, curParticle);
+    array->SetPos(array->ctx, 0, nextPositions[0]);
+    
+    iAlgo++;
+  }
+  //----------------------------------------------------------------------------
+  // </editor-fold>
+  
+  // <editor-fold defaultstate="collapsed" desc="Classifier">
+  // Classifier
+  //----------------------------------------------------------------------------
+  UINT8 algoIdxPerturbed[N_UNITS_TOTAL] = {0};
+  UINT8 algoIdxPerturbedSize = 0;
+  UINT8 tmp, idx;
+  UINT8 unitId;
+  iAlgo = 0;
+  nPerturbed = 0;
+  
+  // <editor-fold defaultstate="collapsed" desc="Set the correct algo indexes">
+  // Set the correct algo indexes
+  //-----------------------------------
+  if (pso->nPnos)
+  {
+    tmp = pso->nParaSwarms + pso->nPnos;
+    for (i = pso->nParaSwarms; i < tmp; i++)
+    {
+      algoIdxPerturbed[algoIdxPerturbedSize++] = i;
+    }
+  }
+  if (pso->nSeqSwarms)
+  {
+    tmp = pso->nParaSwarms + pso->nPnos + pso->nSeqSwarms;
+    for (i = pso->nParaSwarms + pso->nPnos; i < tmp; i++)
+    {
+      algoIdxPerturbed[algoIdxPerturbedSize++] = i;
+    }
+  }
+  if (pso->nParaSwarms)
+  {
+    tmp = pso->nParaSwarms;
+    for (i = 0; i < tmp; i++)
+    {
+      algoIdxPerturbed[algoIdxPerturbedSize++] = i;
+    }
+  }
+  //-----------------------------------
+  // </editor-fold>
+  
+  
+  // <editor-fold defaultstate="collapsed" desc="Assess perturbed P&O instances">
+  // Assess perturbed P&O instances
+  //-----------------------------------
+  for (i = 0; i < pso->nPnos; i++)
+  {
+    idx = algoIdxPerturbed[iAlgo++];
+    pno = pso->pnos[i];
+    __assert(pno, "_PpsoPno_Run pno = pso->pnos[i];");
+    if (allIdxPerturbedSize[idx])
+    {
+      array = pno->GetArray(pno->ctx);
+      __assert(array, "_PpsoPno_Run array = pno->GetArray(pno->ctx);");
+      for (iUnit = 0; iUnit < allIdxPerturbedSize[idx]; iUnit++)
+      {
+        idxPerturbed[nPerturbed++] = array->GetUnitId(array->ctx, allIdxPerturbed[idx][iUnit]);
+      }
+      
+      if (allIdxPerturbedSize[idx] == pno->GetNInstances(pno->ctx))
+      {
+        pno->Release(pno->ctx);
+        _PpsoPno_ShiftPnosLeft(pso, i);
+        i--;
+        pso->nPnos--;
+        array->Release(array->ctx);
+      }
+      else
+      {
+        qsort( (void *) &allIdxPerturbed[idx][0], (size_t) allIdxPerturbedSize[idx], sizeof(UINT8), &_CompareFunc);
+        pno->RemoveInstances(pno->ctx, &allIdxPerturbed[idx][0], allIdxPerturbedSize[idx]);
+        
+        for (iUnit = 0; iUnit < allIdxPerturbedSize[idx]; iUnit++)
+        {
+          array->RemoveUnitFromArray(array->ctx, allIdxPerturbed[idx][iUnit]);
+        }
+      }
+    }
+  }
+  if (pso->nPnos)
+  {
+    for (i = 0; i < pso->nPnos; i++)
+    {
+      pso->pnos[i]->SetId(pso->pnos[i]->ctx, i);
+    }
+  }
+  //-----------------------------------
+  // </editor-fold>
+  
+ 
+  // <editor-fold defaultstate="collapsed" desc="Assess perturbed Sequential PSO">
+  // Assess perturbed Sequential PSO
+  //-----------------------------------
+  for (i = 0; i < pso->nSeqSwarms; i++)
+  {
+    idx = algoIdxPerturbed[iAlgo++];
+    swarm = pso->seqSwarms[i];
+    __assert(swarm, "_PpsoPno_Run swarm = pso->seqSwarms[i];");
+    if (allIdxPerturbedSize[idx])
+    {
+      array = swarm->GetUnitArray(swarm->ctx);
+      __assert(array, "_PpsoPno_Run array = swarm->GetUnitArray(swarm->ctx);");
+      idxPerturbed[nPerturbed++] = array->GetUnitId(array->ctx, 0);
+      
+      swarm->Release(swarm->ctx);
+      _PpsoPno_ShiftSeqSwarmsLeft(pso, i);
+      i--;
+      pso->nSeqSwarms--;
+      array->Release(array->ctx);
+    }
+  }
+  if (pso->nSeqSwarms)
+  {
+    for (i = 0; i < pso->nSeqSwarms; i++)
+    {
+      pso->seqSwarms[i]->SetId(pso->seqSwarms[i]->ctx, i);
+    }
+  }
+  //-----------------------------------
+  // </editor-fold>
+  
+  
+  // <editor-fold defaultstate="collapsed" desc="Assess perturbed Parallel PSO">
+  // Assess perturbed Parallel PSO
+  //-----------------------------------
+  void *units[N_UNITS_TOTAL];
+  UnitArrayInterface_t *newArray;
+  UINT8 tmpUnitsToRemove[N_UNITS_TOTAL], nUnitsToRemove = 0;
+  for (i = 0; i < pso->nParaSwarms; i++)
+  {
+    swarm = pso->paraSwarms[i];
+    __assert(swarm, "_PpsoPno_Run swarm = pso->paraSwarms[i];");
+    array = swarm->GetUnitArray(swarm->ctx);
+    __assert(array, "_PpsoPno_Run array = swarm->GetUnitArray(swarm->ctx);");
+    
+    idx = algoIdxPerturbed[iAlgo++];
+    
+    if (allIdxToRemoveSize[idx])
+    {
+      qsort( (void *) &allIdxToRemove[idx][0], (size_t) allIdxToRemoveSize[idx], sizeof(UINT8), &_CompareFunc);
+      for (iUnit = 0; iUnit < allIdxToRemoveSize[idx]; iUnit++)
+      {
+        nextPositions[iUnit] = swarm->GetParticlePos(swarm->ctx, allIdxToRemove[idx][iUnit]);
+        units[iUnit] = array->GetUnitHandle(array->ctx, allIdxToRemove[idx][iUnit]);
+        unitId = array->GetUnitId(array->ctx, allIdxToRemove[idx][iUnit]);
+        pso->classifier->ResetValues(pso->classifier->ctx, &unitId, 1);
+      }
+      
+      newArray = (UnitArrayInterface_t *) UnitArrayInterface();
+      __assert(newArray, "_PpsoPno_Run newArray = (UnitArrayInterface_t *) UnitArrayInterface(); 1");
+      
+      for (iUnit = 0; iUnit < allIdxToRemoveSize[idx]; iUnit++)
+      {
+        newArray->AddUnitToArray(newArray->ctx, units[iUnit]);
+      }
+      
+      pso->pnos[pso->nPnos] = (PnoSwarmInterface_t *) PnoSwarmInterface();
+      __assert(pso->pnos[pso->nPnos], "_PpsoPno_Run pso->pnos[pso->nPnos] = (PnoSwarmInterface_t *) PnoSwarmInterface();");
+      pno = pso->pnos[pso->nPnos];
+      pno->Init(pno->ctx, newArray, &pso->pnoParam, pso->nPnos++);
+      nUnits = pno->GetNInstances(pno->ctx);
+      for (iUnit = 0; iUnit < nUnits; iUnit++)
+      {
+        pno->SetPos(pno->ctx, iUnit, nextPositions[iUnit]);
+        newArray->SetPos(newArray->ctx, iUnit, nextPositions[iUnit]);
+        unitId = newArray->GetUnitId(newArray->ctx, iUnit);
+        pso->classifier->ResetValues(pso->classifier->ctx, &unitId, 1);
+      }
+    }
+    
+    if (allIdxPerturbedSize[idx])
+    {
+      for (iUnit = 0; iUnit < allIdxPerturbedSize[idx]; iUnit++)
+      {
+        idxPerturbed[nPerturbed++] = array->GetUnitId(array->ctx, allIdxPerturbed[idx][iUnit]);
+      }
+      
+      if (allIdxToRemoveSize[idx])
+      {
+        memcpy(&allIdxPerturbed[idx][allIdxPerturbedSize[idx]], &allIdxToRemove[idx][0], allIdxToRemoveSize[idx]);
+        allIdxPerturbedSize[idx] += allIdxToRemoveSize[idx];
+      }
+      
+      nUnits = swarm->GetNParticles(swarm->ctx);
+      if (allIdxPerturbedSize[idx] == nUnits)
+      {
+        swarm->Release(swarm->ctx);
+        array->Release(array->ctx);
+        _PpsoPno_ShiftParaSwarmsLeft(pso, i);
+        pso->nParaSwarms--;
+        i--;
+      }
+      else if ((nUnits - allIdxPerturbedSize[idx]) < pso->swarmParam.minParticles)
+      {
+        qsort( (void *) &allIdxPerturbed[idx][0], (size_t) allIdxPerturbedSize[idx], sizeof(UINT8), &_CompareFunc);
+        swarm->RemoveParticles(swarm->ctx, &allIdxPerturbed[idx][0], allIdxPerturbedSize[idx]);
+        for (iUnit = 0; iUnit < allIdxPerturbedSize[idx]; iUnit++)
+        {
+          array->RemoveUnitFromArray(array->ctx, allIdxPerturbed[idx][iUnit]);
+        }
+        nUnits = swarm->GetNParticles(swarm->ctx);
+        newArray = (UnitArrayInterface_t *) UnitArrayInterface();
+      __assert(newArray, "_PpsoPno_Run newArray = (UnitArrayInterface_t *) UnitArrayInterface(); 2");
+        for (iUnit = 0; iUnit < nUnits; iUnit++)
+        {
+          nextPositions[iUnit] = swarm->GetParticlePos(swarm->ctx, iUnit);
+          units[iUnit] = array->GetUnitHandle(array->ctx, iUnit);
+          unitId = array->GetUnitId(array->ctx, iUnit);
+          pso->classifier->ResetValues(pso->classifier->ctx, &unitId, 1);
+          newArray->AddUnitToArray(newArray->ctx, units[iUnit]);
+        }
+        swarm->Release(swarm->ctx);
+        array->Release(array->ctx);
+        pso->nParaSwarms--;
+        i--;
+        pso->pnos[pso->nPnos] = (PnoSwarmInterface_t *) PnoSwarmInterface();
+      __assert(pso->pnos[pso->nPnos], "_PpsoPno_Run pso->pnos[pso->nPnos] = (PnoSwarmInterface_t *) PnoSwarmInterface();");
+        pno = pso->pnos[pso->nPnos];
+        pno->Init(pno->ctx, newArray, &pso->pnoParam, pso->nPnos++);
+        for (iUnit = 0; iUnit < nUnits; iUnit++)
+        {
+          unitId = newArray->GetUnitId(newArray->ctx, iUnit);
+          pno->SetPos(pno->ctx, iUnit, pso->classifier->GetBestPos(pso->classifier->ctx, unitId));
+          pso->classifier->ResetValues(pso->classifier->ctx, &unitId, 1);
+//          pno->SetPos(pno->ctx, iUnit, nextPositions[iUnit]);
+        }
+      }
+      else
+      {
+        qsort( (void *) &allIdxPerturbed[idx][0], (size_t) allIdxPerturbedSize[idx], sizeof(UINT8), &_CompareFunc);
+        swarm->RemoveParticles(swarm->ctx, &allIdxPerturbed[idx][0], allIdxPerturbedSize[idx]);
+        for (iUnit = 0; iUnit < allIdxPerturbedSize[idx]; iUnit++)
+        {
+          array->RemoveUnitFromArray(array->ctx, allIdxPerturbed[idx][iUnit]);
+        }
+      }
+    }
+    else if (allIdxToRemoveSize[idx])
+    {
+      nUnits = swarm->GetNParticles(swarm->ctx);
+      
+      if (allIdxToRemoveSize[idx] == nUnits)
+      {
+        swarm->Release(swarm->ctx);
+        array->Release(array->ctx);
+        _PpsoPno_ShiftParaSwarmsLeft(pso, i);
+        pso->nParaSwarms--;
+        i--;
+      }
+      else if ((nUnits - allIdxToRemoveSize[idx]) < pso->swarmParam.minParticles)
+      {
+        swarm->RemoveParticles(swarm->ctx, &allIdxToRemove[idx][0], allIdxToRemoveSize[idx]);
+        for (iUnit = 0; iUnit < allIdxToRemoveSize[idx]; iUnit++)
+        {
+          array->RemoveUnitFromArray(array->ctx, allIdxToRemove[idx][iUnit]);
+        }
+        nUnits = swarm->GetNParticles(swarm->ctx);
+        newArray = (UnitArrayInterface_t *) UnitArrayInterface();
+        __assert(newArray, "_PpsoPno_Run newArray = (UnitArrayInterface_t *) UnitArrayInterface(); 3");
+        for (iUnit = 0; iUnit < nUnits; iUnit++)
+        {
+          nextPositions[iUnit] = swarm->GetParticlePos(swarm->ctx, iUnit);
+          units[iUnit] = array->GetUnitHandle(array->ctx, iUnit);
+          unitId = array->GetUnitId(array->ctx, iUnit);
+          pso->classifier->ResetValues(pso->classifier->ctx, &unitId, 1);
+          newArray->AddUnitToArray(newArray->ctx, units[iUnit]);
+        }
+        swarm->Release(swarm->ctx);
+        array->Release(array->ctx);
+        _PpsoPno_ShiftParaSwarmsLeft(pso, i);
+        pso->nParaSwarms--;
+        i--;
+        pso->pnos[pso->nPnos] = (PnoSwarmInterface_t *) PnoSwarmInterface();
+        __assert(pso->pnos[pso->nPnos], "_PpsoPno_Run pso->pnos[pso->nPnos] = (PnoSwarmInterface_t *) PnoSwarmInterface();");
+        pno = pso->pnos[pso->nPnos];
+        pno->Init(pno->ctx, newArray, &pso->pnoParam, pso->nPnos++);
+        for (iUnit = 0; iUnit < nUnits; iUnit++)
+        {
+          unitId = newArray->GetUnitId(newArray->ctx, iUnit);
+          pno->SetPos(pno->ctx, iUnit, pso->classifier->GetBestPos(pso->classifier->ctx, unitId));
+          pso->classifier->ResetValues(pso->classifier->ctx, &unitId, 1);
+//          pno->SetPos(pno->ctx, iUnit, nextPositions[iUnit]);
+        }
+      }
+      else
+      {
+        swarm->RemoveParticles(swarm->ctx, &allIdxToRemove[idx][0], allIdxToRemoveSize[idx]);
+        for (iUnit = 0; iUnit < allIdxToRemoveSize[idx]; iUnit++)
+        {
+          array->RemoveUnitFromArray(array->ctx, allIdxToRemove[idx][iUnit]);
+        }
+      }
+    }
+  }
+  if (pso->nParaSwarms)
+  {
+    for (i = 0; i < pso->nParaSwarms; i++)
+    {
+      pso->paraSwarms[i]->SetId(pso->paraSwarms[i]->ctx, i);
+    }
+  }
+  //-----------------------------------
+  // </editor-fold>
+  
+  
+  // <editor-fold defaultstate="collapsed" desc="Reposition perturbed units">
+  // Reposition perturbed units
+  //-----------------------------------
+  UINT8 groups[N_UNITS_TOTAL];
+  UINT8 nGroups, iGroup;
+  UINT8 lengths[N_UNITS_TOTAL];
+  UINT32 offset = 0;
+  
+  if (nPerturbed)
+  {
+#ifdef SEND_DEBUG_DATA_TO_UART
+  _SendPerturbedUnits(pso, idxPerturbed, nPerturbed);
+#endif
+    nGroups = pso->classifier->Classify(pso->classifier->ctx, idxPerturbed, nPerturbed, groups, lengths);
+    if (nGroups)
+    {
+      pso->classifierGroups.iteration = pso->iteration;
+      pso->classifierGroups.nGroups = nGroups;
+      memcpy(pso->classifierGroups.groups, groups, N_UNITS_TOTAL);
+      memcpy(pso->classifierGroups.groupLengths, lengths, N_UNITS_TOTAL);
+#ifdef SEND_DEBUG_DATA_TO_UART
+  _SendClassifierResults(pso);
+#endif
+    }
+    pso->classifier->ResetValues(pso->classifier->ctx, idxPerturbed, nPerturbed);
+    array = pso->unitArray;
+    
+    for (iGroup = 0; iGroup < nGroups; iGroup++)
+    {
+      if (lengths[iGroup] < pso->swarmParam.minParticles)   // P&O
+      {
+        newArray = array->CreateSubArray(array->ctx, &groups[offset], lengths[iGroup]);
+        pso->pnos[pso->nPnos] = (PnoSwarmInterface_t *) PnoSwarmInterface();
+        pno = pso->pnos[pso->nPnos];
+        pno->Init(pno->ctx, newArray, &pso->pnoParam, pso->nPnos++);
+        for (iUnit = 0; iUnit < lengths[iGroup]; iUnit++)
+        {
+          pno->SetPos(pno->ctx, iUnit, newArray->GetPos(newArray->ctx, iUnit));
+        }
+        offset += lengths[iGroup];
+      }
+//      if (lengths[iGroup] < pso->swarmParam.minParticles)   // Sequential PSO
+//      {
+//        for (iUnit = 0; iUnit < lengths[iGroup]; iUnit++)
+//        {
+//          newArray = array->CreateSubArray(array->ctx, &groups[offset + iUnit], 1);
+//          __assert(newArray, "_PpsoPno_Run newArray = array->CreateSubArray(array->ctx, &groups[offset + iUnit], 1);");
+//          pso->seqSwarms[pso->nSeqSwarms] = (PsoSwarmInterface_t *) PsoSwarmInterface();
+//          __assert(pso->seqSwarms[pso->nSeqSwarms], "_PpsoPno_Run pso->seqSwarms[pso->nSeqSwarms] = (PsoSwarmInterface_t *) PsoSwarmInterface();");
+//          swarm = pso->seqSwarms[pso->nSeqSwarms];
+//          pso->swarmParam.type = PSO_SWARM_TYPE_PSO_1D;
+//          swarm->Init(swarm->ctx, newArray, &pso->swarmParam, pso->nSeqSwarms++);
+//          swarm->RandomizeAllParticles(swarm->ctx);
+//          newArray->SetPos(newArray->ctx, 0, swarm->GetParticlePos(swarm->ctx, 0));
+//        }
+//        offset += lengths[iGroup];
+//      }
+      else  // Parallel PSO
+      {
+        newArray = array->CreateSubArray(array->ctx, &groups[offset], lengths[iGroup]);
+        __assert(newArray, "_PpsoPno_Run newArray = array->CreateSubArray(array->ctx, &groups[offset], lengths[iGroup]);");
+        pso->paraSwarms[pso->nParaSwarms] = (PsoSwarmInterface_t *) PsoSwarmInterface();
+        __assert(pso->paraSwarms[pso->nParaSwarms], "_PpsoPno_Run pso->paraSwarms[pso->nParaSwarms] = (PsoSwarmInterface_t *) PsoSwarmInterface();");
+        swarm = pso->paraSwarms[pso->nParaSwarms];
+        pso->swarmParam.type = PSO_SWARM_TYPE_PARALLEL_PSO_MULTI_SWARM;
+        swarm->Init(swarm->ctx, newArray, &pso->swarmParam, pso->nParaSwarms++);
+        swarm->RandomizeAllParticles(swarm->ctx);
+        for (iUnit = 0; iUnit < lengths[iGroup]; iUnit++)
+        {
+          newArray->SetPos(newArray->ctx, iUnit, swarm->GetParticlePos(swarm->ctx, iUnit));
+        }
+        offset += lengths[iGroup];
+      }
+    }
+  }
+  //-----------------------------------
+  // </editor-fold>
+  
+  //----------------------------------------------------------------------------
+  // </editor-fold>
+
+  return 0;
+}
+
+
+INT8 _PpsodPno_Run (PpsoPno_t *pso)
 {
   // <editor-fold defaultstate="collapsed" desc="Init">
   UnitArrayInterface_t *array = pso->unitArray;
@@ -1430,7 +2103,17 @@ void _SendUnitsToRemove (PpsoPno_t *pso, UINT8 swarmId, UINT8 *units, UINT8 nUni
 // Public functions
 //==============================================================================
 
-const AlgoInterface_t * PpsoPnoInterface()
+const AlgoInterface_t * PpsoPnoInterface(PpsocType_t type)
 {
-  return &_ppsoPno_if;
+  switch (type)
+  {
+    case PPSOC:
+      return &_ppsoPno_if;
+      
+    case PPSOCD:
+      return &_ppsocPno_if;
+      
+    default:
+      return 0;
+  }
 }

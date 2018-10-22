@@ -28,10 +28,15 @@
 // Public definitions
 //==============================================================================
 
+typedef enum
+{
+  PPSOC
+ ,PPSOCD
+} PpsocType_t;
 
 // Public functions
 //==============================================================================
-const AlgoInterface_t * PpsoPnoInterface (void);
+const AlgoInterface_t * PpsoPnoInterface (PpsocType_t type);
 
 
 

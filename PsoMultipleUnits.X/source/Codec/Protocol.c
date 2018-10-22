@@ -24,7 +24,7 @@
 
 const size_t sizeOfNewRngSeedPayload        = 16;
 
-const size_t sizeOfSetPerturbPayloadBase    = 7;
+const size_t sizeOfSetPerturbPayloadBase    = 11;
 
 const size_t sizeOfInitPerturbPayloadBase   = 2;
 
